@@ -43,6 +43,7 @@ To participate, you must be:
 ### Task Expectations
 - API Design Best Practices
 - Documentation of any assumptions or choices made and why
+- Links as citation to any article / code referred to or used
 - Unit tests covering the core calories logic
 - Appropriate exception handling and error messages
 - Code Quality - remove any unnecessary code, avoid large functions
