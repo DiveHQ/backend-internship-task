@@ -1,4 +1,4 @@
-## Dive 
+## ![Dive logo](https://user-images.githubusercontent.com/424487/219708981-f0416526-ba48-4b01-b5b3-c0eb73362718.png) Dive 
 <!-- ![Company Logo](https://example.org) -->
 
 ### Company information
