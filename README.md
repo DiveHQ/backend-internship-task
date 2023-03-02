@@ -50,10 +50,10 @@ To participate, you must be:
 - Good commit history - we won’t accept a repo with a single giant commit 🙅‍♀️
 
 ### Task submission
-1. Use GitHub Classroom to make submissions.
-1. Open a Pull Request for review.
-1. Use GitHub Discussions to ask any relevant questions regarding the project.
-1. Final submission Checklist:
+1. Making changes on the auto generated `feedback` branch to complete the task
+2. Using the auto generated **Feedback Pull Request** for review and submission
+3. Using GitHub Discussions to ask any relevant questions regarding the project
+4. Final submission Checklist:
 - [ ] SUBMISSION.md in the repository / PR, with:
   - [ ] commands to set up the repo (dependencies etc.)
   - [ ] commands to run the test suite
