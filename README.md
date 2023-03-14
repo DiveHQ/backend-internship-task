@@ -1,13 +1,14 @@
 ## ![Dive logo](https://user-images.githubusercontent.com/424487/219708981-f0416526-ba48-4b01-b5b3-c0eb73362718.png) Dive 
 <!-- ![Company Logo](https://example.org) -->
 
-## Assignment
-
 | Octernship info  | Timelines and Stipend |
 | ------------- | ------------- |
 | Assignment Deadline  | 3rd April 2023  |
 | Octernship Duration  | 1st May 2023 - 30th July 2023 |
 | Monthly Stipend  | $500 USD  |
+
+## Assignment
+
 
 # Write a REST API for the input of calories in Python
 
