@@ -3,6 +3,12 @@
 
 ## Assignment
 
+| Octernship info  | Timelines and Stipend |
+| ------------- | ------------- |
+| Assignment Deadline  | 3rd April 2023  |
+| Octernship Duration  | 1st May 2023 - 30th July 2023 |
+| Monthly Stipend  | $500 USD  |
+
 # Write a REST API for the input of calories in Python
 
 ### Task Instructions
