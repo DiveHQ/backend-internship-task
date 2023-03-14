@@ -1,27 +1,6 @@
 ## ![Dive logo](https://user-images.githubusercontent.com/424487/219708981-f0416526-ba48-4b01-b5b3-c0eb73362718.png) Dive 
 <!-- ![Company Logo](https://example.org) -->
 
-### Company information
-
-<!--- Use this section to share information about your company such as founding information, mission statement, product description, product success, etc.--->
-
-### Why participate in an Octernship with Dive
-
-<!--- Use this section to appeal to students. Consider sharing information about recent projects, the technology stack, the type of mentorship students can expect, listing future employment opportunities, etc. --->
-
-### Octernship role description: Backend Engineering Intern
-
-<!--- Use this section to describe the role in as much detail as necessary. Please include the GitHub Classroom assignment submission date, length of the Octernship, and the monthly stipend --->
-
-### Recommended qualifications
-
-<!--- Use this section to describe what skills a student might need to complete the problem statement on GitHub Classroom --->
-
-### Eligibility
-
-To participate, you must be:
-* 18 years or older
-
 ## Assignment
 
 # Write a REST API for the input of calories in Python
@@ -50,8 +29,9 @@ To participate, you must be:
 - Good commit history - we won’t accept a repo with a single giant commit 🙅‍♀️
 
 ### Task submission
-1. Making changes on the auto generated `feedback` branch to complete the task
-2. Using the auto generated **Feedback Pull Request** for review and submission
+Using the [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow#following-github-flow) for assignment submission
+1. Creating a new branch 
+2. Raising a Pull Request for submission
 3. Using GitHub Discussions to ask any relevant questions regarding the project
 4. Final submission Checklist:
 - [ ] SUBMISSION.md in the repository / PR, with:
