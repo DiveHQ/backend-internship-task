@@ -3,8 +3,8 @@
 
 | Octernship info  | Timelines and Stipend |
 | ------------- | ------------- |
-| Assignment Deadline  | 3rd April 2023  |
-| Octernship Duration  | 1st May 2023 - 30th July 2023 |
+| Assignment Deadline  | 19th June 2023  |
+| Octernship Duration  | 3rd July 2023 - 3rd October 2023 |
 | Monthly Stipend  | $500 USD  |
 
 ## Assignment
