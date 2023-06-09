@@ -1,4 +1,4 @@
-## ![Dive logo](https://user-images.githubusercontent.com/424487/219708981-f0416526-ba48-4b01-b5b3-c0eb73362718.png) Dive 
+## ![Dive logo](https://user-images.githubusercontent.com/424487/219708981-f0416526-ba48-4b01-b5b3-c0eb73362718.png) Dive
 <!-- ![Company Logo](https://example.org) -->
 
 | Octernship info  | Timelines and Stipend |
@@ -37,7 +37,7 @@
 
 ### Task submission
 Using the [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow#following-github-flow) for assignment submission
-1. Creating a new branch 
+1. Creating a new branch
 2. Raising a Pull Request for submission
 3. Using GitHub Discussions to ask any relevant questions regarding the project
 4. Final submission Checklist:
