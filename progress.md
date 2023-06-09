@@ -22,20 +22,20 @@
 
 - [ ] **Implement CRUD Operations**
 
-  - [ ] Implement Create, Read, Update, Delete operations for entries
+  - [x] Implement Create, Read, Update, Delete operations for entries
   - [x] Implement Create, Read, Update, Delete operations for users (accessible by user manager and admin)
 
 - [ ] **Integration with External Calories API**
 
-  - [ ] Connect to an external API to fetch calories if not provided
+  - [x] Connect to an external API to fetch calories if not provided
 
 - [ ] **Implement User Settings**
 
-  - [ ] Allow users to set an expected number of calories per day
+  - [x] Allow users to set an expected number of calories per day
 
 - [ ] **Boolean Field for Daily Calorie Comparison**
 
-  - [ ] Implement functionality to compare total daily calories with expected number and set boolean field accordingly
+  - [x] Implement functionality to compare total daily calories with expected number and set boolean field accordingly
 
 - [ ] **Implement Filtering, Pagination, and JSON Response Formatting**
 
@@ -59,3 +59,7 @@
 
 - [ ] **Final Submission**
   - [ ] Create SUBMISSION.md with setup, test, and run commands
+
+Note: urlparse has been changed to urllib.parse
+In Nutritionx do
+import urllib.parse

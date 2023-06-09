@@ -4,8 +4,12 @@ from sqlalchemy.dialects.postgresql import UUID
 
 import uuid
 
+def generate_uuid():
+    return str(uuid.uuid4())
+
+
 class Entry(db.Model):
-    id = Column(String(36), primary_key=True, default=str(uuid.uuid4()))
+    id = Column(String(36), primary_key=True, default=generate_uuid)
     user_id = Column(String(36), ForeignKey('user.id'), nullable=False)
     date = Column(Date, nullable=False)
     time = Column(Time, nullable=False)

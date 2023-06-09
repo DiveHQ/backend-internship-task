@@ -7,7 +7,7 @@ from functools import wraps
 import datetime
 import jwt
 
-user_routes = Blueprint('user_routes', __name__)
+user_blueprint = Blueprint('user', __name__)
 
 def token_required(f):
     @wraps(f)
@@ -24,7 +24,7 @@ def token_required(f):
     
     return decorator
 
-@user_routes.route('/register/regular', methods=['POST'])
+@user_blueprint.route('/register/regular', methods=['POST'])
 def register_regular():
     try:
         data = request.get_json()
@@ -40,7 +40,7 @@ def register_regular():
     except:
         return jsonify({'message': 'Registration Failed'}), 500
 
-@user_routes.route('/register/admin', methods=['POST'])
+@user_blueprint.route('/register/admin', methods=['POST'])
 def register_admin():
     try:
         data = request.get_json()
@@ -56,7 +56,7 @@ def register_admin():
     except:
         return jsonify({'message': 'Registration Failed'}), 500
 
-@user_routes.route('/register/user_manager', methods=['POST'])
+@user_blueprint.route('/register/user_manager', methods=['POST'])
 def register_user_manager():
     try:
         data = request.get_json()
@@ -72,7 +72,7 @@ def register_user_manager():
     except:
         return jsonify({'message': 'Registration Failed'}), 500
 
-@user_routes.route('/login', methods=['POST'])
+@user_blueprint.route('/login', methods=['POST'])
 def login():
     try:
         data = request.get_json()
@@ -92,7 +92,7 @@ def login():
         return jsonify({'message': 'Login failed.'}), 500
 
 
-@user_routes.route('/users', methods=['POST'])
+@user_blueprint.route('/users', methods=['POST'])
 @token_required
 def create_user(user_data):
     if user_data.role.name != 'admin' and user_data.role.name != 'user_manager':
@@ -111,20 +111,36 @@ def create_user(user_data):
 
     return jsonify({'message': 'New user created!'}), 201
 
-# Get all users
-@user_routes.route('/users', methods=['GET'])
+@user_blueprint.route('/users', methods=['GET'])
 @token_required
 def get_users(user_data):
     if user_data.role.name != 'admin' and user_data.role.name != 'user_manager':
         return jsonify({'message': 'You are not authorized to access this resource.'}), 403
+    
+    page = request.args.get('page', 1, type=int)  # default page is 1
+    per_page = request.args.get('per_page', 10, type=int)  # default per_page is 10
+
+    # Filters
+    role_filter = request.args.get('role', None)  # default is None
+
     try:
-        users = User.query.all()
-        return jsonify(users=[user.to_dict() for user in users]), 200
+        if role_filter:
+            users = User.query.filter_by(role=role_filter).paginate(page, per_page, error_out=False)
+        else:
+            users = User.query.paginate(page, per_page, error_out=False)
+        
+        users_list = [user.to_dict() for user in users.items]
+
+        return jsonify({
+            'users': users_list,
+            'total_pages': users.pages,
+            'current_page': users.page
+        }), 200
     except:
         return jsonify({'message': 'Failed to get users.'}), 500
 
 # Get a specific user
-@user_routes.route('/users/<user_id>', methods=['GET'])
+@user_blueprint.route('/users/<user_id>', methods=['GET'])
 @token_required
 def get_user(user_data, user_id):
     if (user_data.role.name != 'admin' and user_data.role.name != 'user_manager') and user_data.id != user_id :
@@ -139,7 +155,7 @@ def get_user(user_data, user_id):
     return jsonify(user=user.to_dict()), 200
 
 # Update a user
-@user_routes.route('/users/<user_id>', methods=['PUT'])
+@user_blueprint.route('/users/<user_id>', methods=['PUT'])
 @token_required
 def update_user(user_data, user_id):
     if (user_data.role.name != 'admin' and user_data.role.name != 'user_manager') and user_data.id != user_id :
@@ -155,7 +171,7 @@ def update_user(user_data, user_id):
     return jsonify(message="User updated", user=user.to_dict()), 200
 
 # Delete a user
-@user_routes.route('/users/<user_id>', methods=['DELETE'])
+@user_blueprint.route('/users/<user_id>', methods=['DELETE'])
 @token_required
 def delete_user(user_data, user_id):
     if (user_data.role.name != 'admin' and user_data.role.name != 'user_manager') and user_data.id != user_id:
