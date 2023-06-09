@@ -44,9 +44,6 @@ def swagger(request):
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
-    # path(
-    #     "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
-    # ),
     # A path for login_required to use for authentication. Relies on Django auth system
     path("login/", auth_views.LoginView.as_view(), name="login"),
     # API Docs

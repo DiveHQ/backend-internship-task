@@ -66,10 +66,8 @@ DJANGO_APPS = [
 ]
 THIRD_PARTY_APPS = [
     "rest_framework",
-    "rest_framework.authtoken",
     "corsheaders",
     "drf_yasg",
-    "djoser",
 ]
 
 LOCAL_APPS = [
@@ -258,18 +256,7 @@ LOGGING = {
 
 # djoser settings
 # ------------------------------------------------------------------------------
-DJOSER = {
-    "LOGIN_FIELD": "email",
-    "USER_CREATE_PASSWORD_RETYPE": True,
-    "PASSWORD_RESET_CONFIRM_URL": "password/reset/{uid}/{token}",
-    "ACTIVATION_URL": "activate/{uid}/{token}",
-    "SEND_ACTIVATION_EMAIL": False,
-    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
-    "SERIALIZERS": {
-        # "user_create_password_retype": "api_project.users.serializers.UserCreatePasswordRetypeSerializer",  # custom
-        # "password_reset_confirm": "api_project.users.serializers.OTPConfirmSerializer",  # custom password reset
-    },
-}
+
 
 # Simple JWT
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
@@ -320,15 +307,10 @@ This API project uses Token authentication . \n
 To start sending authenticated HTTP requests on behalf of logged in users, you need to
 authenticate the user by providing the username and password. The login response
 includes the user's unique token.  Once you have a valid access token you
-need to add it as a HTTP header to every HTTP request you send to the Spikizi API.
-`Authorization: Token <key>` \n
-When the user [logs out](#operation/auth_logout_create), this API token is expired, and
-a new one created the next time the user logs in. `\n
-A token is also generated at [registration](#operation/auth_registration_create) .\n
-Usage format: `Token <key>`\n
+need to add it as a HTTP header to every HTTP request you send to the API.
+`Authorization: Bearer <jwt>` \n
 """
 
-# CORS_ORIGIN_ALLOW_ALL = True
 
 API_BASE_URL = env.str("API_BASE_URL", "http://localhost:8000/api")
 
@@ -343,23 +325,3 @@ SWAGGER_SETTINGS = {
     },
     "DEFAULT_API_URL": API_BASE_URL,
 }
-
-
-# FRONTEND URL SETTINGS
-PASSWORD_RESET_FRONTEND_URL = env.str(
-    "PASSWORD_RESET_FRONTEND_URL", "http://localhost:3000/complete-path-to-reset-url"
-)
-
-
-# GOOGLE ClOUD TASKS
-# ------------------------------------------------------------------------------
-# Default is the address from running https://github.com/aertje/cloud-tasks-emulator
-GOOGLE_CLOUD_TASKS_CHANNEL = env.str("GOOGLE_CLOUD_TASKS_CHANNEL", "localhost:8123")
-# setting a sample project as the default
-GOOGLE_CLOUD_TASKS_PROJECT = env.str("GOOGLE_CLOUD_TASK_PROJECT", "sample-project")
-# setting a sample task location here as the default
-GOOGLE_CLOUD_TASKS_PROJECT_LOCATION = env.str("GOOGLE_CLOUD_TASK_LOCATION", "local")
-GOOGLE_CLOUD_TASKS_DEFAULT_QUEUE = env.str(
-    "GOOGLE_CLOUD_TASKS_DEFAULT_QUEUE", "default-queue"
-)
-GOOGLE_CLOUD_TASKS_ON_GAE = env.bool("GOOGLE_CLOUD_TASKS_ON_GAE", default=False)
