@@ -2,7 +2,7 @@
  > 1. Install dependencies with `pip install -r requirements/local.txt`.
  > 2. Create an `.env` file. Use `.env.sample` as a guide.
  > 3. Then run migrations with command `python manage.py migrate`.
- > 4. Create superuser with `python manage.py createsuperuser` and follow the prompt.
+ > 4. Create superuser with `python manage.py createsuperuser` and follow the prompt. 
        - *You will need this to access the api docs. Its password protected*
 
 
@@ -14,5 +14,5 @@
 
 ### Commands to run the API server
   > To start the server run `python manage.py runserver`.  
-  > Now run `localhost:8000` in the browser.
+  > Now run `localhost:8000` in the browser. 
   > You can also access the admin page on `localhost:8000/admin`
