@@ -47,9 +47,8 @@ def user_login(request):
     user = authenticate(username=username, password=password)
     if user:
         login(request, user)
-        session_cookie = request.session.session_key
         return Response(
-            {"message": "Login Successful", "session_cookie": session_cookie},
+            {"message": "Login Successful"},
             status=200,
         )
     return Response({"message": "Invalid credentials"}, status=401)
