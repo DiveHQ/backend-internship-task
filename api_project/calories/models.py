@@ -14,5 +14,8 @@ class Calories(BaseModel):
     note = models.CharField(max_length=255, blank=True)
     extra = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ["-created_at"]
+
     def __str__(self):
         return f"{self.user.name}::{self.calories}"

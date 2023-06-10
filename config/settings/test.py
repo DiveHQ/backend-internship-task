@@ -43,9 +43,9 @@ EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 # DRF TESTING
 # ------------------------------------------------------------------------------
 # https://www.django-rest-framework.org/api-guide/testing/
-REST_FRAMEWORK = {
-    "TEST_REQUEST_DEFAULT_FORMAT": "json",
-}
+# REST_FRAMEWORK = {
+#     "TEST_REQUEST_DEFAULT_FORMAT": "json",
+# }
 
 
 # djoser settings

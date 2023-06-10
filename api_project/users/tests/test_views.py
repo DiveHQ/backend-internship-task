@@ -1,95 +1,145 @@
 import pytest
-from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
-from django.test import RequestFactory
 from django.urls.base import reverse
-from pytest_django import asserts as pytest_django_asserts
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from api_project.common.utils import encode_uid
 from api_project.users.models import User
-from api_project.users.views import CustomDjoserViewSet, UserViewSet
 
 pytestmark = pytest.mark.django_db
 
 
-class TestUserViewSet:
-    def test_get_queryset(self, user: User, rf: RequestFactory):
-        view = UserViewSet()
-        request = rf.get("/fake-url/")
-        request.user = user
+class TestUserView:
+    def test_user_list(self, api_client_auth, user: User):
+        url = reverse("api:users-list")
+        client = api_client_auth(user)
 
-        view.request = request
+        resp = client.get(url)
+        resp_data = resp.json()
 
-        assert user in view.get_queryset()
+        assert resp.status_code == status.HTTP_200_OK
+        assert "results" in resp_data
 
-    def test_me(self, user: User, rf: RequestFactory):
-        view = UserViewSet()
-        request = rf.get("/fake-url/")
-        request.user = user
+    def test_user_read(self, api_client_auth, user: User):
+        url = reverse("api:users-detail", args=(user.id,))
+        client = api_client_auth(user)
 
-        view.request = request
+        resp = client.get(url)
+        resp_data = resp.json()
 
-        response = view.me(request)
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp_data["email"] == user.email
+        assert resp_data["role"] == User.Roles.USER
 
-        assert response.data == {
-            "uuid": str(user.uuid),
-            "email": user.email,
-            "name": user.name,
-        }
+    def test_user_read_admin(self, api_client_auth, user: User, admin: User):
+        url = reverse("api:users-detail", args=(user.id,))
+        client = api_client_auth(admin)
 
+        resp = client.get(url)
+        resp_data = resp.json()
 
-class TestCustomDjoserViewSet:
-    def test_me(self, user: User, rf: RequestFactory):
-        view = CustomDjoserViewSet()
-        request = rf.get("/fake-url/")
-        request.user = user
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp_data["email"] == user.email
+        assert resp_data["role"] == User.Roles.USER
 
-        view.request = request
+    def test_user_read_manager(self, api_client_auth, user: User, manager: User):
+        url = reverse("api:users-detail", args=(user.id,))
+        client = api_client_auth(manager)
 
-        response = view.me(request)
-        assert response.data == {
-            "uuid": str(user.uuid),
-            "email": user.email,
-            "name": user.name,
-        }
+        resp = client.get(url)
+        resp_data = resp.json()
 
-    def test_send_reset_password_email(self, api_client: APIClient, user: User):
-        url = reverse("api:users:users-reset-password")
-        response = api_client.post(url, data={"email": user.email})
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp_data["email"] == user.email
+        assert resp_data["role"] == User.Roles.USER
 
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert len(mail.outbox) == 1
+    def test_user_update(self, api_client_auth, user: User):
+        url = reverse("api:users-detail", args=(user.id,))
+        client = api_client_auth(user)
+        data = {"email": "a@a.com", "name": "Hello World"}
 
-    def test_should_not_send_reset_password_email_if_user_does_not_exist(
-        self, api_client: APIClient
+        resp = client.patch(url, data=data)
+        resp_data = resp.json()
+
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp_data["name"] == data["name"]
+        assert resp_data["email"] == data["email"]
+
+    def test_user_update_manager(self, api_client_auth, user: User, manager: User):
+        url = reverse("api:users-detail", args=(user.id,))
+        client = api_client_auth(manager)
+        data = {"email": "a@a.com", "name": "Hello World"}
+
+        resp = client.patch(url, data=data)
+        resp_data = resp.json()
+
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp_data["name"] == data["name"]
+        assert resp_data["email"] == data["email"]
+
+    def test_user_update_not_user(self, api_client_auth, user: User, manager: User):
+        url = reverse("api:users-detail", args=(manager.id,))
+        client = api_client_auth(user)
+        data = {"email": "a@a.com", "name": "Hello World"}
+
+        resp = client.patch(url, data=data)
+
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_me(
+        self,
+        api_client_auth,
+        user: User,
     ):
-        url = reverse("api:users:users-reset-password")
-        data = {"email": "nothing"}
-        response = api_client.post(url, data=data)
+        url = reverse("api:users-me")
+        client = api_client_auth(user)
 
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        resp = client.get(url)
+        resp_data = resp.json()
 
-        # pytest django exports the regular unittest assertion methods as well as django's
-        # https://docs.python.org/3/library/unittest.html#assert-methods
-        # https://docs.djangoproject.com/en/3.2/topics/testing/tools/#assertions
-        pytest_django_asserts.assertContains(
-            response,
-            "Enter a valid email address",
-            status_code=status.HTTP_400_BAD_REQUEST,
+        assert resp.status_code == status.HTTP_200_OK
+        assert resp_data["email"] == user.email
+
+
+class TestAuthView:
+    def test_login(self, api_client: APIClient, user: User, test_password):
+        url = reverse("api:token-obtain")
+        response = api_client.post(
+            url, data={"email": user.email, "password": test_password}
         )
+
+        assert response.status_code == status.HTTP_200_OK
+
+    def test_login_with_wrong_credentials(
+        self, api_client: APIClient, user: User, test_password
+    ):
+        url = reverse("api:token-obtain")
+        response = api_client.post(
+            url, data={"email": user.email, "password": "wrong_password"}
+        )
+
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+    def test_signup(self, api_client: APIClient, test_password, test_email):
+        url = reverse("api:signup")
+        data = {
+            "email": test_email,
+            "name": "test_name",
+            "password": test_password,
+            "password2": test_password,
+        }
+        response = api_client.post(url, data=data)
+        resp_data = response.json()
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert resp_data["role"] == User.Roles.USER
+
         assert len(mail.outbox) == 0
 
-    def test_reset_password_confirmation(self, api_client: APIClient, user: User):
-        url = reverse("api:users:users-reset-password-confirm")
+    def test_refresh_token(self, api_client: APIClient, user: User, token: dict):
+        url = reverse("api:token-refresh")
 
-        data = {
-            "uid": encode_uid(user.pk),
-            "token": default_token_generator.make_token(user),
-            "new_password": "new password",
-        }
+        data = {"refresh": token["refresh"]}
         response = api_client.post(url, data=data)
 
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert len(mail.outbox) == 1
+        assert response.status_code == status.HTTP_200_OK
