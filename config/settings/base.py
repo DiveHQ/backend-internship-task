@@ -72,7 +72,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "api_project.users.apps.UsersConfig",
-    # Your stuff: custom apps go here
+    "api_project.calories.apps.CaloriesConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -325,3 +325,7 @@ SWAGGER_SETTINGS = {
     },
     "DEFAULT_API_URL": API_BASE_URL,
 }
+
+
+CALORIES_API = env("CALORIES_API", default="")
+CALORIES_BASE_URL = "https://api.calorieninjas.com/v1/nutrition"

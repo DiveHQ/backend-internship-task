@@ -16,7 +16,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "name", "password", "password2"]
+        fields = ["id", "email", "name", "calories_per_day", "password", "password2"]
 
     # Check if passwords match
     def validate_password2(self, password2: str):
@@ -35,7 +35,7 @@ class SignupResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "name", "email", "role", "token")
+        fields = ("id", "name", "email", "role", "calories_per_day", "token")
 
     @swagger_serializer_method(
         serializer_or_field=serializers.JSONField(),

@@ -10,7 +10,8 @@ def check_auth(request):
 
 class IsOwner(BasePermission):
     def has_permission(self, request, view):
-        return check_auth(request)
+        user = request.user
+        return check_auth(request) and user.role == User.Roles.USER
 
     def has_object_permission(self, request, view, obj):
         return obj.user == request.user if check_auth(request) else False
@@ -18,7 +19,8 @@ class IsOwner(BasePermission):
 
 class IsManager(BasePermission):
     def has_permission(self, request, view):
-        return check_auth(request)
+        user = request.user
+        return check_auth(request) and user.role == User.Roles.MANAGER
 
     def has_object_permission(self, request, view, obj):
         user = request.user
@@ -27,7 +29,8 @@ class IsManager(BasePermission):
 
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
-        return check_auth(request)
+        user = request.user
+        return check_auth(request) and user.role == User.Roles.ADMIN
 
     def has_object_permission(self, request, view, obj):
         user = request.user

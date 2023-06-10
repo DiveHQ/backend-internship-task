@@ -49,6 +49,7 @@ class User(PermissionsMixin, base_models.BaseModel, AbstractBaseUser):
         help_text=_("Designates whether the user can log into the admin site"),
     )
     role = models.CharField(max_length=25, choices=Roles.choices, default=Roles.USER)
+    calories_per_day = models.PositiveIntegerField(default=0)
     deleted = models.BooleanField(default=False)
 
     objects = UserManager()
