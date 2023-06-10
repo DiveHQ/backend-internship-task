@@ -3,19 +3,24 @@ from rest_framework.decorators import api_view, permission_classes
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, BasePermission
-from django.contrib.auth.models import User
+from .models import User
 from django.contrib.auth import login, authenticate
 from .models import Calories
-from .serializers import CaloriesSerializer, UserSerializer
+from .serializers import CaloriesSerializer, UserSerializer, GroupUpdateSerializer
 
 
 # Permission Classes
 class IsAdminOrManager(BasePermission):
-    def has_permission(self, request):
+    def has_permission(self, request, view):
         return (
             request.user.is_superuser
             or request.user.groups.filter(name="User Manager").exists()
         )
+
+
+class IsAdminUser(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_superuer
 
 
 class IsOwnerOrAdmin(BasePermission):
@@ -56,6 +61,21 @@ def get_users(request):
     users = User.objects.all()
     serializer = UserSerializer(users, many=True)
     return Response(serializer.data, status=200)
+
+
+@api_view(["POST"])
+@permission_classes([IsAdminUser])
+def update_user_groups(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({"message": "User not found"}, status=404)
+
+    serializer = GroupUpdateSerializer(user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": "User groups updated successfully"}, status=200)
+    return Response(serializer.errors, status=400)
 
 
 @api_view(["POST"])
