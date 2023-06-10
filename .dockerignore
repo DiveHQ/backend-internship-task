@@ -1,0 +1,16 @@
+# Git
+.git
+.gitignore
+
+# Docker
+.docker
+
+# Python
+calorie_tracker/__pycache__/
+calorie_tracker/*/__pycache__/
+calorie_tracker/*/*/__pycache__/
+calorie_tracker/*/*/*/__pycache__/
+calorie_tracker/*/*/*/*/__pycache__/
+.env/
+.venv/
+venv/
