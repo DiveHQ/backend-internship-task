@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, BasePermission
 from rest_framework.pagination import PageNumberPagination
 from .models import User
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from .models import Calories
 from .serializers import CaloriesSerializer, UserSerializer, GroupUpdateSerializer
 
@@ -60,6 +60,13 @@ def user_login(request):
             status=200,
         )
     return Response({"message": "Invalid credentials"}, status=401)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def user_logout(request):
+    logout(request)
+    return Response({"message": "Logout successful."}, status=200)
 
 
 @api_view(["GET"])
