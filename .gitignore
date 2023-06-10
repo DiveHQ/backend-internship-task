@@ -1,0 +1,9 @@
+*.pyc
+*.pyo
+__pycache__/
+*.egg-info/
+*.egg
+db.sqlite3
+.vscode/
+.venv/
+.env

@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import dotenv
+import os
+
+dotenv.load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -122,3 +126,9 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+NUTRTIONIX_API_URL = "https://trackapi.nutritionix.com/v2/natural/nutrients"
+
+NUTRTIONIX_API_KEY = os.getenv("NUTRITIONIX_API_KEY")
+
+NUTRTIONIX_APP_ID = os.getenv("NUTRTIONIX_APP_ID")

@@ -1,5 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User, AbstractUser
+from caloriesapi.settings import (
+    NUTRTIONIX_API_URL,
+    NUTRTIONIX_API_KEY,
+    NUTRTIONIX_APP_ID,
+)
+import requests
 
 
 class Calories(models.Model):
@@ -12,8 +18,15 @@ class Calories(models.Model):
 
     def get_calories(self):
         if not self.calories:
-            pass
-    
+            url = NUTRTIONIX_API_URL
+            data = {"query": self.text}
+            headers = {"x-app-id": NUTRTIONIX_APP_ID, "x-app-key": NUTRTIONIX_API_KEY}
+            try:
+                response = requests.post(url, json=data, headers=headers)
+                self.calories = response["foods"].get("nf_calories", 0)
+            except requests.exceptions.RequestException as e:
+                self.calories = None
+
     def set_below_expected(self):
         self.is_below_expected = self.user.max_calories < self.calories
 
