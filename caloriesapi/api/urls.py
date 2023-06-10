@@ -12,4 +12,5 @@ urlpatterns = [
     path("entries/date", views.get_calorie_entries_by_date),
     path("entries/status", views.get_calorie_entries_by_status),
     path("users/", views.get_users),
+    path("user/<int:pk>", views.update_user_groups),
 ]
