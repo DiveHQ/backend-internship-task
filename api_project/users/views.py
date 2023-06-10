@@ -20,6 +20,8 @@ class UserView(RetrieveModelMixin, UpdateModelMixin, ListModelMixin, GenericView
 
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    filterset_fields = ["role", "is_active", "deleted"]
+    search_fields = ["email", "name", ]
 
     def get_queryset(self):
         user = self.request.user
