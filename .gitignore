@@ -274,3 +274,5 @@ api_project/media/
 .ipython/
 .env
 .envs/*
+
+db.sqlite3
