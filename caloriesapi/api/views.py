@@ -63,7 +63,7 @@ def get_users(request):
     return Response(serializer.data, status=200)
 
 
-@api_view(["POST"])
+@api_view(["PUT"])
 @permission_classes([IsAdminUser])
 def update_user_groups(request, user_id):
     try:
