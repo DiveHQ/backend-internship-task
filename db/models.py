@@ -22,3 +22,16 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     expected_calories = Column(Integer, nullable=False, server_default="1000")
     calorie_entries = relationship("CalorieEntry", back_populates="user")
+
+class CalorieEntry(Base):
+    __tablename__ = "calorie_entries"
+    id = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False)
+    time = Column(Time, nullable=False)
+    text = Column(String, nullable=False)
+    number_of_calories = Column(Integer)
+    is_below_expected = Column(Boolean)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    user = relationship("User", back_populates="calorie_entries")
