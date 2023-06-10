@@ -25,6 +25,7 @@ class IsOwnerOrAdmin(BasePermission):
 # Views
 @api_view(["POST"])
 def create_account(request):
+    print(request.data)
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -33,7 +34,7 @@ def create_account(request):
 
 
 @api_view(["POST"])
-def login(request):
+def user_login(request):
     username = request.data.get("username")
     password = request.data.get("password")
     user = authenticate(username=username, password=password)

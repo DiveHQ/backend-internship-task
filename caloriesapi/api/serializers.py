@@ -1,12 +1,15 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User, Group
-from .models import Calories
+from django.contrib.auth.models import Group
+from .models import Calories, User
+from caloriesapi.settings import AUTH_USER_MODEL
 
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     groups = serializers.SlugRelatedField(
-        many=True, queryset=Group.objects.all(), slug_field="name"
+        many=True,
+        queryset=Group.objects.all(),
+        slug_field="name",
     )
 
     def create(self, validated_data):

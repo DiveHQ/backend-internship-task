@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "api",
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,5 @@ NUTRTIONIX_API_URL = "https://trackapi.nutritionix.com/v2/natural/nutrients"
 NUTRTIONIX_API_KEY = os.getenv("NUTRITIONIX_API_KEY")
 
 NUTRTIONIX_APP_ID = os.getenv("NUTRTIONIX_APP_ID")
+
+AUTH_USER_MODEL = "api.User"

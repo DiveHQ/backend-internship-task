@@ -1,15 +1,16 @@
 from django.db import models
-from django.contrib.auth.models import User, AbstractUser
+from django.contrib.auth.models import User, AbstractUser, Group, Permission
 from caloriesapi.settings import (
     NUTRTIONIX_API_URL,
     NUTRTIONIX_API_KEY,
     NUTRTIONIX_APP_ID,
+    AUTH_USER_MODEL,
 )
 import requests
 
 
 class Calories(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE)
     date = models.DateField()
     time = models.TimeField()
     text = models.CharField(max_length=250)
@@ -32,4 +33,8 @@ class Calories(models.Model):
 
 
 class User(AbstractUser):
-    max_calories = models.PositiveIntegerField()
+    max_calories = models.PositiveIntegerField(blank=True, null=True)
+    groups = models.ManyToManyField(Group, related_name="user_groups")
+    user_permissions = models.ManyToManyField(
+        Permission, related_name="user_permissions"
+    )
