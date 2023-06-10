@@ -54,8 +54,14 @@ def get_all_calories(current_user = Depends(get_current_user), db: Session = Dep
 
     """
 
-    all_entries = db.query(models.CalorieEntry).filter(models.CalorieEntry.user_id == current_user.id).all() 
-    return CalorieEntryResponse(total=len(all_entries), data=all_entries)
+    all_entries = db.query(models.CalorieEntry).filter(models.CalorieEntry.user_id == current_user.id).all()
+    calories_response = [Calorie(date=calorie.date,
+                                 time=calorie.time,
+                                 text=calorie.text,
+                                 number_of_calories=calorie.number_of_calories,
+                                 user_id=calorie.user_id,
+                                 is_below_expected=calorie.is_below_expected) for calorie in all_entries]
+    return CalorieEntryResponse(total=len(all_entries), data=calories_response)
 
 @calorie_router.get("/{calorie_id}", status_code=status.HTTP_200_OK, response_model=Calorie)
 def get_calorie_entry(calorie_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
