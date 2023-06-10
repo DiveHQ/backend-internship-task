@@ -75,6 +75,7 @@ def get_calorie_entry(request, pk):
 
 
 @api_view(["PUT"])
+@permission_classes([IsAuthenticated, IsOwnerOrAdmin])
 def update_calorie_entry(request, pk):
     try:
         entry = Calories.objects.get(pk=pk)
@@ -101,7 +102,7 @@ def delete_calorie_entry(request, pk):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def get_calorie_entry(request):
+def get_calorie_entries(request):
     entry = Calories.objects.filter(user=request.user)
     serializer = CaloriesSerializer(entry, many=True)
     return Response(serializer.data, status=200)
@@ -125,7 +126,7 @@ def get_calorie_entries_by_date(request):
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def get_calorie_entry_by_status(request):
+def get_calorie_entries_by_status(request):
     status = request.query_params.get("status", None)
     if status:
         entries = Calories.objects.filter(
