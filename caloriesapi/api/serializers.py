@@ -1,20 +1,26 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from .models import Calories
 
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
+    groups = serializers.SlugRelatedField(
+        many=True, queryset=Group.objects.all(), slug_field="name"
+    )
 
     def create(self, validated_data):
-        user = User(username=validated_data["username"])
-        user.set_password(validated_data["password"])
+        groups = validated_data.pop("groups", [])
+        password = validated_data.pop("password")
+        user = User(**validated_data)
+        user.set_password(password)
         user.save()
+        user.groups.set(groups)
         return user
 
     class Meta:
         model = User
-        fields = ("username", "password")
+        fields = ("username", "password", "groups", "max_calories")
 
 
 class CaloriesSerializer(serializers.ModelSerializer):
