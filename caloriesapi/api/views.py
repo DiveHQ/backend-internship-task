@@ -1,5 +1,6 @@
 from datetime import date
 from rest_framework.decorators import api_view, permission_classes
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, BasePermission
 from django.contrib.auth.models import User
@@ -33,6 +34,7 @@ def create_account(request):
     return Response(serializer.errors, status=400)
 
 
+@csrf_exempt
 @api_view(["POST"])
 def user_login(request):
     username = request.data.get("username")
@@ -40,7 +42,11 @@ def user_login(request):
     user = authenticate(username=username, password=password)
     if user:
         login(request, user)
-        return Response({"message": "Login Successful"}, status=200)
+        session_cookie = request.session.session_key
+        return Response(
+            {"message": "Login Successful", "session_cookie": session_cookie},
+            status=200,
+        )
     return Response({"message": "Invalid credentials"}, status=401)
 
 
