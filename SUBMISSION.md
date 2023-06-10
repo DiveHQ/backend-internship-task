@@ -3,11 +3,12 @@
  > 2. Create an `.env` file. Use `.env.sample` as a guide.
  > 3. Then run migrations with command `python manage.py migrate`.
  > 4. Create superuser with `python manage.py createsuperuser` and follow the prompt.
- 
-       - *You will need this to access the api docs. Its password protected*
+
+ > *You will need this to access the api docs. Its password protected*
 
 
- > *python version used `3.10`*
+ > - *python version used `3.10`*
+ > - *framework used `django`  & `restframework`*
 
 ### Commands to run the test suite
   > To run tests with `pytest -rP` command
@@ -19,3 +20,4 @@
   > Now run `localhost:8000` in the browser. 
   
   > You can also access the admin page on `localhost:8000/admin`.
+
