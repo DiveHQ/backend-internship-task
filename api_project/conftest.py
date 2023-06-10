@@ -2,10 +2,12 @@ import pytest
 from pytest_factoryboy import register
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from api_project.calories.tests.factories import CaloriesFactory
 from api_project.users.models import User
 from api_project.users.tests.factories import UserFactory
 
 register(UserFactory)
+register(CaloriesFactory)
 
 
 @pytest.fixture(autouse=True)

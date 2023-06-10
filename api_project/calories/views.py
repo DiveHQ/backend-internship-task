@@ -22,5 +22,5 @@ class CaloriesView(ModelViewSet):
     def perform_create(self, serializer):
         user = self.request.user
         if user.role == user.Roles.ADMIN:
-            serializer.save()
+            return serializer.save()
         serializer.save(user=user)

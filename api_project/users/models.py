@@ -54,6 +54,9 @@ class User(PermissionsMixin, base_models.BaseModel, AbstractBaseUser):
 
     objects = UserManager()
 
+    class Meta:
+        ordering = ("created_at",)
+
     USERNAME_FIELD = "email"
     EMAIL_FIELD = "email"
     REQUIRED_FIELDS = ["name"]
