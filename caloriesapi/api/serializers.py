@@ -23,7 +23,7 @@ class CaloriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Calories
         fields = ("id", "user", "date", "time", "text", "calories", "is_below_expected")
-        read_only_fields = ("user", "calories", "is_below_expected")
+        read_only_fields = ("user", "is_below_expected")
 
 
 class GroupUpdateSerializer(serializers.ModelSerializer):

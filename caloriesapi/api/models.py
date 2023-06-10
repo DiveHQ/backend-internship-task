@@ -24,12 +24,16 @@ class Calories(models.Model):
             headers = {"x-app-id": NUTRTIONIX_APP_ID, "x-app-key": NUTRTIONIX_API_KEY}
             try:
                 response = requests.post(url, json=data, headers=headers)
-                self.calories = response["foods"].get("nf_calories", 0)
+                response = response.json()
+                foods = response.get("foods", [])
+                if foods:
+                    food = foods[0]
+                    self.calories = food.get("nf_calories", 0)
             except requests.exceptions.RequestException as e:
                 self.calories = None
 
     def set_below_expected(self):
-        self.is_below_expected = self.user.max_calories < self.calories
+        self.is_below_expected = self.user.max_calories > self.calories
 
 
 class User(AbstractUser):

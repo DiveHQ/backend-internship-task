@@ -100,6 +100,7 @@ def create_calorie_entry(request):
         user = request.user
         entry = serializer.save(user=user)
         entry.get_calories()
+        entry.set_below_expected()
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
 
