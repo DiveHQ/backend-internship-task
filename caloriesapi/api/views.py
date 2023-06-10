@@ -3,10 +3,18 @@ from rest_framework.decorators import api_view, permission_classes
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, BasePermission
+from rest_framework.pagination import PageNumberPagination
 from .models import User
 from django.contrib.auth import login, authenticate
 from .models import Calories
 from .serializers import CaloriesSerializer, UserSerializer, GroupUpdateSerializer
+
+
+# Pagination Class
+class Paginator(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
 
 
 # Permission Classes
@@ -63,7 +71,7 @@ def get_users(request):
 
 
 @api_view(["PUT"])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAuthenticated, IsAdminOrManager])
 def update_user_groups(request, user_id):
     try:
         user = User.objects.get(id=user_id)
@@ -127,15 +135,17 @@ def delete_calorie_entry(request, pk):
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsOwnerOrAdmin])
 def get_calorie_entries(request):
-    entry = Calories.objects.filter(user=request.user)
-    serializer = CaloriesSerializer(entry, many=True)
+    entries = Calories.objects.filter(user=request.user)
+    paginator = Paginator()
+    results = paginator.paginate_queryset(entries, request)
+    serializer = CaloriesSerializer(results, many=True)
     return Response(serializer.data, status=200)
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsOwnerOrAdmin])
 def get_calorie_entries_by_date(request):
     date_param = request.query_params.get("date", None)
     if date_param:
@@ -151,7 +161,7 @@ def get_calorie_entries_by_date(request):
 
 
 @api_view(["GET"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsOwnerOrAdmin])
 def get_calorie_entries_by_status(request):
     status = request.query_params.get("status", None)
     if status:
