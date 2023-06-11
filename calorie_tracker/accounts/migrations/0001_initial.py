@@ -1,10 +1,10 @@
-from accounts.constants import ADMIN_GROUP, REGULAR_USER_GROUP, USER_MANAGER_GROUP
+from accounts.constants import ADMIN_GROUP, USER_MANAGER_GROUP
 from django.contrib.auth.models import Group
 from django.db import migrations
 
 
 def create_groups(apps, schema_editor):
-    group_names = [ADMIN_GROUP, REGULAR_USER_GROUP, USER_MANAGER_GROUP]
+    group_names = [ADMIN_GROUP, USER_MANAGER_GROUP]
 
     for group_name in group_names:
         Group.objects.get_or_create(name=group_name)
