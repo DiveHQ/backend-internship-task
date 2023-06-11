@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Calories, CaloryLimit
+from .models import Calories
 
 class CalorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,7 +13,3 @@ class CalorySerializer(serializers.ModelSerializer):
 
 
         
-class CaloryLimitSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CaloryLimit
-        fields = '__all__'
