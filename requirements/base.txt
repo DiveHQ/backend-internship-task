@@ -1,4 +1,4 @@
 Django>=4.2.1,<4.3
 django-environ>=0.10.0,<0.11
 djangorestframework-simplejwt>=5.2.2,<5.3
-django-filter
+django-filter>=23.2,<23.3
