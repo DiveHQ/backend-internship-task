@@ -19,7 +19,7 @@ calorie_link = "/api/v1/calories"
 
 
 @calorie_router.get("/", status_code=status.HTTP_200_OK)
-def get_all_calories(limit:int = Query(default=1, ge=1), page: int = Query(default=1, ge=1), current_user = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_calories(limit:int = Query(default=1, ge=1), page: int = Query(default=1, ge=1), current_user = Depends(get_current_user), db: Session = Depends(get_db)):
 
     """
     Returns all calorie entries that belong to the current user

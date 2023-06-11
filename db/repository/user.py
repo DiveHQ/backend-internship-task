@@ -7,7 +7,7 @@ from schema.user import User
 from db.models import User
 
 
-def create_new_user(user: User, db: Session):
+def save_user_in_db(user, db):
     """
     Creates and stores new user in database
     Args:

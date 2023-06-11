@@ -22,7 +22,7 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
     expected_calories = Column(Integer, nullable=False, server_default="1000")
-    calorie_entries = relationship("CalorieEntry", back_populates="user")
+    calorie_entries = relationship("CalorieEntry", cascade="delete", back_populates="user")
 
 class CalorieEntry(Base):
     __tablename__ = "calorie_entries"

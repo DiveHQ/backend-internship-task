@@ -3,10 +3,9 @@ from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
 from db.database import get_db
 from schema.user import TotalUsers, UserResponse, User, UserUpdate, UserUpdateResponse
+from utils.oauth2 import get_current_user
 from utils.utils import RoleChecker
-from utils.user_utils import create_user, check_for_user, update_existing_user, delete_existing_user
-from db import models
-from datetime import datetime
+from utils.user_utils import create_new_user, get_a_user, update_existing_user, delete_existing_user, get_all_users
 
 
 manager_router = APIRouter(tags=["Manager"], prefix="/manager/users")
@@ -18,23 +17,17 @@ allow_operation = RoleChecker(["manager"])
 def get_users(db: Session = Depends(get_db)):
 
     """
-    Returns all users with the user role
+    Returns all users
     Args:
         db: Database session
         
-    Return: The users in the db with the user role
+    Return: The users in the db
 
     """
 
-    users = db.query(models.User).all()
-    users_response = [UserResponse(id=user.id, 
-                                   email=user.email, 
-                                   first_name=user.first_name, 
-                                   last_name=user.last_name, 
-                                   role=user.role,
-                                   expected_calories=user.expected_calories
-                                   ) for user in users]
-    return TotalUsers(total=len(users_response), data=users_response)
+    users = get_all_users(db)
+
+    return users
 
 @manager_router.get("/{user_id}", status_code=status.HTTP_200_OK, dependencies=[Depends(allow_operation)], response_model=UserResponse)
 def get_user(user_id: int, db: Session = Depends(get_db)):
@@ -49,18 +42,11 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
     """
 
-    user = check_for_user(db, user_id).first()
-
-    returned_user = UserResponse(id=user.id, 
-                        email=user.email, 
-                        first_name=user.first_name, 
-                        last_name=user.last_name, 
-                        role=user.role,
-                        expected_calories=user.expected_calories)
-    return returned_user
+    user = get_a_user(db, user_id)
+    return user
 
 @manager_router.post('/', status_code=status.HTTP_201_CREATED, dependencies=[Depends(allow_operation)], response_model=UserResponse)
-def create_new_user(user: User, db: Session = Depends(get_db)):
+def create_user(user: User, db: Session = Depends(get_db)):
 
     """
     Creates a regular user
@@ -72,13 +58,13 @@ def create_new_user(user: User, db: Session = Depends(get_db)):
 
     """
 
-    user = create_user(user, db)
+    user = create_new_user(user, db)
 
     return user
 
 
 @manager_router.put('/{user_id}', status_code=status.HTTP_200_OK, dependencies=[Depends(allow_operation)], response_model=UserUpdateResponse)
-def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
+def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     """
     Updates a regular user
     Args:
@@ -89,11 +75,11 @@ def update_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
     Return: The newly updated user 
 
     """
-    updated_user = update_existing_user(user_id, user, db)
+    updated_user = update_existing_user(user_id, user, db, current_user)
     return updated_user
 
 @manager_router.delete('/{user_id}', status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(allow_operation)])
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+def delete_user(user_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
 
     """
     Deletes a regular user
@@ -105,4 +91,4 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
 
     """
 
-    delete_existing_user(user_id, db)
+    delete_existing_user(user_id, db, current_user)

@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from utils.user_utils import create_user
+from utils.user_utils import create_new_user
 from db import models
 from db.database import get_db
 from schema.user import User, Token, UserResponse
@@ -27,7 +27,7 @@ def signup(user: User, db: Session = Depends(get_db)):
 
     """
 
-    user = create_user(user, db)
+    user = create_new_user(user, db)
     return user
 
 

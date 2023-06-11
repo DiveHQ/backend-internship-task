@@ -12,8 +12,11 @@ class User(BaseModel):
     password: str = Field(...)
     password_confirmation: str = Field(...)
 
-    class Config:
-        orm_mode = True
+    # class Config:
+    #     orm_mode = True
+
+class UserWithRole(User):
+    role: Role = Field(...)
 
 class UserResponse(BaseModel):
     id: int = Field(...)
@@ -42,3 +45,7 @@ class UserUpdate(BaseModel):
     first_name: Optional[str]
     last_name: Optional[str]
     updated_at: Optional[datetime.datetime]
+    role: Optional[Role]
+
+class AdminUserUpdate(UserUpdate):
+    role: Optional[Role]

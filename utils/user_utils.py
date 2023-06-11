@@ -1,13 +1,10 @@
 
 from db import models
-from sqlalchemy.orm import Session
-from db.database import get_db
-from schema.user import User, UserResponse, UserUpdate, UserUpdateResponse
+from schema.user import  UserResponse, UserUpdate, UserUpdateResponse, TotalUsers
 from core.exceptions import ValidationError
-from db.repository.user import create_new_user
+from db.repository.user import save_user_in_db
 from datetime import datetime
 from core.exceptions import NotFoundError, ForbiddenError
-from fastapi import Depends
 from utils.utils import get_password_hash
 
 def check_for_user(db, user_id):
@@ -22,18 +19,68 @@ def check_for_user(db, user_id):
 
     return user_in_db
 
-def check_user_and_role(db, user_id, msg):
+def get_all_users(db):
+
+    """
+    Returns all users
+    Args:
+        db: Database session
+        
+    Return: The users in the db
+
+    """
+
+    users = db.query(models.User).all()
+    users_response = [UserResponse(id=user.id, 
+                                   email=user.email, 
+                                   first_name=user.first_name, 
+                                   last_name=user.last_name, 
+                                   role=user.role,
+                                   expected_calories=user.expected_calories
+                                   ) for user in users]
+    return TotalUsers(total=len(users_response), data=users_response)
+
+
+def get_a_user(db, user_id):
+
+    """
+    Return a user with the specified id
+    Args:
+        user_id: The id of the user
+        db: Database session
+        
+    Return: The user in the db
+
+    """
+
+    user = check_for_user(db, user_id).first()
+
+    returned_user = UserResponse(id=user.id, 
+                        email=user.email, 
+                        first_name=user.first_name, 
+                        last_name=user.last_name, 
+                        role=user.role,
+                        expected_calories=user.expected_calories)
+    return returned_user
+
+def check_user_and_role(db, user_id, current_user, msg):
     user = check_for_user(db, user_id)
     first_user = user.first()
 
-    if first_user.role.name != "user":
+    if current_user.role.name == "admin":
+        return user
+
+    elif first_user.role.name != "user":
         raise ForbiddenError(detail=msg)
 
     return user
 
+"""
+ to update a user, you can add the current user as a parameter to the function. check if the current user is an admin and allow
+ him to update anything. if it is a manager, only allow it to update users with the user role
+"""
 
-
-def create_user(user: User, db: Session = Depends(get_db)):
+def create_new_user(user, db):
    
     """
     Creates a regular user
@@ -44,15 +91,18 @@ def create_user(user: User, db: Session = Depends(get_db)):
     Return: The newly created user 
 
     """
+
     user_data = db.query(models.User).filter(models.User.email == user.email).first()
     if user_data:
-        raise ValidationError(detail="User already exists")
+        raise ValidationError(detail="User with email already exists")
     hash_passwd = get_password_hash(user.password)
     if user.password != user.password_confirmation:
         raise ValidationError(detail="Passwords do not match")
 
     user.password = hash_passwd
-    new_user = create_new_user(user, db)
+
+    new_user = save_user_in_db(user, db)
+
     return UserResponse(id=new_user.id, 
                         email=new_user.email, 
                         first_name=new_user.first_name, 
@@ -61,7 +111,7 @@ def create_user(user: User, db: Session = Depends(get_db)):
                         expected_calories=new_user.expected_calories)
 
 
-def update_existing_user(user_id, user, db):
+def update_existing_user(user_id, user, db, current_user):
     """
     Updates a regular user
     Args:
@@ -72,12 +122,13 @@ def update_existing_user(user_id, user, db):
     Return: The newly updated user 
 
     """
-    user_in_db = check_user_and_role(db, user_id, "You do not have the permission to update this user")
+    user_in_db = check_user_and_role(db, user_id, current_user, "You do not have the permission to update this user")
     current_time = datetime.utcnow()
     updated_user = UserUpdate(email=user.email, 
                               first_name=user.first_name, 
                               last_name=user.last_name,
-                              updated_at=current_time)
+                              updated_at=current_time,
+                              role=user.role)
     user_dict = updated_user.dict()
     new_update = {k:v for k,v in user_dict.items() if v is not None}
 
@@ -96,7 +147,7 @@ def update_existing_user(user_id, user, db):
                         updated_at=user.updated_at)
 
 
-def delete_existing_user(user_id, db):
+def delete_existing_user(user_id, db, current_user):
     """
     Deletes a regular user
     Args:
@@ -107,6 +158,6 @@ def delete_existing_user(user_id, db):
 
     """
 
-    user_in_db = check_user_and_role(db, user_id, "You do not have the permission to delete this user")
+    user_in_db = check_user_and_role(db, user_id, current_user, "You do not have the permission to delete this user")
     user_in_db.delete()
     db.commit()
