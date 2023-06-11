@@ -1,7 +1,4 @@
 from flask_crud import app, db
-from flask_crud.models.entry import Entry
-from flask_crud.models.setting import Setting
-from flask_crud.models.user import User
 from flask_crud.models.role import Role
 
 with app.app_context():

@@ -17,5 +17,8 @@ class User(db.Model):
         return {
             'id': self.id,
             'username': self.username,
-            'role_id': self.role_id,
+            'role': {
+                'id': self.role.id,
+                'name': self.role.name
+            } if self.role else None
         }

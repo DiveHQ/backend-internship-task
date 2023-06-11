@@ -39,9 +39,9 @@
 
 - [ ] **Implement Filtering, Pagination, and JSON Response Formatting**
 
-  - [ ] Add filter capabilities to endpoints returning a list of elements
-  - [ ] Add pagination to endpoints returning a list of elements
-  - [ ] Ensure all responses are formatted as JSON
+  - [x] Add filter capabilities to endpoints returning a list of elements
+  - [x] Add pagination to endpoints returning a list of elements
+  - [x] Ensure all responses are formatted as JSON
 
 - [ ] **Write Tests**
 

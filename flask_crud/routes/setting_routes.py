@@ -14,7 +14,8 @@ setting_blueprint = Blueprint('setting', __name__)
 def token_required(f):
     @wraps(f)
     def decorator(*args, **kwargs):
-        token = request.headers.get('Authorization')
+        auth = request.headers.get('Authorization')
+        token = auth.split()[1] if auth else None
         if not token:
             return jsonify({'message': 'Token is missing!'}), 401
 
