@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from app.permissions import ManagerEditDeletePermission, CaloryEditDeletePermission
 from .serializers import CalorySerializer
 from .models import CaloryLimit, Calories
+from .nutritionix import get_calories
 
 import datetime
 
@@ -19,20 +20,32 @@ class CaloryView(APIView):
             return CaloryLimit.objects.get(id=pk)
         except CaloryLimit.DoesNotExist:
             raise Http404
+        
+    def validate_and_save(self, request, limit):
+        serializer = CalorySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        limit.present_calory_amount += request.data['calories']
+        if limit.present_calory_amount >= limit.calory_limit:
+            limit.exceeded_maximum = True
+        limit.save()
+
+        serializer.save(user=request.user, calory_limit=limit)
+        return serializer.data
     
     def post(self, request, pk):
         limit = self.get_limit(pk)
-        serializer = CalorySerializer(data=request.data)
-        if serializer.is_valid():
-            limit.present_calory_amount+= request.data['calories']
-            if limit.present_calory_amount >= limit.calory_limit:
-                limit.exceeded_maximum = True
-            limit.save()
-            serializer.save(user=request.user, calory_limit=limit)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    
+        if 'calories' not in request.data:
+            calories = get_calories(request.data['text'])
+            request.data['calories'] = calories
+        
+        try:
+            data = self.validate_and_save(request, limit)
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            error_message = { 'error': str(e)}
+            return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
+        
         
     def get(self, request, pk):
         limit = self.get_limit(pk)
@@ -45,6 +58,7 @@ class CaloryDetailsView(RetrieveUpdateDestroyAPIView):
     permission_classes = [CaloryEditDeletePermission | ManagerEditDeletePermission]
     queryset = Calories.objects.all()
     serializer_class = CalorySerializer
+
 
     
 class GetCurrentCaloryDetails(APIView):
