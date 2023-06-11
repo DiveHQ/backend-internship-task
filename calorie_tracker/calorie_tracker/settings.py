@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 import socket
+from datetime import timedelta
 from typing import List
 
 import environ
@@ -146,9 +147,16 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 50,
 }
 
 if DEBUG:
     # For Docker, the following will set INTERNAL_IPS correctly for django-debug-toolbar
     hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
     INTERNAL_IPS = [ip[: ip.rfind(".")] + ".1" for ip in ips] + ["127.0.0.1", "10.0.2.2"]
+
+    # Extend access token lifetime for a better development experience.
+    SIMPLE_JWT = {
+        "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
+    }
