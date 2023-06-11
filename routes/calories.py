@@ -3,7 +3,7 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from utils.oauth2 import get_current_user
 from datetime import datetime
-from schema.calories import CalorieEntry, Calorie, CalorieEntryResponse, CaloriePaginatedResponse, CalorieUpdate
+from schema.calories import CalorieEntry, Calorie, CaloriePaginatedResponse, CalorieUpdate
 from db.repository.calorie import create_new_calorie_entry
 from db.database import get_db
 from sqlalchemy.orm import Session
@@ -11,6 +11,7 @@ from db import models
 from service.nutrixion import get_nutrition_data
 from sqlalchemy import func
 from sqlalchemy import desc
+from core.exceptions import NotFoundError, ForbiddenError
 
 calorie_router = APIRouter(tags=["Calorie"], prefix="/calories")
 
@@ -32,13 +33,11 @@ def check_for_calorie(db, calorie_id, current_user):
     calorie_entry = db.query(models.CalorieEntry).filter(models.CalorieEntry.id == calorie_id)
     first_entry = calorie_entry.first()
     if not first_entry:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
+        raise NotFoundError(
             detail=f"Calorie entry with id {calorie_id} not found"
         )
     if first_entry.user_id != current_user.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+        raise ForbiddenError(
             detail="You not authorized to access this",
         )
     

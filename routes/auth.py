@@ -2,11 +2,9 @@
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from utils.utils import get_password_hash
+from utils.user_utils import create_user
 from db import models
 from db.database import get_db
-from db.repository.user import create_new_user
-
 from schema.user import User, Token, UserResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from utils.utils import verify_password
@@ -29,21 +27,8 @@ def signup(user: User, db: Session = Depends(get_db)):
 
     """
 
-    user_data = db.query(models.User).filter(models.User.email == user.email).first()
-    if user_data:
-        raise ValidationError(detail="User already exists")
-    hash_passwd = get_password_hash(user.password)
-    if user.password != user.password_confirmation:
-        raise ValidationError(detail="Passwords do not match")
-
-    user.password = hash_passwd
-    new_user = create_new_user(user, db)
-    return UserResponse(id=new_user.id, 
-                        email=new_user.email, 
-                        first_name=new_user.first_name, 
-                        last_name=new_user.last_name, 
-                        role=new_user.role,
-                        expected_calories=new_user.expected_calories)
+    user = create_user(user, db)
+    return user
 
 
 @auth_router.post('/login', response_model=Token)

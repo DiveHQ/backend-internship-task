@@ -11,6 +11,16 @@ class ValidationError(HTTPException):
 class UserNotFoundError(ValidationError):
   pass
 
+class NotFoundError(HTTPException):
+   def __init__(self, detail: str):
+    self.status_code = status.HTTP_404_NOT_FOUND
+    self.detail = detail
+
+class ForbiddenError(HTTPException):
+   def __init__(self, detail: str):
+    self.status_code = status.HTTP_403_FORBIDDEN
+    self.detail = detail
+
 
 class CredentialsException(HTTPException):
     def __init__(self, detail: str):

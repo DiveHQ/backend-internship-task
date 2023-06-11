@@ -3,6 +3,7 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from db.models import Role
+import datetime
 
 class User(BaseModel):
     email: EmailStr = Field(...)
@@ -22,9 +23,22 @@ class UserResponse(BaseModel):
     role: Role = Field(...)
     expected_calories: int = Field(...)
 
+class UserUpdateResponse(UserResponse):
+    updated_at: datetime.datetime = Field(...)
+
 class Token(BaseModel):
     token: str = Field(...)
     token_type: str = Field(...)
 
 class TokenData(BaseModel):
     id: Optional[str] = Field(default=None)
+
+class TotalUsers(BaseModel):
+    total: int = Field(...)
+    data: List[UserResponse] = Field(...)
+
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr]
+    first_name: Optional[str]
+    last_name: Optional[str]
+    updated_at: Optional[datetime.datetime]

@@ -93,3 +93,15 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 
     
+def get_current_manager(current_user = Depends(get_current_user)):
+    """
+    Checks if user is a user manager and returns it
+    Args:
+        current_user: It depends on the get_current_user function
+
+    Return: User manager
+    """
+    if current_user.role.name != "user_manager":
+        raise HTTPException(status_code=403, detail="Insufficient privileges")
+    return current_user
+    

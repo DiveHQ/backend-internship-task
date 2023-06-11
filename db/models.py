@@ -8,7 +8,7 @@ import enum
 
 class Role(enum.Enum):
     user = "user"
-    user_manager = "manager"
+    manager = "manager"
     admin = "admin"
 
 class User(Base):
@@ -20,6 +20,7 @@ class User(Base):
     last_name = Column(String, nullable=False)
     password = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
     expected_calories = Column(Integer, nullable=False, server_default="1000")
     calorie_entries = relationship("CalorieEntry", back_populates="user")
 

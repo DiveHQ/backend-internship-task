@@ -2,9 +2,10 @@
 
 from typing import List
 from passlib.context import CryptContext
-from fastapi import HTTPException, Depends
+from fastapi import Depends
 from db.models import User
 from utils.oauth2 import get_current_user
+from core.exceptions import ForbiddenError
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -22,4 +23,5 @@ class RoleChecker:
 
     def __call__(self, user: User = Depends(get_current_user)):
         if user.role.name not in self.allowed_roles:
-            raise HTTPException(status_code=403, detail="Operation not permitted")
+            raise ForbiddenError(detail="You are not permitted to perform this operation")
+        
