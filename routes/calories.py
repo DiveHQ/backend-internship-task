@@ -1,17 +1,20 @@
 
 
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status, Depends, Query
 from utils.oauth2 import get_current_user
 from datetime import datetime
-from schema.calories import CalorieEntry, Calorie, CalorieEntryResponse, CalorieUpdate
+from schema.calories import CalorieEntry, Calorie, CalorieEntryResponse, CaloriePaginatedResponse, CalorieUpdate
 from db.repository.calorie import create_new_calorie_entry
 from db.database import get_db
 from sqlalchemy.orm import Session
 from db import models
 from service.nutrixion import get_nutrition_data
 from sqlalchemy import func
+from sqlalchemy import desc
 
 calorie_router = APIRouter(tags=["Calorie"], prefix="/calories")
+
+calorie_link = "/api/v1/calories"
 
 def check_for_calorie(db, calorie_id, current_user):
     
@@ -41,8 +44,8 @@ def check_for_calorie(db, calorie_id, current_user):
     
     return calorie_entry
 
-@calorie_router.get("/", status_code=status.HTTP_200_OK, response_model=CalorieEntryResponse)
-def get_all_calories(current_user = Depends(get_current_user), db: Session = Depends(get_db)):
+@calorie_router.get("/", status_code=status.HTTP_200_OK)
+def get_all_calories(limit:int = Query(default=1, ge=1), page: int = Query(default=1, ge=1), current_user = Depends(get_current_user), db: Session = Depends(get_db)):
 
     """
     Returns all calorie entries that belong to the current user
@@ -54,14 +57,46 @@ def get_all_calories(current_user = Depends(get_current_user), db: Session = Dep
 
     """
 
-    all_entries = db.query(models.CalorieEntry).filter(models.CalorieEntry.user_id == current_user.id).all()
+    total_calorie_entries = db.query(models.CalorieEntry).count()
+    pages = (total_calorie_entries - 1) // limit + 1
+    offset = (page - 1) * limit
+    calorie_entries = db.query(
+                        models.CalorieEntry).filter(
+                        models.CalorieEntry.user_id == current_user.id
+                        ).order_by(desc(
+                        models.CalorieEntry.created_at)
+                        ).offset(offset).limit(limit).all()
+    
+    print(type(calorie_entries[0]))
     calories_response = [Calorie(date=calorie.date,
                                  time=calorie.time,
                                  text=calorie.text,
                                  number_of_calories=calorie.number_of_calories,
                                  user_id=calorie.user_id,
-                                 is_below_expected=calorie.is_below_expected) for calorie in all_entries]
-    return CalorieEntryResponse(total=len(all_entries), data=calories_response)
+                                 is_below_expected=calorie.is_below_expected) for calorie in calorie_entries]
+
+    links = {
+        "first": f"{calorie_link}?limit={limit}&page=1",
+        "last": f"{calorie_link}?limit={limit}&page={pages}",
+        "current_page": f"{calorie_link}?limit={limit}&page={page}",
+        "next": None,
+        "prev": None,
+    }
+
+    if page < pages:
+        links["next"] = f"{calorie_link}?limit={limit}&page={page + 1}"
+
+    if page > 1:
+        links["prev"] = f"{calorie_link}?limit={limit}&page={page - 1}"
+
+    return CaloriePaginatedResponse(
+        calorie_entries=calories_response,
+        total=total_calorie_entries,
+        page=page,
+        size=limit,
+        pages=pages,
+        links=links
+    )
 
 @calorie_router.get("/{calorie_id}", status_code=status.HTTP_200_OK, response_model=Calorie)
 def get_calorie_entry(calorie_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
