@@ -1,3 +1,5 @@
 from django.contrib import admin
+from .models import Calories, CaloryLimit
 
-# Register your models here.
+admin.site.register(Calories)
+admin.site.register(CaloryLimit)

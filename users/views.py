@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from .serializers import RegistrationSerializer, UserSerializer
 from rest_framework.generics import CreateAPIView, UpdateAPIView
-from rest_framework.views import APIView
 
 from .models import User
 from app.permissions import UserEditDeletePermission

@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.contrib.auth.hashers import make_password
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from .models import User
@@ -8,6 +9,17 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+
+    def validate_password(self, value):
+        return make_password(value)
+    
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email address already exists.")
+        return value
+    
+    def validate(self, attrs):
+        return attrs
 
         
 class RegistrationSerializer(serializers.ModelSerializer):
