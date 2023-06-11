@@ -1,9 +1,9 @@
 
 
-from fastapi import APIRouter, HTTPException, status, Depends, Query
+from fastapi import APIRouter, status, Depends, Query
 from utils.oauth2 import get_current_user
 from datetime import datetime
-from schema.calories import CalorieEntry, Calorie, CaloriePaginatedResponse, CalorieUpdate
+from schema.calories import CalorieEntry, Calorie, CaloriePaginatedResponse, CalorieUpdate, CalorieResponse
 from db.repository.calorie import create_new_calorie_entry
 from db.database import get_db
 from sqlalchemy.orm import Session
@@ -11,37 +11,12 @@ from db import models
 from service.nutrixion import get_nutrition_data
 from sqlalchemy import func
 from sqlalchemy import desc
-from core.exceptions import NotFoundError, ForbiddenError
+from utils.calorie_utils import check_for_calorie_and_owner, update_calorie_entry, delete_calorie_entry
 
 calorie_router = APIRouter(tags=["Calorie"], prefix="/calories")
 
 calorie_link = "/api/v1/calories"
 
-def check_for_calorie(db, calorie_id, current_user):
-    
-    """
-    Checks if a calorie entry exists and also if the calorie entry belongs to the current user
-    Args:
-        db: Database session
-        calorie_id: The id of the calorie entry to obtain from db
-        current_user: The current user object
-
-    Return: The query object
-
-    """
-
-    calorie_entry = db.query(models.CalorieEntry).filter(models.CalorieEntry.id == calorie_id)
-    first_entry = calorie_entry.first()
-    if not first_entry:
-        raise NotFoundError(
-            detail=f"Calorie entry with id {calorie_id} not found"
-        )
-    if first_entry.user_id != current_user.id:
-        raise ForbiddenError(
-            detail="You not authorized to access this",
-        )
-    
-    return calorie_entry
 
 @calorie_router.get("/", status_code=status.HTTP_200_OK)
 def get_all_calories(limit:int = Query(default=1, ge=1), page: int = Query(default=1, ge=1), current_user = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -66,7 +41,6 @@ def get_all_calories(limit:int = Query(default=1, ge=1), page: int = Query(defau
                         models.CalorieEntry.created_at)
                         ).offset(offset).limit(limit).all()
     
-    print(type(calorie_entries[0]))
     calories_response = [Calorie(date=calorie.date,
                                  time=calorie.time,
                                  text=calorie.text,
@@ -111,7 +85,7 @@ def get_calorie_entry(calorie_id: int, db: Session = Depends(get_db), current_us
 
     """
 
-    calorie_entry = check_for_calorie(db, calorie_id, current_user)
+    calorie_entry = check_for_calorie_and_owner(db, calorie_id, current_user)
     return_data = calorie_entry.first()
     return Calorie(date=return_data.date, 
                    time=return_data.time, 
@@ -120,7 +94,7 @@ def get_calorie_entry(calorie_id: int, db: Session = Depends(get_db), current_us
                    user_id=current_user.id,
                    is_below_expected=return_data.is_below_expected)
 
-@calorie_router.post('/', status_code=status.HTTP_201_CREATED, response_model=Calorie)
+@calorie_router.post('/', status_code=status.HTTP_201_CREATED, response_model=CalorieResponse)
 def create_calorie(calorie_entry: CalorieEntry, current_user = Depends(get_current_user), db: Session = Depends(get_db)):
 
     """
@@ -161,7 +135,8 @@ def create_calorie(calorie_entry: CalorieEntry, current_user = Depends(get_curre
 
     new_calorie_entry = create_new_calorie_entry(calorie, db)
 
-    return Calorie(
+    return CalorieResponse(
+                    id=new_calorie_entry.id,
                     date=new_calorie_entry.date, 
                     time=new_calorie_entry.time, 
                     text=new_calorie_entry.text, 
@@ -185,27 +160,9 @@ def update_calorie(calorie_id: int, calorie_entry: CalorieUpdate, db: Session = 
 
     """
 
-    calorie = check_for_calorie(db, calorie_id, current_user)
-    current_time = datetime.utcnow()
-    updated_calorie = CalorieUpdate(
-                        text=calorie_entry.text,
-                        number_of_calories=calorie_entry.number_of_calories,
-                        is_below_expected=calorie_entry.is_below_expected,
-                        updated_at=current_time
-                    )
-    updated_dict = updated_calorie.dict()
-    new_update = {k:v for k,v in updated_dict.items() if v is not None}
+    calorie = update_calorie_entry(calorie_id, calorie_entry, db, current_user)
 
-    calorie.update(new_update)
-    db.commit()
-    updated_calorie_entry = calorie.first()
-
-    return Calorie(date=updated_calorie_entry.date, 
-                   time=updated_calorie_entry.time, 
-                   text=updated_calorie_entry.text, 
-                   number_of_calories=updated_calorie_entry.number_of_calories,
-                   user_id=updated_calorie_entry.user_id,
-                   is_below_expected=updated_calorie_entry.is_below_expected)
+    return calorie
 
 
 @calorie_router.delete("/{calorie_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -222,6 +179,5 @@ def delete_calorie(calorie_id: int, db: Session = Depends(get_db), current_user 
 
     """
 
-    calorie = check_for_calorie(db, calorie_id, current_user)
-    calorie.delete()
-    db.commit()
+    delete_calorie_entry(db, calorie_id, current_user)
+

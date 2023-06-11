@@ -15,6 +15,9 @@ class Calorie(BaseModel):
     # class Config:
     #     orm_mode = True
 
+class CalorieResponse(Calorie):
+    id: int = Field(...)
+
 class CalorieUpdate(BaseModel):
     text: Optional[str]
     number_of_calories: Optional[int]
@@ -42,3 +45,7 @@ class CaloriePaginatedResponse(BaseModel):
     pages: int = Field(...)
     calorie_entries: List[Calorie] = Field(...)
     links: Optional[Dict[str, Optional[str]]]
+
+class CalorieEntryResponse(BaseModel):
+    total: int = Field(...)
+    data: Calorie

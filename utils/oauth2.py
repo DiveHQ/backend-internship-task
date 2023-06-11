@@ -104,4 +104,16 @@ def get_current_manager(current_user = Depends(get_current_user)):
     if current_user.role.name != "user_manager":
         raise HTTPException(status_code=403, detail="Insufficient privileges")
     return current_user
+
+def get_current_admin_user(current_user = Depends(get_current_user)):
+    """
+    Checks if user is an admin user and returns it
+    Args:
+        current_user: It depends on the get_current_user function
+
+    Return: Admin user
+    """
+    if current_user.role.name != "admin":
+        raise HTTPException(status_code=403, detail="Insufficient privileges")
+    return current_user
     
