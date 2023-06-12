@@ -5,7 +5,6 @@ from models import User, Entry, engine, Session
 import requests
 from sqlalchemy import func
 from datetime import date
-from fastapi_jwt_auth import AuthJWT
 from fastapi.encoders import jsonable_encoder
 
 
@@ -14,15 +13,19 @@ from fastapi.encoders import jsonable_encoder
 
 calories_routes = APIRouter(prefix="/api/v1.0", tags=["Calories"])
 
+#creating a session for database
 session = Session(bind=engine)
 
 
-#route to create new calor entry
+
+
+
+
+# Route to create a new calory entry
 @calories_routes.post("/new_entry", status_code=status.HTTP_201_CREATED)
 async def new_calory(
     entry: EntryCreate,
-    current_user: str = Depends(token_manager),
-    expected_calories: int = 2000  # Default expected calories per day
+    current_user: str = Depends(token_manager)
 ):
     try:
         if not entry.calories:
@@ -31,7 +34,6 @@ async def new_calory(
                 try:
                     # Extract the calories information from the response
                     data = response.text
-                    print(response.json)
                     start_index = data.find("Calories") + len("Calories")
                     end_index = data.find("% Daily Value*")
                     calories_text = data[start_index:end_index].strip()
@@ -48,6 +50,8 @@ async def new_calory(
                 )
 
         existing_user = session.query(User).filter_by(email=current_user).first()
+  
+
         if not existing_user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist"
@@ -62,26 +66,54 @@ async def new_calory(
         session.add(new_entry)
         session.commit()
 
-        # Calculate the total calories for the current day
+      # Calculate the total calories for the current day
         today = date.today()
         total_calories = (
             session.query(func.sum(Entry.calories))
-            .filter(func.DATE(Entry.date) == today)
+            .filter(func.DATE(Entry.date) == today, Entry.users_id == existing_user.id)
             .scalar()
         )
+       
+        
+      
 
         # Determine if the total calories for the day are less than the expected calories
-        is_below_expected_calorie = total_calories < expected_calories
+        is_below_expected_calorie = total_calories < existing_user.expected_calories
 
+        # Update the is_below_expected_calories attribute of the new_entry object
         new_entry.is_below_expected_calories = is_below_expected_calorie
         session.commit()
-        
+
         return {"message": "New entry created"}
     except HTTPException as e:
         raise e  # Re-raise the HTTPException
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+#route to dislay total number of calories per day
+@calories_routes.get("/total_calories", status_code=status.HTTP_200_OK)
+async def total_calories(current_user:str = Depends(token_manager)):
+    existing_user = session.query(User).filter_by(email=current_user).first()
+  
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist"
+            )
+
+    if existing_user.role not in ["user", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="User does not have permission"
+            )
+    today = date.today()
+    total_calories = (
+        session.query(func.sum(Entry.calories))
+        .filter(func.DATE(Entry.date) == today, Entry.users_id == existing_user.id)
+        .scalar()
+        )
     
+    return jsonable_encoder({"total calories on {}".format(today):total_calories})
+
 
 #route to display all calories entry
 @calories_routes.get("/all_entries", status_code=status.HTTP_200_OK)

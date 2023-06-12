@@ -1,11 +1,14 @@
 from sqlalchemy import Column, Text, String, Integer, create_engine, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship, declarative_base, sessionmaker
 from datetime import datetime
+from sqlalchemy import MetaData
 
 
 
 engine = create_engine("sqlite:///mydb.sql", echo=True)
-Base = declarative_base()
+metadata = MetaData()
+Base = declarative_base(metadata=metadata)
+
 Session = sessionmaker()
 
 
@@ -15,6 +18,7 @@ class User(Base):
     email = Column(String, unique=True)
     password = Column(String)
     role = Column(String)
+    expected_calories = Column(Integer, default=2000)
 
 
 class Entry(Base):
@@ -25,5 +29,11 @@ class Entry(Base):
     calories = Column(Integer)
     users_id = Column(Integer, ForeignKey("users.id"))
     is_below_expected_calories = Column(Boolean, default=False)
+
+
+class RevokedToken(Base):
+    __tablename__ = 'revoked_tokens'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
     
