@@ -1,5 +1,4 @@
 import pytest
-from accounts.constants import User
 from accounts.tests.conftest import (
     FAILED_LOGIN_ERROR_MESSAGE,
     FORBIDDEN_ERROR_MESSAGE,
@@ -11,6 +10,7 @@ from accounts.tests.conftest import (
     update_user_password_url,
     user_detail_url,
 )
+from core.constants import User
 from django.contrib.auth.models import User as UserModel
 from model_bakery import baker
 from rest_framework import status

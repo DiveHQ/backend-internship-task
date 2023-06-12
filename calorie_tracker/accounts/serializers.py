@@ -1,9 +1,8 @@
+from core.constants import User
 from django.contrib.auth.password_validation import (
     validate_password as django_validate_password,
 )
 from rest_framework import serializers
-
-from .constants import User
 
 
 class PasswordSerializer(serializers.ModelSerializer):

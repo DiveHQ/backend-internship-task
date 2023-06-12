@@ -1,7 +1,8 @@
+from core.constants import User
 from django.http import HttpRequest
 from rest_framework.permissions import BasePermission, IsAuthenticated
 
-from .constants import USER_MANAGER_GROUP, User
+from .constants import USER_MANAGER_GROUP
 
 
 class IsUserManager(BasePermission):
