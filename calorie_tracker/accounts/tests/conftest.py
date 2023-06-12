@@ -1,7 +1,8 @@
 import secrets
 
 import pytest
-from accounts.constants import USER_MANAGER_GROUP, User
+from accounts.constants import USER_MANAGER_GROUP
+from core.constants import User
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User as UserModel
 from django.urls import reverse

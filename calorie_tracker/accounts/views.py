@@ -1,10 +1,10 @@
+from core.constants import User
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from .constants import User
 from .filters import UserFilter
 from .permissions import IsAccountOwner, IsUserManager
 from .serializers import PasswordSerializer, UserSerializer
