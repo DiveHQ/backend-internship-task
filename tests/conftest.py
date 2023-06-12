@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from src.db.database import Base, get_db
 from src.main import app
 
-TEST_SQLALCHEMY_DATABASE_URL = f"sqlite:///./test_db"
+TEST_SQLALCHEMY_DATABASE_URL = f"sqlite:///./testdb.db"
 
 engine = create_engine(
     TEST_SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
