@@ -16,4 +16,14 @@ class CaloryLimit(models.Model):
 
     def __str__(self) -> str:
         return self.description
+    
+
+    def save(self, *args, **kwargs):
+        if self.present_calory_amount > self.calory_limit:
+            self.exceeded_maximum = True
+        else:
+            self.exceeded_maximum = False
+
+        super().save(*args, **kwargs)
+
 

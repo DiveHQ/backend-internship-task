@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from app.permissions import ManagerEditDeletePermission, CaloryEditDeletePermission
+from app.permissions import ManagerEditDeletePermission, IsOwnerOrReadOnly
 from calory_limit.serializers import CaloryLimitSerializer
 from .serializers import CalorySerializer
 from .models import CaloryLimit, Calories
@@ -55,7 +55,7 @@ class CaloryView(APIView):
     
 
 class CaloryDetailsView(RetrieveAPIView):
-    permission_classes = [CaloryEditDeletePermission | ManagerEditDeletePermission]
+    permission_classes = [IsOwnerOrReadOnly | ManagerEditDeletePermission]
     queryset = Calories.objects.all()
     serializer_class = CalorySerializer
 
@@ -75,6 +75,7 @@ class GetCurrentCaloryDetails(APIView):
         return Response(response, status=status.HTTP_200_OK) 
 
 class EditDeleteCaloryView(APIView):
+    permission_classes = [IsOwnerOrReadOnly | ManagerEditDeletePermission]
     def get_calory_limit(self, pk):
         try:
             return CaloryLimit.objects.get(id=pk)
