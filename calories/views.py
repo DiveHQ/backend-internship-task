@@ -1,11 +1,11 @@
-from django.shortcuts import render
 from django.http import Http404
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from app.permissions import ManagerEditDeletePermission, CaloryEditDeletePermission
+from calory_limit.serializers import CaloryLimitSerializer
 from .serializers import CalorySerializer
 from .models import CaloryLimit, Calories
 from .nutritionix import get_calories
@@ -54,7 +54,7 @@ class CaloryView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
-class CaloryDetailsView(RetrieveUpdateDestroyAPIView):
+class CaloryDetailsView(RetrieveAPIView):
     permission_classes = [CaloryEditDeletePermission | ManagerEditDeletePermission]
     queryset = Calories.objects.all()
     serializer_class = CalorySerializer
@@ -72,5 +72,104 @@ class GetCurrentCaloryDetails(APIView):
             'total': total_calories,
             'data': serializer.data,
         }
-        return Response(response, status=status.HTTP_200_OK)  
+        return Response(response, status=status.HTTP_200_OK) 
+
+class EditDeleteCaloryView(APIView):
+    def get_calory_limit(self, pk):
+        try:
+            return CaloryLimit.objects.get(id=pk)
+        except CaloryLimit.DoesNotExist:
+            raise Http404
+        
+    def get_calory(self, pk):
+        try:
+            return Calories.objects.get(id=pk)
+        except Calories.DoesNotExist:
+            raise Http404
+        
+    def get_calory_serialized_data(self, pk):
+        try:
+            calory = Calories.objects.get(id=pk)
+            serializer = CalorySerializer(calory)
+            return serializer.data
+        except Calories.DoesNotExist:
+            raise Http404
+    
+    def get_limit_serialized_data(self, pk):
+        try:
+            _limit = CaloryLimit.objects.get(id=int(pk))
+            serializer = CaloryLimitSerializer(_limit)
+            return serializer.data
+        except CaloryLimit.DoesNotExist:
+            raise Http404
+    
+    def remove_old_calory_amount(self, calory):
+        calory_limit = self.get_limit_serialized_data(calory['calory_limit'])
+        calory_limit['present_calory_amount'] -= calory['calories']
+        if calory_limit['present_calory_amount'] >= calory_limit['calory_limit']:
+            calory_limit['exceeded_maximum'] = True
+        else:
+            calory_limit['exceeded_maximum'] = False
+        return calory_limit
+
+    def add_new_calory_amount(self, calory, calory_amount):
+        calory_limit = self.get_limit_serialized_data(calory['calory_limit'])
+        calory_limit['present_calory_amount'] += calory_amount
+        if calory_limit['present_calory_amount'] >= calory_limit['calory_limit']:
+            calory_limit['exceeded_maximum'] = True
+        else:
+            calory_limit['exceeded_maximum'] = False
+        return calory_limit
+
+    def put(self, request, pk):
+        calory = self.get_calory_serialized_data(pk)
+        calory_ = self.get_calory(pk)
+        limit = self.get_calory_limit(calory['calory_limit'])
+        try:
+            limit_data = self.remove_old_calory_amount(calory)
+            serializer = CaloryLimitSerializer(limit, data=limit_data) 
+            if serializer.is_valid():
+                serializer.save()
+                # return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            error_message = {'error': str(e)}
+            return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
+        serializer = CalorySerializer(calory_, data=request.data)      
+        if serializer.is_valid():
+            try:
+                limit_data = self.add_new_calory_amount(calory, request.data['calories'])
+                limit_serializer = CaloryLimitSerializer(limit, data=limit_data)  
+                if limit_serializer.is_valid():
+                    limit_serializer.save()
+                #     return Response(limit_serializer.data, status=status.HTTP_200_OK)
+                # else:
+                #     return Response(limit_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                error_message = {'error': 'The error is here'}
+                return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self, request, pk):
+        calory = self.get_calory_serialized_data(pk)
+        calory_ = self.get_calory(pk)
+        limit = self.get_calory_limit(calory['calory_limit'])
+        try:
+            limit_data = self.remove_old_calory_amount(calory)
+            serializer = CaloryLimitSerializer(limit, data=limit_data)
+            if serializer.is_valid():
+                serializer.save()
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            error_message = {'error': str(e)}
+            return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
+        
+        # delete calory
+        calory_.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 

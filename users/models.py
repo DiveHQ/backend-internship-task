@@ -45,23 +45,22 @@ class UserManager(BaseUserManager):
         )
 
         return user
-
+    
 class User(AbstractUser):
     ROLE_CHOICES = [
         ('Regular', 'Regular'),
         ('Manager', 'Manager')
     ]
     username = None
-    email = models.EmailField(max_length=100, unique=True)
-    password = models.CharField(max_length=100, null=False)
+    email = models.CharField(max_length=100, unique=True, null=False)
+    first_name = models.CharField(max_length=100, null=False)
+    last_name = models.CharField(max_length=100, null=False)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, null=False)
-    createdAt = models.DateTimeField(auto_now=True)
-    updatedAt = models.DateTimeField(auto_now_add=True)
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now=True)
+    
 
     object = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['password']
+    REQUIRED_FIELDS = ['password', 'first_name', 'last_name']
 

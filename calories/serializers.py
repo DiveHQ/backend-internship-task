@@ -12,4 +12,3 @@ class CalorySerializer(serializers.ModelSerializer):
         return attrs
 
 
-        
