@@ -7,3 +7,4 @@ __pycache__
 test.env
 test_db
 *.db
+.DS_Store

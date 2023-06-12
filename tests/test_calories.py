@@ -38,3 +38,4 @@ def test_get_one_calorie_entry(authorized_user, calorie_entries):
     assert calorie.time == calorie_entries[0].time
     assert calorie.number_of_calories == calorie_entries[0].number_of_calories
     assert res.status_code == 200
+
