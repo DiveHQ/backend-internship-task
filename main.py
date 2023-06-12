@@ -3,6 +3,7 @@ from calories import calories_routes
 from fastapi_jwt_auth import AuthJWT
 from schema import Settings
 from auth import auth_routes
+from users import users_routes
 
 
 
@@ -17,3 +18,4 @@ def get_config():
 
 app.include_router(calories_routes)
 app.include_router(auth_routes)
+app.include_router(users_routes)
