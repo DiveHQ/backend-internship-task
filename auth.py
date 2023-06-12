@@ -7,7 +7,7 @@ from fastapi.encoders import jsonable_encoder
 
 
 
-auth =  APIRouter(tags="Authentication")
+auth_routes =  APIRouter(prefix="/api/v1.0", tags=["Authentication"])
 
 session = Session(bind=engine)
 
@@ -36,10 +36,9 @@ async def token_manager(Authorize: AuthJWT = Depends()):
         
     except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid or missing token")
-    
 
 
-@auth.post("/sign_up", status_code=status.HTTP_201_CREATED)
+@auth_routes.post("/sign_up", status_code=status.HTTP_201_CREATED)
 async def new_user(user:UserCreate):
 
     existing_user = session.query(User).filter_by(email=user.email).first()
@@ -52,7 +51,7 @@ async def new_user(user:UserCreate):
     return {"message":"New user created"}
 
 
-@auth.post("/sign_in", status_code=status.HTTP_200_OK)
+@auth_routes.post("/sign_in", status_code=status.HTTP_200_OK)
 async def sign_in(user:UserSignin, Authorize:AuthJWT=Depends()):
     existing_user = session.query(User).filter_by(email=user.email).first()
     if existing_user is None:
@@ -66,7 +65,7 @@ async def sign_in(user:UserSignin, Authorize:AuthJWT=Depends()):
     
 
 # #route to log out user
-@auth.post("/sign_out", status_code=status.HTTP_200_OK)
+@auth_routes.post("/sign_out", status_code=status.HTTP_200_OK)
 def sign_out(Authorize: AuthJWT = Depends()):
     try:
         Authorize.jwt_required()
