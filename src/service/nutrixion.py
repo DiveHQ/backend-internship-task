@@ -1,6 +1,6 @@
 
 
-from src.core.exceptions import ValidationError
+from src.core.exceptions import ValidationError, EmptyResponseError
 from src.core.configvars import env_config
 import httpx
 import json
@@ -15,7 +15,11 @@ def get_nutrition_data(text):
         raise ValidationError(detail=msg)
     data = resp.json()
 
-    food = data.get('branded')[0]
+    branded = data.get('branded')
+    if not branded:
+        raise EmptyResponseError("Text could not retrieve number of calories. Kindly enter the number of calories or write a new text")
+    food = branded[0]
+    print(branded)
     number_of_calories = food.get("nf_calories")
 
     return number_of_calories

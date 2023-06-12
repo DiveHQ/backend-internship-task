@@ -9,7 +9,7 @@ from src.schema.user import User, Token, UserResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from src.utils.utils import verify_password
 from src.utils.oauth2 import get_access_token
-from src.core.exceptions import ValidationError, UserNotFoundError
+from src.core.exceptions import InvalidCredentialError
 
 
 auth_router = APIRouter(tags=["Auth"], prefix="/users")
@@ -46,10 +46,10 @@ def login(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     
     user_data = db.query(models.User).filter(models.User.email == user.username).first()
     if not user_data:
-        raise UserNotFoundError(detail="Invalid Credentials")
+        raise InvalidCredentialError(detail="Invalid Credentials")
 
     if not verify_password(user.password, user_data.password):
-        raise ValidationError(detail="Invalid credentials")
+        raise InvalidCredentialError(detail="Invalid credentials")
 
     token = get_access_token(str(user_data.id))
 
