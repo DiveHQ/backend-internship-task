@@ -12,7 +12,7 @@ from datetime import datetime
 
 #     return calorie
 
-def check_for_calorie_and_owner(db, calorie_id, current_user):
+def check_for_calorie_and_owner(db, calorie_id, current_user, msg):
     
     """
     Checks if a calorie entry exists and also if the calorie entry belongs to the current user
@@ -35,18 +35,17 @@ def check_for_calorie_and_owner(db, calorie_id, current_user):
         return calorie_entry
     elif first_entry.user_id != current_user.id:
             raise ForbiddenError(
-                detail="You not authorized to access this",
+                detail=msg,
             )
     
     return calorie_entry
 
 def update_calorie_entry(calorie_id, calorie_entry, db, current_user):
-    calorie = check_for_calorie_and_owner(db, calorie_id, current_user)
+    calorie = check_for_calorie_and_owner(db, calorie_id, current_user, "You not authorized to update this calorie entry")
     current_time = datetime.utcnow()
     updated_calorie = CalorieUpdate(
                         text=calorie_entry.text,
                         number_of_calories=calorie_entry.number_of_calories,
-                        is_below_expected=calorie_entry.is_below_expected,
                         updated_at=current_time
                     )
     updated_dict = updated_calorie.dict()
@@ -77,6 +76,6 @@ def delete_calorie_entry(db, calorie_id, current_user):
 
     """
 
-    calorie = check_for_calorie_and_owner(db, calorie_id, current_user)
+    calorie = check_for_calorie_and_owner(db, calorie_id, current_user, "You not authorized to delete this calorie entry")
     calorie.delete()
     db.commit()

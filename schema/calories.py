@@ -12,17 +12,17 @@ class Calorie(BaseModel):
     user_id: int = Field(...)
     is_below_expected: bool = Field(...)
 
-    # class Config:
-    #     orm_mode = True
 
 class CalorieResponse(Calorie):
     id: int = Field(...)
 
-class CalorieUpdate(BaseModel):
+class CalorieUpdateInput(BaseModel):
     text: Optional[str]
     number_of_calories: Optional[int]
-    is_below_expected: Optional[bool]
-    updated_at: Optional[datetime.datetime]
+
+
+class CalorieUpdate(CalorieUpdateInput):
+    updated_at: datetime.datetime
 
 class CalorieEntry(BaseModel):
     text: str = Field(...)

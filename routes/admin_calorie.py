@@ -47,6 +47,10 @@ def get_calorie(calorie_id: int, db: Session = Depends(get_db)):
         raise NotFoundError(detail=f"Calorie Entry with id {calorie_id} does not exist")
     return calorie_entry
 
+# @admin_calorie_router.post("/", status_code=status.HTTP_201_CREATED, dependencies=[Depends(allow_operation)])
+# def create_calorie_for_user():
+#     pass
+
 
 @admin_calorie_router.put("/{calorie_id}", status_code=status.HTTP_200_OK, dependencies=[Depends(allow_operation)])
 def update_calorie(calorie_id: int, calorie_entry: CalorieUpdate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):

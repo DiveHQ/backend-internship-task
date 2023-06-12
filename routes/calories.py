@@ -3,7 +3,7 @@
 from fastapi import APIRouter, status, Depends, Query
 from utils.oauth2 import get_current_user
 from datetime import datetime
-from schema.calories import CalorieEntry, Calorie, CaloriePaginatedResponse, CalorieUpdate, CalorieResponse
+from schema.calories import CalorieEntry, Calorie, CaloriePaginatedResponse, CalorieUpdateInput, CalorieResponse
 from db.repository.calorie import create_new_calorie_entry
 from db.database import get_db
 from sqlalchemy.orm import Session
@@ -146,7 +146,7 @@ def create_calorie(calorie_entry: CalorieEntry, current_user = Depends(get_curre
 
 
 @calorie_router.put("/{calorie_id}", status_code=status.HTTP_200_OK, response_model=Calorie)
-def update_calorie(calorie_id: int, calorie_entry: CalorieUpdate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+def update_calorie(calorie_id: int, calorie_entry: CalorieUpdateInput, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
 
     """
     Update a calorie entry
