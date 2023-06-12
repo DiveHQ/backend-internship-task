@@ -19,6 +19,7 @@ pip install -r requirements.txt
 ## Test Suite
 
 To run the test suite, execute the following command:
+
 pytest test_auth.py
 
 pytest test_calories.py
