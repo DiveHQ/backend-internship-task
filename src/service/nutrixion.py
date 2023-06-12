@@ -22,8 +22,9 @@ def get_nutrition_data(text):
         raise EmptyResponseError(
             "Text could not retrieve number of calories. Kindly enter the number of calories or write a new text"
         )
+    
     food = branded[0]
-    print(branded)
+    
     number_of_calories = food.get("nf_calories")
 
     return number_of_calories

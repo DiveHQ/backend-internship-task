@@ -6,11 +6,11 @@ import datetime
 
 class User(BaseModel):
     email: EmailStr = Field(...)
-    first_name: str = Field(...)
-    last_name: str = Field(...)
-    password: str = Field(...)
-    password_confirmation: str = Field(...)
-
+    first_name: str = Field(..., min_length=2)
+    last_name: str = Field(..., min_length=2)
+    password: str = Field(..., min_length=5)
+    password_confirmation: str = Field(..., min_length=5)
+    role: Optional[Role]
     # class Config:
     #     orm_mode = True
 
@@ -52,6 +52,7 @@ class UserUpdate(BaseModel):
     last_name: Optional[str]
     updated_at: Optional[datetime.datetime]
     role: Optional[Role]
+    expected_calories: Optional[int]
 
 
 class AdminUserUpdate(UserUpdate):

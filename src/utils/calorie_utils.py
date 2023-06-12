@@ -2,6 +2,7 @@ from src.core.exceptions import NotFoundError, ForbiddenError
 from src.db import models
 from src.schema.calories import CalorieUpdate, CalorieResponse
 from datetime import datetime
+from sqlalchemy import func
 
 # def check_for_calorie_entry(db, calorie_id):
 #     calorie = db.query(models.CalorieEntry).filter(models.CalorieEntry.id == calorie_id)
@@ -11,6 +12,15 @@ from datetime import datetime
 
 #     return calorie
 
+def get_total_number_of_calories(db, current_user, date):
+    total_calories_today = (
+        db.query(func.coalesce(func.sum(models.CalorieEntry.number_of_calories), 0))
+        .filter(
+            models.CalorieEntry.user_id == current_user.id
+            and models.CalorieEntry.date == date
+        )
+        .scalar()
+    )
 
 def check_for_calorie_and_owner(db, calorie_id, current_user, msg):
     """

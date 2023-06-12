@@ -5,7 +5,9 @@ from src.routes.manager import manager_router
 from src.routes.admin_calorie import admin_calorie_router
 from src.routes.admin_user import admin_user_router
 
+
 app = FastAPI()
+
 
 
 @app.get("/")

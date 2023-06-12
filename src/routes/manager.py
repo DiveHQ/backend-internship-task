@@ -105,6 +105,7 @@ def update_user(
         user_id: The id of the user to be updated
         user: User schema that is accepted in request to update user details
         db: Database session
+        current_user: The currently logged in user
 
     Return: The newly updated user
 

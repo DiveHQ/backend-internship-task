@@ -6,6 +6,10 @@ class ValidationError(HTTPException):
         self.status_code = status.HTTP_400_BAD_REQUEST
         self.detail = detail
 
+class UserAlreadyExistsError(HTTPException):
+    def __init__(self, detail: str):
+        self.status_code = status.HTTP_409_CONFLICT
+        self.detail = detail
 
 class InvalidCredentialError(HTTPException):
     def __init__(self, detail: str):

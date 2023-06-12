@@ -19,6 +19,7 @@ from src.utils.calorie_utils import (
     check_for_calorie_and_owner,
     update_calorie_entry,
     delete_calorie_entry,
+    get_total_number_of_calories
 )
 
 calorie_router = APIRouter(tags=["Calorie"], prefix="/calories")
@@ -43,7 +44,7 @@ def get_calories(
 
     """
 
-    total_calorie_entries = db.query(models.CalorieEntry).count()
+    total_calorie_entries = db.query(models.CalorieEntry).filter(models.CalorieEntry.user_id == current_user.id).count()
     pages = (total_calorie_entries - 1) // limit + 1
     offset = (page - 1) * limit
     calorie_entries = (
@@ -63,6 +64,7 @@ def get_calories(
             number_of_calories=calorie.number_of_calories,
             user_id=calorie.user_id,
             is_below_expected=calorie.is_below_expected,
+            id=calorie.id
         )
         for calorie in calorie_entries
     ]
@@ -145,6 +147,8 @@ def create_calorie(
     nf_calories = 0
     date = datetime.now().date()
     time = datetime.now().time().strftime("%H:%M:%S")
+
+    # total_calories_today = get_total_number_of_calories(db, current_user, date)
 
     total_calories_today = (
         db.query(func.coalesce(func.sum(models.CalorieEntry.number_of_calories), 0))

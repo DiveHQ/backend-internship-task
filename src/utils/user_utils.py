@@ -1,6 +1,6 @@
 from src.db import models
 from src.schema.user import UserResponse, UserUpdate, UserUpdateResponse, TotalUsers
-from src.core.exceptions import ValidationError
+from src.core.exceptions import UserAlreadyExistsError, ValidationError
 from src.db.repository.user import save_user_in_db
 from datetime import datetime
 from src.core.exceptions import NotFoundError, ForbiddenError
@@ -18,6 +18,25 @@ def check_for_user(db, user_id):
         raise NotFoundError(detail=f"User with id {user_id} does not exist")
 
     return user_in_db
+
+def check_user_and_role(db, user_id, current_user, msg):
+    user = check_for_user(db, user_id)
+    first_user = user.first()
+
+    if current_user.role.name == "admin":
+        return user
+    
+    if current_user.role.name == "manager":
+        if first_user.role.name != "user":
+            raise ForbiddenError(detail=msg)
+        else:
+            return user
+    
+    if (current_user.id != first_user.id):
+        raise ForbiddenError(detail=msg)
+    
+    return user
+
 
 
 def get_all_users(db):
@@ -69,19 +88,6 @@ def get_a_user(db, user_id):
     return returned_user
 
 
-def check_user_and_role(db, user_id, current_user, msg):
-    user = check_for_user(db, user_id)
-    first_user = user.first()
-
-    if current_user.role.name == "admin":
-        return user
-
-    elif first_user.role.name != "user":
-        raise ForbiddenError(detail=msg)
-
-    return user
-
-
 """
  to update a user, you can add the current user as a parameter to the function. check if the current user is an admin and allow
  him to update anything. if it is a manager, only allow it to update users with the user role
@@ -101,7 +107,8 @@ def create_new_user(user, db):
 
     user_data = db.query(models.User).filter(models.User.email == user.email).first()
     if user_data:
-        raise ValidationError(detail="User with email already exists")
+        raise UserAlreadyExistsError(detail="User with email already exists")
+
     hash_passwd = get_password_hash(user.password)
     if user.password != user.password_confirmation:
         raise ValidationError(detail="Passwords do not match")
@@ -141,6 +148,7 @@ def update_existing_user(user_id, user, db, current_user):
         last_name=user.last_name,
         updated_at=current_time,
         role=user.role,
+        expected_calories=user.expected_calories
     )
     user_dict = updated_user.dict()
     new_update = {k: v for k, v in user_dict.items() if v is not None}
@@ -177,3 +185,29 @@ def delete_existing_user(user_id, db, current_user):
     )
     user_in_db.delete()
     db.commit()
+
+
+
+"""
+
+async def http_error_handler(_: Request, exc: HTTPException) -> JSONResponse:
+    return JSONResponse({"errors": [exc.detail]}, status_code=exc.status_code)
+async def http422_error_handler(
+    _: Request,
+    exc: Union[RequestValidationError, ValidationError],
+) -> JSONResponse:
+    return JSONResponse(
+        {"errors": exc.errors()},
+        status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+    )
+
+
+validation_error_response_definition["properties"] = {
+    "errors": {
+        "title": "Errors",
+        "type": "array",
+        "items": {"$ref": "{0}ValidationError".format(REF_PREFIX)},
+    },
+}
+
+"""
