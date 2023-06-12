@@ -1,15 +1,25 @@
-
-
 from src.db.database import Base
-from sqlalchemy import Column, String, Integer, Time, ForeignKey, Enum, Boolean, Date, DateTime
+from sqlalchemy import (
+    Column,
+    String,
+    Integer,
+    Time,
+    ForeignKey,
+    Enum,
+    Boolean,
+    Date,
+    DateTime,
+)
 from datetime import datetime
 from sqlalchemy.orm import relationship
 import enum
+
 
 class Role(enum.Enum):
     user = "user"
     manager = "manager"
     admin = "admin"
+
 
 class User(Base):
     __tablename__ = "users"
@@ -22,7 +32,10 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow)
     expected_calories = Column(Integer, nullable=False, server_default="1000")
-    calorie_entries = relationship("CalorieEntry", cascade="all,delete", backref="users")
+    calorie_entries = relationship(
+        "CalorieEntry", cascade="all,delete", backref="users"
+    )
+
 
 class CalorieEntry(Base):
     __tablename__ = "calorie_entries"

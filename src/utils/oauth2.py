@@ -1,5 +1,3 @@
-
-
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
@@ -12,13 +10,13 @@ from fastapi import Depends, HTTPException
 from src.core.configvars import env_config
 from src.core.exceptions import CredentialsException
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='login')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 30
 ALGORITHM = "HS256"
 
+
 def verify_token(token):
-    
     """
     Verifies if a token is valid
     Raises an exception if the token is invalid
@@ -41,8 +39,8 @@ def verify_token(token):
 
     return token_data
 
+
 def create_access_token(data: dict, expires_delta: timedelta):
-   
     """
     Creates an access token to be used by the user
     Args:
@@ -61,7 +59,6 @@ def create_access_token(data: dict, expires_delta: timedelta):
 
 
 def get_access_token(sub: str):
-   
     """
     Returns the created access token
     Args:
@@ -74,8 +71,10 @@ def get_access_token(sub: str):
     access_token = create_access_token({"sub": sub}, expires_delta=access_token_expires)
     return access_token
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+):
     """
     Returns the currently logged-in user
     Args:
@@ -88,12 +87,11 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     token = verify_token(token)
     user = db.query(models.User).filter(models.User.id == token.id).first()
     if not user:
-      raise CredentialsException(detail="User not authenticated")
+        raise CredentialsException(detail="User not authenticated")
     return user
 
 
-    
-def get_current_manager(current_user = Depends(get_current_user)):
+def get_current_manager(current_user=Depends(get_current_user)):
     """
     Checks if user is a user manager and returns it
     Args:
@@ -105,7 +103,8 @@ def get_current_manager(current_user = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Insufficient privileges")
     return current_user
 
-def get_current_admin_user(current_user = Depends(get_current_user)):
+
+def get_current_admin_user(current_user=Depends(get_current_user)):
     """
     Checks if user is an admin user and returns it
     Args:
@@ -116,4 +115,3 @@ def get_current_admin_user(current_user = Depends(get_current_user)):
     if current_user.role.name != "admin":
         raise HTTPException(status_code=403, detail="Insufficient privileges")
     return current_user
-    

@@ -1,6 +1,3 @@
-
-
-
 from sqlalchemy.orm import Session
 
 from src.schema.user import User

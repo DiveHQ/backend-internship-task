@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
 from src.core.exceptions import NotFoundError
@@ -14,14 +13,16 @@ admin_calorie_router = APIRouter(tags=["Admin"], prefix="/admin/calories")
 
 allow_operation = RoleChecker(["admin"])
 
-@admin_calorie_router.get("/", status_code=status.HTTP_200_OK, dependencies=[Depends(allow_operation)])
+
+@admin_calorie_router.get(
+    "/", status_code=status.HTTP_200_OK, dependencies=[Depends(allow_operation)]
+)
 def get_all_calories(db: Session = Depends(get_db)):
-    
     """
     Returns all calories in the db
     Args:
         db: Database session
-        
+
     Return: The calorie entries in the db
 
     """
@@ -29,32 +30,49 @@ def get_all_calories(db: Session = Depends(get_db)):
     calorie_entry = db.query(models.CalorieEntry).all()
     return {"total": len(calorie_entry), "data": calorie_entry}
 
-@admin_calorie_router.get("/{calorie_id}", status_code=status.HTTP_200_OK, dependencies=[Depends(allow_operation)])
-def get_calorie(calorie_id: int, db: Session = Depends(get_db)):
 
+@admin_calorie_router.get(
+    "/{calorie_id}",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(allow_operation)],
+)
+def get_calorie(calorie_id: int, db: Session = Depends(get_db)):
     """
     Returns a calorie entry with the specified id
     Args:
         calorie_id: The id of the calorie
         db: Database session
-        
-    Return: The calorie entry 
+
+    Return: The calorie entry
 
     """
 
-    calorie_entry = db.query(models.CalorieEntry).filter(models.CalorieEntry.id == calorie_id).first()
+    calorie_entry = (
+        db.query(models.CalorieEntry)
+        .filter(models.CalorieEntry.id == calorie_id)
+        .first()
+    )
     if not calorie_entry:
         raise NotFoundError(detail=f"Calorie Entry with id {calorie_id} does not exist")
     return calorie_entry
+
 
 # @admin_calorie_router.post("/", status_code=status.HTTP_201_CREATED, dependencies=[Depends(allow_operation)])
 # def create_calorie_for_user():
 #     pass
 
 
-@admin_calorie_router.put("/{calorie_id}", status_code=status.HTTP_200_OK, dependencies=[Depends(allow_operation)])
-def update_calorie(calorie_id: int, calorie_entry: CalorieUpdate, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-
+@admin_calorie_router.put(
+    "/{calorie_id}",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(allow_operation)],
+)
+def update_calorie(
+    calorie_id: int,
+    calorie_entry: CalorieUpdate,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
     """
     Updates a calorie entry with the specified id
     Args:
@@ -62,8 +80,8 @@ def update_calorie(calorie_id: int, calorie_entry: CalorieUpdate, db: Session = 
         calorie_entry: The new details to update the calorie entry in the db
         db: Database session
         current_user: The current user object
-        
-    Return: The calorie entry 
+
+    Return: The calorie entry
 
     """
 
@@ -71,14 +89,23 @@ def update_calorie(calorie_id: int, calorie_entry: CalorieUpdate, db: Session = 
 
     return calorie
 
-@admin_calorie_router.delete("/{calorie_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(allow_operation)])
-def delete_calorie(calorie_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+
+@admin_calorie_router.delete(
+    "/{calorie_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(allow_operation)],
+)
+def delete_calorie(
+    calorie_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
     """
     Deletes a calorie entry with the specified id
     Args:
         calorie_id: The id of the calorie entry to update
         db: Database session
-        
+
     Return: Nothing
 
     """
@@ -86,14 +113,15 @@ def delete_calorie(calorie_id: int, db: Session = Depends(get_db), current_user 
     delete_calorie_entry(db, calorie_id, current_user)
 
 
-@admin_calorie_router.delete("/", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(allow_operation)])
+@admin_calorie_router.delete(
+    "/", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(allow_operation)]
+)
 def delete_all_calories(db: Session = Depends(get_db)):
-
     """
     Deletes all calorie entries
     Args:
         db: Database session
-        
+
     Return: Nothing
 
     """

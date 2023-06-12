@@ -5,5 +5,5 @@ __pycache__
 .pytest_cache
 .env
 test.env
-test.db
+test_db
 *.db
