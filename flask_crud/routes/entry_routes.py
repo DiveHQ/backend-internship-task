@@ -1,13 +1,14 @@
 from flask import Blueprint, request, jsonify
+from marshmallow import ValidationError
 from flask_crud import db, app
 from flask_crud.models.user import User
 from flask_crud.models.entry import Entry
 from flask_crud.models.setting import Setting
-from functools import wraps
+from flask_crud.utils.helpers import EntrySchema, EntryUpdateSchema, token_required
 
 from nutritionix.nutritionix import NutritionixClient
 import jwt
-import datetime
+from datetime import datetime
 
 
 entry_blueprint = Blueprint('entry', __name__)
@@ -30,59 +31,52 @@ def update_entries_below_expected(user_id, date, expected_calories):
         db.session.commit()
 
 
-def token_required(f):
-    @wraps(f)
-    def decorator(*args, **kwargs):
-        auth = request.headers.get('Authorization')
-        token = auth.split()[1] if auth else None
-        if not token:
-            return jsonify({'message': 'Token is missing!'}), 401
-
-        user_data = get_user_from_token(token)
-        if not user_data:
-            return jsonify({'message': 'Invalid token.'}), 401
-
-        return f(user_data, *args, **kwargs)
-
-    return decorator
-
 
 @entry_blueprint.route('/entries', methods=['POST'])
 @token_required
 def create_entry(user_data):
-    current_user_id = user_data.id
+    schema = EntrySchema()
     data = request.get_json()
+    try:
+        current_user_id = user_data.id
+        data = schema.load(data)
+    except ValidationError as e:
+        return jsonify({'message': e.messages}), 400
+    try:
+        # check if calories is provided
+        if data.get('calories') is None:
+            print(data.get('text'), "data")
+            # get the calories data from Nutritionix API
+            response = nutritionix.search(query=data.get(
+                'text'))
+            data['calories'] = response['branded'][0]['nf_calories']
+            print(data['calories'], "data calories")
 
-    # check if calories is provided
-    if data.get('calories') is None:
-        # get the calories data from Nutritionix API
-        response = nutritionix.search(q=data.get(
-            'text'), limit=1, search_nutrient='calories')
-        data['calories'] = response['hits'][0]['fields']['nf_calories']
+        today = datetime.now().date()
+        total_calories_today = calculate_total_calories(current_user_id, today)
 
-    today = datetime.today().date()
-    total_calories_today = calculate_total_calories(current_user_id, today)
+        user_settings = Setting.query.filter_by(user_id=current_user_id).first()
 
-    user_settings = Setting.query.filter_by(user_id=current_user_id).first()
+        is_below_expected = False
+        if user_settings and user_settings.expected_calories_per_day is not None:
+            is_below_expected = total_calories_today <= user_settings.expected_calories_per_day
 
-    is_below_expected = True
-    if user_settings and user_settings.expected_calories_per_day is not None:
-        is_below_expected = total_calories_today <= user_settings.expected_calories_per_day
+        entry = Entry(
+            user_id=current_user_id,
+            text=data.get('text'),
+            calories=data.get('calories'),
+            is_below_expected=is_below_expected
+        )
 
-    entry = Entry(
-        user_id=current_user_id,
-        date=data.get('date'),
-        time=data.get('time'),
-        text=data.get('text'),
-        calories=data.get('calories'),
-        is_below_expected=is_below_expected
-    )
+        print(entry, "entry")
 
-    db.session.add(entry)
-    db.session.commit()
+        db.session.add(entry)
+        db.session.commit()
 
-    return jsonify({'message': 'Entry created successfully', 'entry': entry.to_dict()}), 201
-
+        return jsonify({'message': 'Entry created successfully', 'entry': entry.to_dict()}), 201
+    except Exception as e:
+        print(f'An error occurred: {e}')
+        return jsonify({'message': 'Create Entry Failed'}), 500
 
 @entry_blueprint.route('/entries', methods=['GET'])
 @token_required

@@ -31,11 +31,18 @@ class UserSchema(Schema):
     password = fields.Str(required=True)    
 
     # Add more fields as needed
+class EntrySchema(Schema):
+    text = fields.Str(required=True)
+    calories = fields.Int(required=False)
+    is_below_expected = fields.Bool(required=False)
 
 class UserUpdateSchema(Schema):
     username = fields.Str(required=True)
     # Add more fields as needed
-
+class EntryUpdateSchema(Schema):
+    text = fields.Str(required=False)
+    calories = fields.Int(required=False)
+    is_below_expected = fields.Bool(required=False)
 
 def hash_password(password):
     return generate_password_hash(password, method='scrypt')

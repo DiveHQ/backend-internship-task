@@ -7,7 +7,6 @@ from flask_crud.models.user import User
 from flask_crud.models.role import Role
 from flask_crud.utils.helpers import UserSchema, UserUpdateSchema, hash_password, token_required
 from flask_crud import db, app
-from functools import wraps
 import datetime
 import jwt
 
@@ -15,81 +14,54 @@ user_blueprint = Blueprint('user', __name__)
 
 @user_blueprint.route('/register/regular', methods=['POST'])
 def register_regular():
+    schema = UserSchema()
+    data = request.get_json()
     try:
-        schema = UserSchema()
-        data = request.get_json()
-        try:
-            data = schema.load(data)
-        except ValidationError as e:
-            return jsonify({'message': e.messages}), 400
+        data = schema.load(data)
+    except ValidationError as e:
+        return jsonify({'message': e.messages}), 400
 
-        # # Validate data
-        # if not data.get('username') or not data.get('password'):
-        #     return jsonify({'message': 'Please provide a username and password.'}), 400
-
-        hashed_password = hash_password(data['password'])
-        regular_user_role = Role.query.filter_by(name='regular_user').first()
-        new_user = User(username=data['username'], password_hash=hashed_password, role_id=regular_user_role.id)
-        db.session.add(new_user)
-        db.session.commit()
-
+    try:
+        create_user(data['username'], data['password'], 'regular_user')
         return jsonify({'message': 'New user created! Welcome.'}), 201
-    except IntegrityError as e:
-        print(f"IntegrityError occurred: {e}")
+    except IntegrityError:
         return jsonify({'message': 'Username already exists.'}), 400
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    except Exception:
         return jsonify({'message': 'Registration Failed'}), 500
 
 @user_blueprint.route('/register/admin', methods=['POST'])
 def register_admin():
+    schema = UserSchema()
+    data = request.get_json()
     try:
-        schema = UserSchema()
-        data = request.get_json()
-        try:
-            data = schema.load(data)
-        except ValidationError as e:
-            return jsonify({'message': e.messages}), 400
+        data = schema.load(data)
+    except ValidationError as e:
+        return jsonify({'message': e.messages}), 400
 
-        hashed_password = hash_password(data['password'])
-        admin_role = Role.query.filter_by(name='admin').first()
-
-        new_user = User(username=data['username'], password_hash=hashed_password, role_id=admin_role.id)
-        db.session.add(new_user)
-        db.session.commit()
-
+    try:
+        create_user(data['username'], data['password'], 'admin')
         return jsonify({'message': 'New Admin created! Welcome.'}), 201
-    except IntegrityError as e:
-        print(f"IntegrityError occurred: {e}")
+    except IntegrityError:
         return jsonify({'message': 'Username already exists.'}), 400
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    except Exception:
         return jsonify({'message': 'Registration Failed'}), 500
 
 
 @user_blueprint.route('/register/user_manager', methods=['POST'])
 def register_user_manager():
+    schema = UserSchema()
+    data = request.get_json()
     try:
-        schema = UserSchema()
-        data = request.get_json()
-        try:
-            data = schema.load(data)
-        except ValidationError as e:
-            return jsonify({'message': e.messages}), 400
+        data = schema.load(data)
+    except ValidationError as e:
+        return jsonify({'message': e.messages}), 400
 
-        hashed_password = hash_password(data['password'])
-        user_manager_role = Role.query.filter_by(name='user_manager').first()
-
-        new_user = User(username=data['username'], password_hash=hashed_password, role_id=user_manager_role.id)
-        db.session.add(new_user)
-        db.session.commit()
-
+    try:
+        create_user(data['username'], data['password'], 'regular_user')
         return jsonify({'message': 'New User Manager created! Welcome.'}), 201
-    except IntegrityError as e:
-        print(f"IntegrityError occurred: {e}")
+    except IntegrityError:
         return jsonify({'message': 'Username already exists.'}), 400
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    except Exception:
         return jsonify({'message': 'Registration Failed'}), 500
 
 
@@ -133,13 +105,14 @@ def create_user(user_data):
         new_user = User(username=data['username'], password_hash=hashed_password, role=role)
         db.session.add(new_user)
         db.session.commit()
+        return jsonify({'message': 'New user created!'}), 201
     except IntegrityError as e:
         print(f"IntegrityError occurred: {e}")
         return jsonify({'message': 'Username already exists.'}), 400
     except Exception as e:
         print(f"An error occurred: {e}")
         return jsonify({'message': 'Creating a user failed!'}), 500
-    return jsonify({'message': 'New user created!'}), 201
+    
 
 @user_blueprint.route('/users', methods=['GET'])
 @token_required
@@ -183,11 +156,14 @@ def get_user(user_data, user_id):
 
     if user_data.role.name == 'regular_user' and user_data.id == user_id:
         return jsonify(user=user_data.to_dict()), 200
-
-    user = User.query.get(user_id)
-    if user is None:
-        return jsonify(message="User not found"), 404
-    return jsonify(user=user.to_dict()), 200
+    try:
+        user = User.query.get(user_id)
+        if user is None:
+            return jsonify(message="User not found"), 404
+        return jsonify(user=user.to_dict()), 200
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'message': 'Failed to get users.'}), 500
 
 # Update a user
 @user_blueprint.route('/users/<user_id>', methods=['PUT'])
@@ -195,20 +171,23 @@ def get_user(user_data, user_id):
 def update_user(user_data, user_id):
     if (user_data.role.name != 'admin' and user_data.role.name != 'user_manager') and user_data.id != user_id :
         return jsonify({'message': 'You are not authorized to access this resource.'}), 403
-
-    schema = UserUpdateSchema()
-    data = request.get_json()
     try:
-        data = schema.load(data)
-    except ValidationError as e:
-        return jsonify({'message': e.messages}), 400
-    user = User.query.get(user_id)
-    if user is None:
-        return jsonify(message="User not found"), 404
-    for key, value in data.items():
-        setattr(user, key, value)
-    db.session.commit()
-    return jsonify(message="User updated", user=user.to_dict()), 200
+        schema = UserUpdateSchema()
+        data = request.get_json()
+        try:
+            data = schema.load(data)
+        except ValidationError as e:
+            return jsonify({'message': e.messages}), 400
+        user = User.query.get(user_id)
+        if user is None:
+            return jsonify(message="User not found"), 404
+        for key, value in data.items():
+            setattr(user, key, value)
+        db.session.commit()
+        return jsonify(message="User updated", user=user.to_dict()), 200
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'message': 'Failed to update user.'}), 500
 
 # Delete a user
 @user_blueprint.route('/users/<user_id>', methods=['DELETE'])
@@ -216,20 +195,31 @@ def update_user(user_data, user_id):
 def delete_user(user_data, user_id):
     if (user_data.role.name != 'admin' and user_data.role.name != 'user_manager') and user_data.id != user_id:
         return jsonify({'message': 'You are not authorized to access this resource.'}), 403
-
-    user = User.query.get(user_id)
-    if user is None:
-        return jsonify(message="User not found"), 404
-    db.session.delete(user)
-    db.session.commit()
-    return jsonify(message="User deleted"), 200
-
-
-
-
-
-
+    try:
+        user = User.query.get(user_id)
+        if user is None:
+            return jsonify({'message': 'User not found'}), 404
+        
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({'message': 'User deleted'}), 200
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'message': 'Failed to delete user.'}), 500
 
 
 
-
+def create_user(username, password, role_name):
+    try:
+        hashed_password = hash_password(password)
+        role = Role.query.filter_by(name=role_name).first()
+        new_user = User(username=username, password_hash=hashed_password, role_id=role.id)
+        db.session.add(new_user)
+        db.session.commit()
+        return new_user
+    except IntegrityError as e:
+        print(f"IntegrityError occurred: {e}")
+        raise
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        raise

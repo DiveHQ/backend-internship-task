@@ -113,3 +113,5 @@ def get_user_from_token(token):
         return jsonify({'message': 'User not found!'}), 401
 
     return user
+
+
