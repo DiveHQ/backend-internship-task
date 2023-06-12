@@ -11,6 +11,7 @@ git clone https://github.com/Abiorh001/backend-internship-task.git
 
 2. Install the dependencies:
 cd backend-internship-task
+
 pip install -r requirements.txt
 
 
@@ -19,6 +20,7 @@ pip install -r requirements.txt
 
 To run the test suite, execute the following command:
 pytest test_auth.py
+
 pytest test_calories.py
 
 
