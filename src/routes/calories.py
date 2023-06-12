@@ -1,17 +1,17 @@
 
 
 from fastapi import APIRouter, status, Depends, Query
-from utils.oauth2 import get_current_user
+from src.utils.oauth2 import get_current_user
 from datetime import datetime
-from schema.calories import CalorieEntry, Calorie, CaloriePaginatedResponse, CalorieUpdateInput, CalorieResponse
-from db.repository.calorie import create_new_calorie_entry
-from db.database import get_db
+from src.schema.calories import CalorieEntry, Calorie, CaloriePaginatedResponse, CalorieUpdateInput, CalorieResponse
+from src.db.repository.calorie import create_new_calorie_entry
+from src.db.database import get_db
 from sqlalchemy.orm import Session
-from db import models
-from service.nutrixion import get_nutrition_data
+from src.db import models
+from src.service.nutrixion import get_nutrition_data
 from sqlalchemy import func
 from sqlalchemy import desc
-from utils.calorie_utils import check_for_calorie_and_owner, update_calorie_entry, delete_calorie_entry
+from src.utils.calorie_utils import check_for_calorie_and_owner, update_calorie_entry, delete_calorie_entry
 
 calorie_router = APIRouter(tags=["Calorie"], prefix="/calories")
 

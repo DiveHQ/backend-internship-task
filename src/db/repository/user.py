@@ -3,8 +3,8 @@
 
 from sqlalchemy.orm import Session
 
-from schema.user import User
-from db.models import User
+from src.schema.user import User
+from src.db.models import User
 
 
 def save_user_in_db(user, db):

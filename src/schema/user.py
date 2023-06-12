@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
-from db.models import Role
+from src.db.models import Role
 import datetime
 
 class User(BaseModel):

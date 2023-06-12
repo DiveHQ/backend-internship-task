@@ -2,14 +2,14 @@
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from utils.user_utils import create_new_user
-from db import models
-from db.database import get_db
-from schema.user import User, Token, UserResponse
+from src.utils.user_utils import create_new_user
+from src.db import models
+from src.db.database import get_db
+from src.schema.user import User, Token, UserResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from utils.utils import verify_password
-from utils.oauth2 import get_access_token
-from core.exceptions import ValidationError, UserNotFoundError
+from src.utils.utils import verify_password
+from src.utils.oauth2 import get_access_token
+from src.core.exceptions import ValidationError, UserNotFoundError
 
 
 auth_router = APIRouter(tags=["Auth"], prefix="/users")

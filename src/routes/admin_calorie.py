@@ -1,14 +1,14 @@
 
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
-from core.exceptions import NotFoundError
-from db import models
-from db.database import get_db
-from utils.calorie_utils import update_calorie_entry
-from utils.oauth2 import get_current_user
-from utils.utils import RoleChecker
-from schema.calories import CalorieUpdate
-from utils.calorie_utils import delete_calorie_entry
+from src.core.exceptions import NotFoundError
+from src.db import models
+from src.db.database import get_db
+from src.utils.calorie_utils import update_calorie_entry
+from src.utils.oauth2 import get_current_user
+from src.utils.utils import RoleChecker
+from src.schema.calories import CalorieUpdate
+from src.utils.calorie_utils import delete_calorie_entry
 
 admin_calorie_router = APIRouter(tags=["Admin"], prefix="/admin/calories")
 

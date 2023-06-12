@@ -3,9 +3,9 @@
 from typing import List
 from passlib.context import CryptContext
 from fastapi import Depends
-from db.models import User
-from utils.oauth2 import get_current_user
-from core.exceptions import ForbiddenError
+from src.db.models import User
+from src.utils.oauth2 import get_current_user
+from src.core.exceptions import ForbiddenError
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

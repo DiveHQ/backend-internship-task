@@ -1,11 +1,11 @@
 
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
-from db.database import get_db
-from schema.user import TotalUsers, UserResponse, User, UserUpdate, UserUpdateResponse
-from utils.oauth2 import get_current_user
-from utils.utils import RoleChecker
-from utils.user_utils import create_new_user, get_a_user, update_existing_user, delete_existing_user, get_all_users
+from src.db.database import get_db
+from src.schema.user import TotalUsers, UserResponse, User, UserUpdate, UserUpdateResponse
+from src.utils.oauth2 import get_current_user
+from src.utils.utils import RoleChecker
+from src.utils.user_utils import create_new_user, get_a_user, update_existing_user, delete_existing_user, get_all_users
 
 
 manager_router = APIRouter(tags=["Manager"], prefix="/manager/users")

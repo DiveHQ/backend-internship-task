@@ -1,7 +1,7 @@
 
-from core.exceptions import NotFoundError, ForbiddenError
-from db import models
-from schema.calories import CalorieUpdate, CalorieResponse
+from src.core.exceptions import NotFoundError, ForbiddenError
+from src.db import models
+from src.schema.calories import CalorieUpdate, CalorieResponse
 from datetime import datetime
 
 # def check_for_calorie_entry(db, calorie_id):

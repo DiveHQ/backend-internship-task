@@ -1,11 +1,11 @@
 
-from db import models
-from schema.user import  UserResponse, UserUpdate, UserUpdateResponse, TotalUsers
-from core.exceptions import ValidationError
-from db.repository.user import save_user_in_db
+from src.db import models
+from src.schema.user import  UserResponse, UserUpdate, UserUpdateResponse, TotalUsers
+from src.core.exceptions import ValidationError
+from src.db.repository.user import save_user_in_db
 from datetime import datetime
-from core.exceptions import NotFoundError, ForbiddenError
-from utils.utils import get_password_hash
+from src.core.exceptions import NotFoundError, ForbiddenError
+from src.utils.utils import get_password_hash
 
 def check_for_user(db, user_id):
     """

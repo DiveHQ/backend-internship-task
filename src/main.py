@@ -1,10 +1,10 @@
 
 from fastapi import FastAPI
-from routes.auth import auth_router
-from routes.calories import calorie_router
-from routes.manager import manager_router
-from routes.admin_calorie import admin_calorie_router
-from routes.admin_user import admin_user_router
+from src.routes.auth import auth_router
+from src.routes.calories import calorie_router
+from src.routes.manager import manager_router
+from src.routes.admin_calorie import admin_calorie_router
+from src.routes.admin_user import admin_user_router
 
 app = FastAPI()
 

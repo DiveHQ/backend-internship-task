@@ -3,8 +3,8 @@
 
 from sqlalchemy.orm import Session
 
-from schema.calories import Calorie
-from db.models import CalorieEntry
+from src.schema.calories import Calorie
+from src.db.models import CalorieEntry
 
 
 def create_new_calorie_entry(calorie: Calorie, db: Session):

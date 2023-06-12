@@ -1,12 +1,12 @@
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.orm import Session
-from db.database import get_db
-from db import models
-from schema.user import AdminUserUpdate, UserWithRole
-from utils.oauth2 import get_current_user
-from utils.user_utils import delete_existing_user, get_a_user, get_all_users, create_new_user, update_existing_user
+from src.db.database import get_db
+from src.db import models
+from src.schema.user import AdminUserUpdate, UserWithRole
+from src.utils.oauth2 import get_current_user
+from src.utils.user_utils import delete_existing_user, get_a_user, get_all_users, create_new_user, update_existing_user
 
-from utils.utils import RoleChecker
+from src.utils.utils import RoleChecker
 
 admin_user_router = APIRouter(tags=["Admin"], prefix="/admin/users")
 

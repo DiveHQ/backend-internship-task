@@ -1,7 +1,7 @@
 
 
-from core.exceptions import ValidationError
-from core.configvars import env_config
+from src.core.exceptions import ValidationError
+from src.core.configvars import env_config
 import httpx
 import json
 
