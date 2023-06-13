@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "accounts.apps.AccountsConfig",
+    "tracker.apps.TrackerConfig",
     "rest_framework",
     "rest_framework_simplejwt",
     "debug_toolbar",
