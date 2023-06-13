@@ -18,6 +18,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
+
 @pytest.fixture()
 def session():
     Base.metadata.drop_all(bind=engine)
@@ -41,7 +42,6 @@ def client(session):
     yield TestClient(app)
 
 
-
 @pytest.fixture
 def test_user(client):
     user = {
@@ -57,6 +57,7 @@ def test_user(client):
     new_user = res.json()
     new_user["password"] = user.get("password")
     return new_user
+
 
 @pytest.fixture
 def test_user_1(client):
@@ -77,13 +78,16 @@ def test_user_1(client):
 
 @pytest.fixture
 def authorized_user(client, test_user):
-    res = client.post("/api/v1/users/login", data={"username": test_user.get("email"), "password": test_user.get("password")})
+    res = client.post(
+        "/api/v1/users/login",
+        data={
+            "username": test_user.get("email"),
+            "password": test_user.get("password"),
+        },
+    )
     res_body = res.json()
     token = res_body.get("token")
-    client.headers = {
-        **client.headers,
-        "Authorization": f"Bearer {token}"
-    }
+    client.headers = {**client.headers, "Authorization": f"Bearer {token}"}
 
     return client, test_user
 
@@ -91,82 +95,87 @@ def authorized_user(client, test_user):
 def return_calorie(entry):
     return models.CalorieEntry(**entry)
 
+
 @pytest.fixture
 def calorie_entries(test_user, session, test_user_1):
     date = datetime.now().date()
     datetime_time = datetime.now().time()
-    time_obj = time(datetime_time.hour, datetime_time.minute, datetime_time.second, datetime_time.microsecond)
+    time_obj = time(
+        datetime_time.hour,
+        datetime_time.minute,
+        datetime_time.second,
+        datetime_time.microsecond,
+    )
 
     calories = [
         {
             "text": "beef",
             "id": 1,
             "is_below_expected": True,
-            "user_id": test_user['id'],
+            "user_id": test_user["id"],
             "date": date,
             "time": time_obj,
             "number_of_calories": 90,
             "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
+            "updated_at": datetime.utcnow(),
         },
         {
             "text": "chicken",
             "id": 2,
             "is_below_expected": True,
-            "user_id": test_user_1['id'],
+            "user_id": test_user_1["id"],
             "date": date,
             "time": time_obj,
             "number_of_calories": 70,
             "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
+            "updated_at": datetime.utcnow(),
         },
         {
             "text": "rice",
             "id": 3,
             "is_below_expected": True,
-            "user_id": test_user['id'],
+            "user_id": test_user["id"],
             "date": date,
             "time": time_obj,
             "number_of_calories": 70,
             "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
+            "updated_at": datetime.utcnow(),
         },
         {
             "text": "grape",
             "id": 4,
             "is_below_expected": True,
-            "user_id": test_user_1['id'],
+            "user_id": test_user_1["id"],
             "date": date,
             "time": time_obj,
             "number_of_calories": 150,
             "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
+            "updated_at": datetime.utcnow(),
         },
         {
             "text": "milo",
             "id": 5,
             "is_below_expected": False,
-            "user_id": test_user['id'],
+            "user_id": test_user["id"],
             "date": date,
             "time": time_obj,
             "number_of_calories": 660,
             "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
+            "updated_at": datetime.utcnow(),
         },
         {
             "text": "water",
             "id": 6,
             "is_below_expected": False,
-            "user_id": test_user_1['id'],
+            "user_id": test_user_1["id"],
             "date": date,
             "time": time_obj,
             "number_of_calories": 70,
             "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow()
-        }]
-    
-   
-    
+            "updated_at": datetime.utcnow(),
+        },
+    ]
+
     entry = map(return_calorie, calories)
     calorie_entries = list(entry)
 

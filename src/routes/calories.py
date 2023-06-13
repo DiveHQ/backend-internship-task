@@ -1,4 +1,5 @@
 from fastapi import APIRouter, status, Depends, Query
+from src.core.exceptions import ForbiddenError
 from src.utils.oauth2 import get_current_user
 from datetime import datetime
 from src.schema.calories import (
@@ -21,10 +22,13 @@ from src.utils.calorie_utils import (
     delete_calorie_entry,
     get_total_number_of_calories
 )
+from src.utils.utils import RoleChecker
 
 calorie_router = APIRouter(tags=["Calorie"], prefix="/calories")
 
 calorie_link = "/api/v1/calories"
+
+allow_operation = RoleChecker(["user", "admin"])
 
 
 @calorie_router.get("/", status_code=status.HTTP_200_OK)
@@ -44,10 +48,24 @@ def get_calories(
 
     """
 
-    total_calorie_entries = db.query(models.CalorieEntry).filter(models.CalorieEntry.user_id == current_user.id).count()
+    calorie_entries = None
+    total_calorie_entries = 0
+
     pages = (total_calorie_entries - 1) // limit + 1
     offset = (page - 1) * limit
-    calorie_entries = (
+
+    if current_user.role.name == "admin":
+        total_calorie_entries = db.query(models.CalorieEntry).count()
+        calorie_entries = (
+        db.query(models.CalorieEntry)
+        .order_by(desc(models.CalorieEntry.created_at))
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+    else:
+        total_calorie_entries = db.query(models.CalorieEntry).filter(models.CalorieEntry.user_id == current_user.id).count()
+        calorie_entries = (
         db.query(models.CalorieEntry)
         .filter(models.CalorieEntry.user_id == current_user.id)
         .order_by(desc(models.CalorieEntry.created_at))
@@ -112,7 +130,7 @@ def get_calorie_entry(
 
     """
 
-    calorie_entry = check_for_calorie_and_owner(db, calorie_id, current_user, "You do not have the permission to view this")
+    calorie_entry = check_for_calorie_and_owner(db, calorie_id, current_user, f"You do not have a calorie entry with id {calorie_id}")
     return_data = calorie_entry.first()
     return Calorie(
         id=return_data.id,
@@ -190,7 +208,7 @@ def create_calorie(
     )
 
 
-@calorie_router.put(
+@calorie_router.patch(
     "/{calorie_id}", status_code=status.HTTP_200_OK, response_model=Calorie
 )
 def update_calorie(
@@ -234,3 +252,22 @@ def delete_calorie(
     """
 
     delete_calorie_entry(db, calorie_id, current_user)
+
+@calorie_router.delete(
+    "/", status_code=status.HTTP_204_NO_CONTENT
+)
+def delete_all_calories(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """
+    Deletes all calorie entries
+    Args:
+        db: Database session
+
+    Return: Nothing
+
+    """
+
+    if current_user.role.name != "admin":
+        raise ForbiddenError(detail="You are not allowed to perform this operation")
+
+    db.query(models.CalorieEntry).delete()
+    db.commit()

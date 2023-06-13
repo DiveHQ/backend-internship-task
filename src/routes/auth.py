@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-from src.utils.user_utils import create_new_user, update_existing_user
+from src.utils.user_utils import create_new_user, get_a_user, get_all_users, update_existing_user
 from src.db import models
 from src.db.database import get_db
 from src.schema.user import User, Token, UserResponse, UserUpdate
@@ -65,7 +65,49 @@ def create_user(
 ):
     
     """
-    Return a newl created user
+    Return a newly created user
+    Args:
+        user: The user details to create the user
+        current_user: The current user object
+        db: Database session
+
+    Return: A user
+
+    """
+    get_user_role = current_user.role.name
+    if get_user_role == "admin":
+        if user.role.name == "admin":
+            raise ForbiddenError(detail="You are not allowed to create an admin user")
+    if get_user_role == "manager":
+        if (user.role and (user.role.name == "admin" or user.role.name == "manager")):
+            raise ForbiddenError(detail="You are not allowed to create a user with this role")
+        
+    user = create_new_user(user, db)
+    return user
+
+@auth_router.get("/", status_code=status.HTTP_200_OK, dependencies=[Depends(allow_operation)])
+def get_users(db: Session = Depends(get_db)):
+    """
+    Returns all users in the db
+    Args:
+        db: Database session
+
+    Return: The users in the db
+
+    """
+
+    users = get_all_users(db)
+    return users
+
+@auth_router.get(
+    "/{user_id}",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(allow_operation)],
+    response_model=UserResponse,
+)
+def get_user(user_id: int, db: Session = Depends(get_db)):
+    """
+    Return a user with the specified id
     Args:
         user_id: The id of the user
         db: Database session
@@ -74,18 +116,10 @@ def create_user(
 
     """
 
-    get_user_role = current_user.role.name
-    if get_user_role == "admin":
-        if user.role.name == "admin":
-            raise ForbiddenError(detail="You are not allowed to create an admin user")
-    if get_user_role == "manager":
-        if user.role.name == "admin" or user.role.name == "manager":
-            raise ForbiddenError(detail="You are not allowed to create a user with this role")
-        
-    user = create_new_user(user, db)
+    user = get_a_user(db, user_id)
     return user
 
-@auth_router.put("/{user_id}", status_code=status.HTTP_200_OK)
+@auth_router.patch("/{user_id}", status_code=status.HTTP_200_OK, dependencies=[Depends(allow_operation)])
 def update_user(
     user_id: int,
     user: UserUpdate,
