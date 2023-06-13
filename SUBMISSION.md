@@ -4,6 +4,10 @@
 + [About](#about)
 + [Getting Started](#getting_started)
 + [Usage](#usage)
++ [Prerequisites](#prerequisites)
++ [Activating Virtual Environments](#virtual_environment)
++ [Configuring Environment Variables](#environment_variables)
++ [Running app](#running_app)
 
 ## About <a name = "about"></a>
 This is a REST API for tracking daily calorie intake 
@@ -11,7 +15,7 @@ This is a REST API for tracking daily calorie intake
 ## Getting Started <a name = "getting_started"></a>
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
 
-### Prerequisites
+### Prerequisites <a name = "prerequisites"></a>
 
 ### Prerequisites (Without Docker)
 * Python (3.9 and above)
@@ -20,9 +24,7 @@ These instructions will get you a copy of the project up and running on your loc
 * Python (3.9 and above)
 * Docker
 
-### Installing
-
-### Step 1: Activate virtual environment and install packages
+### Step 1: Activate virtual environment and install packages <a name = "virtual_environment"></a>
 
 #### 1.1 Create python virtual environment
 ```
@@ -31,11 +33,11 @@ python3 -m venv venv
 #### 1.2.1 Activate python virtual environment
 - On MacOS
 ```
-source /venv/bin/activate
+source venv/bin/activate
 ```
 - On Windows
 ```
-source ~/{project_path}/venv/Scrpt
+source venv/Scripts/activate
 ```
 
 #### 1.4 Install poetry
@@ -48,7 +50,7 @@ pip install poetry
 poetry install
 ```
 
-### Step 2: Configure Environment Variables
+### Step 2: Configure Environment Variables <a name = "environment_variables"></a>
 Make a copy of `.env.example`. This newly created file should be `.env`
 ```
 cp .env.example .env
@@ -66,13 +68,13 @@ PASSWORD=The admin's password
 PASSWORD_CONFIRMATION=The admin's password confirmation
 ```
 
-### Step 3: Running CalorieTrack locally
+### Step 3: Running CalorieTrack locally <a name = "running_app"></a>
 
 #### Without Docker
-- Ensure the virtual environment is activated. If not see step 1.2
-- Ensure that all dependencies are installed. If not see steps 
+- Ensure the virtual environment is activated. If not see step 1
+- Ensure that all dependencies are installed. If not see step 1
 - Ensure environment variables are filled with the correct details
-- Start CalorieTrack server with using the code snippet below
+- Start CalorieTrack server using the code snippet below
 ```
 uvicorn src.main:app --reload
 ```
