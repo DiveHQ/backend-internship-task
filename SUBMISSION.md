@@ -5,21 +5,21 @@
 To set up the repository and install the dependencies, please follow these steps:
 
 1. Clone the repository:
-git clone https://github.com/DiveHQ/backend-internship-task.git
-cd backend-internship-task
+   git clone https://github.com/DiveHQ/backend-internship-task.git
+   cd backend-internship-task
 
 2. Create and activate a virtual environment:
-python3 -m venv env
-source env/bin/activate (Linux/Mac)
-env\Scripts\activate (Windows)
+   python3 -m venv env
+   source env/bin/activate (Linux/Mac)
+   env\Scripts\activate (Windows)
 
 3. Install the required dependencies:
-pip install -r requirements.txt
+   pip install -r requirements.txt
 
 cd caloriesapi
 
 4. Apply the database migrations:
-python manage.py migrate
+   python manage.py migrate
 
 ## Running the Test Suite
 
@@ -32,6 +32,7 @@ To start the API server, execute the following command:
 python manage.py runserver
 
 The API server will be accessible at `http://localhost:8000/api/`.
+Docs are accessible at `http://localhost:8000/api/docs`
 
 ## Additional Notes
 
