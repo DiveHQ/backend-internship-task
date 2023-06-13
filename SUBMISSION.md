@@ -75,4 +75,13 @@ REST API for managing and tracking daily calorie intake.
     python3 manage.py runserver
     ```
 
-    The API server will be accessible at `http://127.0.0.1:8000/`.
+    The API server will be accessible at __<http://127.0.0.1:8000/>__ along with documentation at __<http://127.0.0.1:8000/docs/>__.
+
+3. Create a superuser with the following command:
+
+    ```bash
+    docker-compose run --rm web sh -c 'python manage.py createsuperuser'
+    ```
+
+    Or `python3 manage.py createsuperuser` in a virtual environment.
+    Access the admin panel at __<http://127.0.0.1:8000/admin/>__.
