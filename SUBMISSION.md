@@ -69,7 +69,11 @@ REST API for managing and tracking daily calorie intake.
     docker-compose up
     ```
 
-    If you are using a virtual environment, start the server with the following command:
+    If you are using a virtual environment run migrations and start the server with the following commands:
+
+     ```bash
+    python3 manage.py migrate
+    ```
 
     ```bash
     python3 manage.py runserver
