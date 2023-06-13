@@ -44,7 +44,7 @@ def create_access_token(data: dict, expires_delta: timedelta):
     """
     Creates an access token to be used by the user
     Args:
-        data: A dictionary containing a user object to be used to create the access token
+        data: A User object used to create the access token
         expires_delta: The time in seconds that the access token expires
 
     Return: An encoded JWT token
@@ -62,7 +62,7 @@ def get_access_token(sub: str):
     """
     Returns the created access token
     Args:
-        sub: A string containing data that will be used by the create_access_token function to create the token
+        sub: A string used to create the token
 
     Return: The created access token
 

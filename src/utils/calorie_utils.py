@@ -20,7 +20,7 @@ def get_total_number_of_calories(db, current_user, date):
 
 def check_for_calorie_and_owner(db, calorie_id, current_user, msg):
     """
-    Checks if a calorie entry exists and also if the calorie entry belongs to the current user
+    Checks if a calorie entry exists and if it belongs to the current user
     Args:
         db: Database session
         calorie_id: The id of the calorie entry to obtain from db
@@ -35,7 +35,7 @@ def check_for_calorie_and_owner(db, calorie_id, current_user, msg):
     )
     first_entry = calorie_entry.first()
     if not first_entry:
-        raise NotFoundError(detail=f"Calorie entry with specified id not found")
+        raise NotFoundError(detail="Calorie entry not found")
     if current_user.role.name == "admin":
         return calorie_entry
     elif first_entry.user_id != current_user.id:

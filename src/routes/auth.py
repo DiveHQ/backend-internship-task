@@ -28,7 +28,9 @@ allow_operation = RoleChecker(["manager", "admin"])
 
 
 @auth_router.post(
-    "/register", status_code=status.HTTP_201_CREATED, response_model=UserResponse
+    "/register",
+    status_code=status.HTTP_201_CREATED,
+    response_model=UserResponse
 )
 def signup(user: User, db: Session = Depends(get_db)):
     """
@@ -46,7 +48,11 @@ def signup(user: User, db: Session = Depends(get_db)):
 
 
 @auth_router.post("/login", response_model=Token)
-def login(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(
+    user: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+
     """
     Creates a token for authorization
     Args:
@@ -57,7 +63,9 @@ def login(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
 
     """
 
-    user_data = db.query(models.User).filter(models.User.email == user.username).first()
+    user_data = db.query(models.User
+                ).filter(models.User.email == user.username
+                ).first()
     if not user_data:
         raise InvalidCredentialError(detail="Invalid Credentials")
 
@@ -78,7 +86,9 @@ def login(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     response_model=UserResponse,
 )
 def create_user(
-    user: User, db: Session = Depends(get_db), current_user=Depends(get_current_user)
+    user: User,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     """
     Return a newly created user
@@ -184,7 +194,7 @@ def update_user(
     status_code=status.HTTP_204_NO_CONTENT,
     dependencies=[Depends(allow_operation)],
 )
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+def delete_a_user(user_id: int, db: Session = Depends(get_db)):
     """
     Deletes a regular user
     Query Parameters:

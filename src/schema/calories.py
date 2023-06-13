@@ -33,14 +33,6 @@ class CalorieEntry(BaseModel):
         orm_mode = True
 
 
-class CalorieEntryResponse(BaseModel):
-    total: int = Field(...)
-    data: List[Calorie]
-
-    class Config:
-        orm_mode = True
-
-
 class CaloriePaginatedResponse(BaseModel):
     total: int = Field(...)
     page: int = Field(...)
@@ -48,8 +40,3 @@ class CaloriePaginatedResponse(BaseModel):
     total_pages: int = Field(...)
     calorie_entries: List[CalorieResponse] = Field(...)
     links: Optional[Dict[str, Optional[str]]]
-
-
-class CalorieEntryResponse(BaseModel):
-    total: int = Field(...)
-    data: Calorie

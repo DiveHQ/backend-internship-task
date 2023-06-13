@@ -5,10 +5,6 @@ Revises: 553db079bd70
 Create Date: 2023-06-12 20:18:50.577833
 
 """
-from alembic import op
-import sqlalchemy as sa
-from datetime import datetime
-from sqlalchemy.orm import relationship
 
 # revision identifiers, used by Alembic.
 revision = "57eda0ce6ab2"

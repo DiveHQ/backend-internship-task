@@ -2,10 +2,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 
-from sqlalchemy import event
-from sqlalchemy.engine import Engine
-from sqlite3 import Connection as SQLite3Connection
-
 database_name = "sql_app.db"
 
 SQLALCHEMY_DATABASE_URL = f"sqlite:///./{database_name}"

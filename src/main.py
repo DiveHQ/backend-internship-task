@@ -1,6 +1,5 @@
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 
-from src.db.database import get_db
 from src.routes.auth import auth_router
 from src.routes.calories import calorie_router
 from src.db import models

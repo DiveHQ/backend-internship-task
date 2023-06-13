@@ -14,7 +14,7 @@ from src.db.database import get_db
 from sqlalchemy.orm import Session
 from src.db import models
 from src.service.nutrixion import get_nutrition_data
-from sqlalchemy import and_, func, desc
+from sqlalchemy import desc
 from src.utils.calorie_utils import (
     check_for_calorie_and_owner,
     update_calorie_entry,
@@ -31,7 +31,9 @@ allow_operation = RoleChecker(["user", "admin"])
 
 
 @calorie_router.get(
-    "/", status_code=status.HTTP_200_OK, response_model=CaloriePaginatedResponse
+    "/",
+    status_code=status.HTTP_200_OK,
+    response_model=CaloriePaginatedResponse
 )
 def get_calories(
     limit: int = Query(default=10, ge=1, le=100),
@@ -47,7 +49,7 @@ def get_calories(
         limit: The number of items to display in a page
         page: The page number
 
-    Return: All calorie entries that corresponding to the CalorieEntryResponse model
+    Return: All calorie entries
 
     """
 
@@ -139,7 +141,7 @@ def get_calorie_entry(
         db,
         calorie_id,
         current_user,
-        f"You do not have a calorie entry with the specified id",
+        "Calorie entry not found",
     )
     return_data = calorie_entry.first()
     return CalorieResponse(
@@ -253,7 +255,8 @@ def delete_calorie(
 
 @calorie_router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
 def delete_all_calories(
-    db: Session = Depends(get_db), current_user=Depends(get_current_user)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
     """
     Deletes all calorie entries

@@ -4,7 +4,6 @@ from fastapi import Depends
 from src.db.models import User
 from src.utils.oauth2 import get_current_user
 from src.core.exceptions import ForbiddenError
-from sqlalchemy import desc
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

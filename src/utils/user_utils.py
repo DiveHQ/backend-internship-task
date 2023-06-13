@@ -1,4 +1,3 @@
-
 from src.db import models
 from src.schema.user import (
     UserResponse,
@@ -25,7 +24,7 @@ def check_for_user(db, user_id):
     user_in_db = db.query(models.User).filter(models.User.id == user_id)
     first_user = user_in_db.first()
     if not first_user:
-        raise NotFoundError(detail=f"User with specified id not found")
+        raise NotFoundError(detail="User not found")
 
     return user_in_db
 
@@ -126,12 +125,6 @@ def get_a_user(db, user_id):
         expected_calories=user.expected_calories,
     )
     return returned_user
-
-
-"""
- to update a user, you can add the current user as a parameter to the function. check if the current user is an admin and allow
- him to update anything. if it is a manager, only allow it to update users with the user role
-"""
 
 
 def create_new_user(user, db):

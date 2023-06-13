@@ -7,7 +7,7 @@ from src.main import app
 from datetime import datetime, time
 from src.db import models
 
-TEST_SQLALCHEMY_DATABASE_URL = f"sqlite:///./test.db"
+TEST_SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
 engine = create_engine(
     TEST_SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}

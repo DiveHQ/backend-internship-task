@@ -63,7 +63,7 @@ def test_unauthorized_get_calorie_entry(client, calorie_entries):
     assert res.status_code == 401
 
 
-def test_unauthorized_get_all_calorie_entry(client, calorie_entries):
-    res = client.get(f"/api/v1/calories/")
+def test_unauthorized_get_all_calorie_entry(client):
+    res = client.get("/api/v1/calories/")
 
     assert res.status_code == 401

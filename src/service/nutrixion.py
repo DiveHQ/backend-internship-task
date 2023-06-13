@@ -9,7 +9,7 @@ def get_nutrition_data(text):
         "x-app-id": f"{env_config.NUTRIXION_APP_ID}",
         "x-app-key": f"{env_config.NUTRIXION_APP_KEY}",
     }
-    url = f"{env_config.URL}?query={text}"
+    url = f"{env_config.API_URL}?query={text}"
     timeout = httpx.Timeout(None, read=5.0)
     resp: httpx.Response = httpx.get(url, headers=headers, timeout=timeout)
     if resp.status_code != 200:
@@ -20,7 +20,7 @@ def get_nutrition_data(text):
     branded = data.get("branded")
     if not branded:
         raise EmptyResponseError(
-            "Text could not retrieve number of calories. Kindly enter the number of calories or write a new text"
+            "Could not retrieve number of calories. Enter it or write a new text"
         )
 
     food = branded[0]
