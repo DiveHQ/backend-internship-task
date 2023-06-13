@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from users.models import User
+from ..models import CaloryLimit
 
 
 class CaloryLimitViewsTest(APITestCase):
@@ -29,7 +30,7 @@ class CaloryLimitViewsTest(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 401)
     
-    def test_post_calory_limit_success(self):
+    def test_post_calory_limit_view_success(self):
         data = {
             'calory_limit': 55,
             'description': 'I will burn them' 
@@ -52,3 +53,5 @@ class CaloryLimitViewsTest(APITestCase):
     def test_get_calory_limit_success(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+
+

@@ -41,7 +41,7 @@ class CaloryView(APIView):
         
         try:
             data = self.validate_and_save(request, limit)
-            return Response(data, status=status.HTTP_200_OK)
+            return Response(data, status=status.HTTP_201_CREATED)
         except Exception as e:
             error_message = { 'error': str(e)}
             return Response(error_message, status=status.HTTP_400_BAD_REQUEST)
@@ -123,8 +123,8 @@ class EditDeleteCaloryView(APIView):
         return calory_limit
 
     def put(self, request, pk):
-        calory = self.get_calory_serialized_data(pk)
         calory_ = self.get_calory(pk)
+        calory = self.get_calory_serialized_data(pk)
         limit = self.get_calory_limit(calory['calory_limit'])
         try:
             limit_data = self.remove_old_calory_amount(calory)

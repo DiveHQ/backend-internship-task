@@ -13,10 +13,10 @@ class UserSerializer(serializers.ModelSerializer):
     def validate_password(self, value):
         return make_password(value)
     
-    def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Email address already exists.")
-        return value
+    # def validate_email(self, value):
+    #     if User.objects.filter(email=value).exists():
+    #         raise serializers.ValidationError("Email address already exists.")
+    #     return value
     
     def validate(self, attrs):
         return attrs
