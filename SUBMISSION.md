@@ -24,24 +24,37 @@ REST API for managing and tracking daily calorie intake.
    cp .env.example .env
    ```
 
+   Set the `NUTRITIONIX_APP_ID` and `NUTRITIONIX_APP_KEY` in the `.env` file if you wish to test the fetching of calories from the provider(Nutritionix). You can get them at __<https://developer.nutritionix.com/admin/access_details>__.
+
 4. If you haven't already, download and set up Docker. Alternatively, you can use a virtual environment.
 
-5. Build a Docker image with all the project dependencies by running the following command:
+5. If using Docker, build a Docker image with all the project dependencies by running the following command:
 
     ```bash
-    docker compose build
+    docker-compose build
     ```
 
-6. If using a virtual environment, install the dependencies with `pip install -r requirements/local.txt`
+    If you are using a virtual environment, create and activate the virtual environment:
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+    Then, install the dependencies with `pip`:
+
+    ```bash
+    pip install -r ../requirements/local.txt
+    ```
 
 ## Running the Test suite
 
 1. Ensure that you are in the Django project directory (verify `manage.py` is listed when running `ls`).
 
-2. Run the tests using Docker:
+2. If using Docker, run the tests inside a Docker container:
 
     ```bash
-    docker compose run --rm web sh -c pytest
+    docker-compose run --rm web sh -c pytest
     ```
 
     If you are using a virtual environment, simply run `pytest`.
@@ -50,10 +63,16 @@ REST API for managing and tracking daily calorie intake.
 
 1. Verify that you are in the Django project directory (check for `manage.py` after running `ls`).
 
-2. Start the server using Docker:
+2. If using Docker, start the API server using Docker Compose:
 
     ```bash
-    docker compose up
+    docker-compose up
     ```
 
-    If you are using a virtual environment, run `python3 manage.py runserver`.
+    If you are using a virtual environment, start the server with the following command:
+
+    ```bash
+    python3 manage.py runserver
+    ```
+
+    The API server will be accessible at `http://127.0.0.1:8000/`.
