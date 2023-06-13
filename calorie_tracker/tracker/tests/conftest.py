@@ -49,7 +49,7 @@ def mock_calories_provider(mocker):
         }
         requests.post.return_value.json.return_value = response_json
 
-        expected_total_calories = 350.45
+        expected_total_calories = 350.45  # 100.10 + 200.25 + 50
         total_calories = sum(food.get("nf_calories", 0) for food in response_json["foods"])
         assert total_calories == expected_total_calories
 

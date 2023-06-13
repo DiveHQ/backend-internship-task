@@ -1,13 +1,10 @@
 from core.constants import COMMON_FILTER_LOOKUPS as _
 from core.constants import User
-from django_filters import CharFilter
 from django_filters.rest_framework import FilterSet
 
 
 class UserFilter(FilterSet):
     """Filter class for the User model."""
-
-    username = CharFilter()
 
     class Meta:
         model = User
