@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 from src.utils.user_utils import (
     create_new_user,
@@ -100,7 +100,10 @@ def create_user(
 @auth_router.get(
     "/", status_code=status.HTTP_200_OK, dependencies=[Depends(allow_operation)]
 )
-def get_users(db: Session = Depends(get_db)):
+def get_users( 
+    limit: int = Query(default=10, ge=1, le=100),
+    page: int = Query(default=1, ge=1),
+    db: Session = Depends(get_db),):
     """
     Returns all users in the db
     Args:
@@ -110,7 +113,7 @@ def get_users(db: Session = Depends(get_db)):
 
     """
 
-    users = get_all_users(db)
+    users = get_all_users(db, page, limit)
     return users
 
 

@@ -40,7 +40,7 @@ class CaloriePaginatedResponse(BaseModel):
     total: int = Field(...)
     page: int = Field(...)
     size: int = Field(...)
-    pages: int = Field(...)
+    total_pages: int = Field(...)
     calorie_entries: List[Calorie] = Field(...)
     links: Optional[Dict[str, Optional[str]]]
 

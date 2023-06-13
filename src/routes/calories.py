@@ -14,8 +14,7 @@ from src.db.database import get_db
 from sqlalchemy.orm import Session
 from src.db import models
 from src.service.nutrixion import get_nutrition_data
-from sqlalchemy import func
-from sqlalchemy import desc
+from sqlalchemy import func, desc
 from src.utils.calorie_utils import (
     check_for_calorie_and_owner,
     update_calorie_entry,
@@ -51,7 +50,6 @@ def get_calories(
     calorie_entries = None
     total_calorie_entries = 0
 
-    pages = (total_calorie_entries - 1) // limit + 1
     offset = (page - 1) * limit
 
     if current_user.role.name == "admin":
@@ -78,6 +76,7 @@ def get_calories(
             .all()
         )
 
+    pages = (total_calorie_entries - 1) // limit + 1
     calories_response = [
         Calorie(
             date=calorie.date,
@@ -108,7 +107,7 @@ def get_calories(
         total=total_calorie_entries,
         page=page,
         size=limit,
-        pages=pages,
+        total_pages=pages,
         links=links,
     )
 

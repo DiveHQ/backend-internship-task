@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional, List
+from typing import Optional, List, Dict
 from src.db.models import Role
 import datetime
 
@@ -12,17 +12,27 @@ class User(BaseModel):
     password_confirmation: str = Field(..., min_length=5)
     role: Optional[Role]
 
-
-class UserWithRole(User):
-    role: Role = Field(...)
-
-
 class UserResponse(BaseModel):
     email: Optional[EmailStr] = Field(...)
     first_name: Optional[str] = Field(...)
     last_name: Optional[str] = Field(...)
     role: Role = Field(...)
     expected_calories: int = Field(...)
+
+class UserPaginatedResponse(BaseModel):
+    total: int = Field(...)
+    page: int = Field(...)
+    size: int = Field(...)
+    total_pages: int = Field(...)
+    users_response: List[UserResponse] = Field(...)
+    links: Optional[Dict[str, Optional[str]]]
+
+
+class UserWithRole(User):
+    role: Role = Field(...)
+
+
+
 
 
 class UserUpdateResponse(UserResponse):

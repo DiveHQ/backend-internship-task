@@ -1,11 +1,15 @@
+from src.core.configvars import EnvConfig
 from src.db import models
-from src.schema.user import UserResponse, UserUpdate, UserUpdateResponse, TotalUsers
+from src.schema.user import User, UserResponse, UserUpdate, UserUpdateResponse, UserPaginatedResponse
 from src.core.exceptions import UserAlreadyExistsError, ValidationError
 from src.db.repository.user import save_user_in_db
 from datetime import datetime
 from src.core.exceptions import NotFoundError, ForbiddenError
 from src.utils.utils import get_password_hash
+from sqlalchemy import desc
 
+
+user_link = "/api/v1/users"
 
 def check_for_user(db, user_id):
     """
@@ -39,7 +43,7 @@ def check_user_and_role(db, user_id, current_user, msg):
     return user
 
 
-def get_all_users(db):
+def get_all_users(db, page, limit):
     """
     Returns all users
     Args:
@@ -49,10 +53,20 @@ def get_all_users(db):
 
     """
 
-    users = db.query(models.User).all()
+
+    total_users = db.query(models.User).count()
+    pages = (total_users - 1) // limit + 1
+    offset = (page - 1) * limit
+    users = (
+        db.query(models.User)
+        .order_by(desc(models.User.created_at))
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
+
     users_response = [
         UserResponse(
-            id=user.id,
             email=user.email,
             first_name=user.first_name,
             last_name=user.last_name,
@@ -61,7 +75,29 @@ def get_all_users(db):
         )
         for user in users
     ]
-    return TotalUsers(total=len(users_response), data=users_response)
+
+    links = {
+        "first": f"{user_link}?limit={limit}&page=1",
+        "last": f"{user_link}?limit={limit}&page={pages}",
+        "current_page": f"{user_link}?limit={limit}&page={page}",
+        "next": None,
+        "prev": None,
+    }
+
+    if page < pages:
+        links["next"] = f"{user_link}?limit={limit}&page={page + 1}"
+
+    if page > 1:
+        links["prev"] = f"{user_link}?limit={limit}&page={page - 1}"
+
+    return UserPaginatedResponse(
+        total=total_users,
+        page=page,
+        total_pages=pages,
+        users_response=users_response,
+        links=links,
+        size=limit
+    )
 
 
 def get_a_user(db, user_id):
@@ -107,6 +143,7 @@ def create_new_user(user, db):
     user_data = db.query(models.User).filter(models.User.email == user.email).first()
     if user_data:
         raise UserAlreadyExistsError(detail="User with email already exists")
+    
 
     hash_passwd = get_password_hash(user.password)
     if user.password != user.password_confirmation:
@@ -183,26 +220,4 @@ def delete_existing_user(user_id, db):
     db.commit()
 
 
-"""
 
-async def http_error_handler(_: Request, exc: HTTPException) -> JSONResponse:
-    return JSONResponse({"errors": [exc.detail]}, status_code=exc.status_code)
-async def http422_error_handler(
-    _: Request,
-    exc: Union[RequestValidationError, ValidationError],
-) -> JSONResponse:
-    return JSONResponse(
-        {"errors": exc.errors()},
-        status_code=HTTP_422_UNPROCESSABLE_ENTITY,
-    )
-
-
-validation_error_response_definition["properties"] = {
-    "errors": {
-        "title": "Errors",
-        "type": "array",
-        "items": {"$ref": "{0}ValidationError".format(REF_PREFIX)},
-    },
-}
-
-"""
