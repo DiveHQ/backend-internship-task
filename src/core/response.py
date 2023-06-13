@@ -1,5 +1,3 @@
-
-
 # class Response():
 #     pass
 

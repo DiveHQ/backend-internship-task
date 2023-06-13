@@ -9,7 +9,14 @@ from src.utils.user_utils import (
 )
 from src.db import models
 from src.db.database import get_db
-from src.schema.user import User, Token, UserResponse, UserUpdate
+from src.schema.user import (
+    User,
+    Token,
+    UserPaginatedResponse,
+    UserResponse,
+    UserUpdate,
+    UserUpdateResponse,
+)
 from fastapi.security import OAuth2PasswordRequestForm
 from src.utils.utils import verify_password
 from src.utils.oauth2 import get_access_token, get_current_user
@@ -75,7 +82,7 @@ def create_user(
 ):
     """
     Return a newly created user
-    Args:
+    Query parameters:
         user: The user details to create the user
         current_user: The current user object
         db: Database session
@@ -85,7 +92,7 @@ def create_user(
     """
     get_user_role = current_user.role.name
     if get_user_role == "admin":
-        if user.role.name == "admin":
+        if user.role and user.role.name == "admin":
             raise ForbiddenError(detail="You are not allowed to create an admin user")
     if get_user_role == "manager":
         if user.role and (user.role.name == "admin" or user.role.name == "manager"):
@@ -98,16 +105,22 @@ def create_user(
 
 
 @auth_router.get(
-    "/", status_code=status.HTTP_200_OK, dependencies=[Depends(allow_operation)]
+    "/",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(allow_operation)],
+    response_model=UserPaginatedResponse,
 )
-def get_users( 
+def get_users(
     limit: int = Query(default=10, ge=1, le=100),
     page: int = Query(default=1, ge=1),
-    db: Session = Depends(get_db),):
+    db: Session = Depends(get_db),
+):
     """
     Returns all users in the db
-    Args:
+    Query parameters:
         db: Database session
+        limit: The number of items to display in a page
+        page: The page number
 
     Return: The users in the db
 
@@ -126,7 +139,7 @@ def get_users(
 def get_user(user_id: int, db: Session = Depends(get_db)):
     """
     Return a user with the specified id
-    Args:
+    Query parameters:
         user_id: The id of the user
         db: Database session
 
@@ -142,6 +155,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     "/{user_id}",
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(allow_operation)],
+    response_model=UserUpdateResponse,
 )
 def update_user(
     user_id: int,
@@ -151,7 +165,7 @@ def update_user(
 ):
     """
     Updates a regular user
-    Args:
+    Query Parameters:
         user_id: The id of the user to be updated
         user: User schema that is accepted in request to update user details
         db: Database session
@@ -173,7 +187,7 @@ def update_user(
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     """
     Deletes a regular user
-    Args:
+    Query Parameters:
         user_id: The id of the user to be updated
         db: Database session
 
@@ -192,7 +206,7 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
 def delete_user(db: Session = Depends(get_db)):
     """
     Deletes all users
-    Args:
+    Query Parameters:
         db: Database session
 
     Return: Nothing

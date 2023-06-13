@@ -12,12 +12,14 @@ class User(BaseModel):
     password_confirmation: str = Field(..., min_length=5)
     role: Optional[Role]
 
+
 class UserResponse(BaseModel):
     email: Optional[EmailStr] = Field(...)
     first_name: Optional[str] = Field(...)
     last_name: Optional[str] = Field(...)
     role: Role = Field(...)
     expected_calories: int = Field(...)
+
 
 class UserPaginatedResponse(BaseModel):
     total: int = Field(...)
@@ -30,9 +32,6 @@ class UserPaginatedResponse(BaseModel):
 
 class UserWithRole(User):
     role: Role = Field(...)
-
-
-
 
 
 class UserUpdateResponse(UserResponse):

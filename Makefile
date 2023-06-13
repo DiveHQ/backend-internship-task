@@ -10,8 +10,11 @@ venv_setup:
 venv:
 	source ./venv/bin/activate
 
+test:
+	source ./venv/bin/activate && pytest
+
 format:
-	source ./venv/bin/activate && black .
+	source ./venv/bin/activate && poetry run black .
 
 start:
 	docker-compose up -d

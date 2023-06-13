@@ -1,6 +1,6 @@
 from src.core.exceptions import NotFoundError, ForbiddenError
 from src.db import models
-from src.schema.calories import CalorieUpdate, Calorie
+from src.schema.calories import CalorieUpdate, CalorieResponse
 from datetime import datetime
 from sqlalchemy import func
 
@@ -14,6 +14,8 @@ def get_total_number_of_calories(db, current_user, date):
         )
         .scalar()
     )
+
+    return total_calories_today
 
 
 def check_for_calorie_and_owner(db, calorie_id, current_user, msg):
@@ -45,15 +47,51 @@ def check_for_calorie_and_owner(db, calorie_id, current_user, msg):
 
 
 def update_calorie_entry(calorie_id, calorie_entry, db, current_user):
+    """
+    Updates a calorie entry
+    Args:
+        db: Database session
+        calorie_id: The id of the calorie entry to obtain from db
+        current_user: The current user object
+        calorie_entry: The data to be used to update the calorie entry in db
+
+    Return: The query object
+
+    """
+
     calorie = check_for_calorie_and_owner(
         db, calorie_id, current_user, "You not authorized to update this calorie entry"
     )
     current_time = datetime.utcnow()
-    updated_calorie = CalorieUpdate(
-        text=calorie_entry.text,
-        number_of_calories=calorie_entry.number_of_calories,
-        updated_at=current_time,
-    )
+    date = datetime.now().date()
+
+    if calorie_entry.number_of_calories:
+        entry = (
+            db.query(models.CalorieEntry)
+            .filter(models.CalorieEntry.id == calorie_id)
+            .first()
+        )
+        total_calories = get_total_number_of_calories(db, current_user, date)
+
+        total_calories_before_update = total_calories - entry.number_of_calories
+        updated_total_calories = (
+            total_calories_before_update + calorie_entry.number_of_calories
+        )
+
+        is_below_expected = updated_total_calories < current_user.expected_calories
+        updated_calorie = CalorieUpdate(
+            text=calorie_entry.text,
+            number_of_calories=calorie_entry.number_of_calories,
+            updated_at=current_time,
+            is_below_expected=is_below_expected,
+        )
+    else:
+        updated_calorie = CalorieUpdate(
+            text=calorie_entry.text,
+            number_of_calories=calorie_entry.number_of_calories,
+            updated_at=current_time,
+        )
+
     updated_dict = updated_calorie.dict()
     new_update = {k: v for k, v in updated_dict.items() if v is not None}
 
@@ -61,7 +99,7 @@ def update_calorie_entry(calorie_id, calorie_entry, db, current_user):
     db.commit()
     updated_calorie_entry = calorie.first()
 
-    return Calorie(
+    return CalorieResponse(
         date=updated_calorie_entry.date,
         time=updated_calorie_entry.time,
         text=updated_calorie_entry.text,

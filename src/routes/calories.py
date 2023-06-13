@@ -7,14 +7,14 @@ from src.schema.calories import (
     Calorie,
     CaloriePaginatedResponse,
     CalorieUpdateInput,
-    Calorie,
+    CalorieResponse,
 )
 from src.db.repository.calorie import create_new_calorie_entry
 from src.db.database import get_db
 from sqlalchemy.orm import Session
 from src.db import models
 from src.service.nutrixion import get_nutrition_data
-from sqlalchemy import func, desc
+from sqlalchemy import and_, func, desc
 from src.utils.calorie_utils import (
     check_for_calorie_and_owner,
     update_calorie_entry,
@@ -30,7 +30,9 @@ calorie_link = "/api/v1/calories"
 allow_operation = RoleChecker(["user", "admin"])
 
 
-@calorie_router.get("/", status_code=status.HTTP_200_OK)
+@calorie_router.get(
+    "/", status_code=status.HTTP_200_OK, response_model=CaloriePaginatedResponse
+)
 def get_calories(
     limit: int = Query(default=10, ge=1, le=100),
     page: int = Query(default=1, ge=1),
@@ -39,9 +41,11 @@ def get_calories(
 ):
     """
     Returns all calorie entries that belong to the current user
-    Args:
+    Query Parameters:
         current_user: The current user object
         db: Database session
+        limit: The number of items to display in a page
+        page: The page number
 
     Return: All calorie entries that corresponding to the CalorieEntryResponse model
 
@@ -113,7 +117,7 @@ def get_calories(
 
 
 @calorie_router.get(
-    "/{calorie_id}", status_code=status.HTTP_200_OK, response_model=Calorie
+    "/{calorie_id}", status_code=status.HTTP_200_OK, response_model=CalorieResponse
 )
 def get_calorie_entry(
     calorie_id: int,
@@ -122,7 +126,7 @@ def get_calorie_entry(
 ):
     """
     Returns the calorie entry with the specified id
-    Args:
+    Query Parameters:
         calorie_id: The id of the calorie entry to access from db
         current_user: The current user object
         db: Database session
@@ -135,10 +139,10 @@ def get_calorie_entry(
         db,
         calorie_id,
         current_user,
-        f"You do not have a calorie entry with id {calorie_id}",
+        f"You do not have a calorie entry with the specified id",
     )
     return_data = calorie_entry.first()
-    return Calorie(
+    return CalorieResponse(
         date=return_data.date,
         time=return_data.time,
         text=return_data.text,
@@ -147,7 +151,9 @@ def get_calorie_entry(
     )
 
 
-@calorie_router.post("/", status_code=status.HTTP_201_CREATED, response_model=Calorie)
+@calorie_router.post(
+    "/", status_code=status.HTTP_201_CREATED, response_model=CalorieResponse
+)
 def create_calorie(
     calorie_entry: CalorieEntry,
     current_user=Depends(get_current_user),
@@ -155,7 +161,7 @@ def create_calorie(
 ):
     """
     Creates a new calorie entry
-    Args:
+    Query Parameters:
         calories_entry: Details of the calorie entry to save
         current_user: The current user object
         db: Database session
@@ -168,16 +174,7 @@ def create_calorie(
     date = datetime.now().date()
     time = datetime.now().time().strftime("%H:%M:%S")
 
-    # total_calories_today = get_total_number_of_calories(db, current_user, date)
-
-    total_calories_today = (
-        db.query(func.coalesce(func.sum(models.CalorieEntry.number_of_calories), 0))
-        .filter(
-            models.CalorieEntry.user_id == current_user.id
-            and models.CalorieEntry.date == date
-        )
-        .scalar()
-    )
+    total_calories_today = get_total_number_of_calories(db, current_user, date)
 
     if calorie_entry.number_of_calories is None:
         nf_calories = get_nutrition_data(calorie_entry.text)
@@ -199,7 +196,7 @@ def create_calorie(
 
     new_calorie_entry = create_new_calorie_entry(calorie, db)
 
-    return Calorie(
+    return CalorieResponse(
         date=new_calorie_entry.date,
         time=new_calorie_entry.time,
         text=new_calorie_entry.text,
@@ -209,7 +206,7 @@ def create_calorie(
 
 
 @calorie_router.patch(
-    "/{calorie_id}", status_code=status.HTTP_200_OK, response_model=Calorie
+    "/{calorie_id}", status_code=status.HTTP_200_OK, response_model=CalorieResponse
 )
 def update_calorie(
     calorie_id: int,
@@ -219,7 +216,7 @@ def update_calorie(
 ):
     """
     Update a calorie entry
-    Args:
+    Query Parameters:
         calorie_id: The id of the calorie entry to update
         calorie_entry: The new details to update the calorie entry in the db
         db: Database session
@@ -242,7 +239,7 @@ def delete_calorie(
 ):
     """
     Delete a calorie entry
-    Args:
+    Query Parameters:
         calorie_id: The id of the calorie entry to update
         db: Database session
         current_user: The current user object
@@ -260,7 +257,7 @@ def delete_all_calories(
 ):
     """
     Deletes all calorie entries
-    Args:
+    Query Parameters:
         db: Database session
 
     Return: Nothing

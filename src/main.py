@@ -24,7 +24,7 @@ async def lifespan(app: FastAPI):
             password_confirmation=env_config.PASSWORD_CONFIRMATION,
             role=Role.admin.name,
         )
-        user = db.query(models.User).filter_by(role = "admin").first()
+        user = db.query(models.User).filter_by(role="admin").first()
         if not user:
             create_new_user(admin, db)
     finally:
