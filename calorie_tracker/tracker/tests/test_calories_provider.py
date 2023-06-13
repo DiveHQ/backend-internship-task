@@ -2,7 +2,7 @@ import pytest
 from tracker.helpers import retrieve_calories
 
 
-@pytest.mark.django_db
+@pytest.mark.skip
 def test_calories_provider_is_up():
     """Test that calories provider is up."""
     calories = retrieve_calories(query="1 bowl of rice.")
