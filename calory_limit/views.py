@@ -10,6 +10,9 @@ from .models import CaloryLimit
 
 import datetime
 
+'''
+A decorator function which checks if the limit has already been set for a day
+'''
 def check_limit_set(view_func):
     def wrapped_view(self, request, *args, **kwargs):
         today = datetime.date.today()
@@ -22,7 +25,10 @@ def check_limit_set(view_func):
 
 class CaloryLimitView(APIView):
     permission_classes = [IsAuthenticated]
-
+    
+    '''
+    Setting a limit resource
+    '''
     @check_limit_set
     def post(self, request):
         serializer = CaloryLimitSerializer(data=request.data)
@@ -30,13 +36,19 @@ class CaloryLimitView(APIView):
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+    '''
+    Getting all limits of a user
+    '''
     def get(self, request):
         calory_limits = CaloryLimit.objects.filter(user=request.user).all()
         serializer = CaloryLimitSerializer(calory_limits, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
+'''
+For performing GET, PUT, DELETE operation on a particular resource
+'''
 class CaloryLimitDetailsView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwnerOrReadOnly | ManagerEditDeletePermission]
     queryset = CaloryLimit.objects.all()

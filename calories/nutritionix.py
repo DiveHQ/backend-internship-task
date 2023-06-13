@@ -1,3 +1,7 @@
+'''
+This function calls the Nutritionix API to give the number of calories of a certain food
+'''
+
 import requests
 import json
 
@@ -17,8 +21,11 @@ def get_calories(query):
 
     if response.status_code == 200:
         data = response.json()
+        # print(data)
         calories = data['foods'][0]['nf_calories']
-        if isinstance('calories', int):
+        print(type(calories))
+        if isinstance(calories, float) or isintance(calories, int):
+            print(calories)
             return calories
     return 0
     

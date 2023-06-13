@@ -3,7 +3,10 @@ from users.models import User
 from calory_limit.models import CaloryLimit
 
 
-
+'''
+ The calories model. 
+ It has a one-to-many relationship with user and the calory_limit model
+'''
 class Calories(models.Model):
     text = models.CharField(max_length=200, null=False)
     calories = models.FloatField(null=True)
