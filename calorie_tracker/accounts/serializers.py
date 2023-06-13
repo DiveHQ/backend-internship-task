@@ -4,6 +4,8 @@ from django.contrib.auth.password_validation import (
 )
 from rest_framework import serializers
 
+from .models import UserSettings
+
 
 class PasswordSerializer(serializers.ModelSerializer):
     """Password serializer."""
@@ -59,3 +61,31 @@ class UserSerializer(PasswordSerializer):
         self.set_user_password(password, user)
 
         return user
+
+
+class UserSettingsSerializer(serializers.ModelSerializer):
+    """UserSettings model serializer."""
+
+    class Meta:
+        model = UserSettings
+        fields = [
+            "id",
+            "user",
+            "expected_daily_calories",
+        ]
+        read_only_fields = [
+            "id",
+            "user",
+        ]
+
+    def create(self, validated_data):
+        """Create user settings or raise an error if they already exist."""
+        user = validated_data["user"]
+        settings, created = UserSettings.objects.get_or_create(user=user, defaults=validated_data)
+
+        if not created:
+            raise serializers.ValidationError(
+                {"detail": "Settings already exist for the request user."}
+            )
+
+        return settings
