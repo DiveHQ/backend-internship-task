@@ -112,7 +112,7 @@ async def total_calories(current_user:str = Depends(token_manager)):
         .scalar()
         )
     
-    return jsonable_encoder({"total calories on {}".format(today):total_calories})
+    return jsonable_encoder({"total calories "})
 
 
 #route to display all calories entry
@@ -146,6 +146,52 @@ async def all_entries(
         .limit(page_size)
         .all()
     )
+
+
+# Route to filter and search entries by text
+@calories_routes.get("/filter_entries", status_code=status.HTTP_200_OK)
+async def filter_entries(
+    query: str = Query(None, description="Search query string to filter entries"),
+    current_user: str = Depends(token_manager),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100)
+):
+    existing_user = session.query(User).filter_by(email=current_user).first()
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist"
+        )
+
+    if existing_user.role not in ["user", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="User does not have permission"
+        )
+
+    # Create a query to filter entries based on the search query
+    entries_query = session.query(Entry).filter(Entry.users_id == existing_user.id)
+    if query:
+        entries_query = entries_query.filter(Entry.text.ilike(f"%{query}%"))
+
+    total_entries = session.query(Entry).filter_by(users_id=existing_user.id).count()
+
+    # Calculate the offset based on the page number and page size
+    offset = (page - 1) * page_size
+
+    # Query the entries with pagination
+    entries = (
+        entries_query
+        .offset(offset)
+        .limit(page_size)
+        .all()
+    )
+
+    return {
+        "total_entries": total_entries,
+        "page": page,
+        "page_size": page_size,
+        "entries": jsonable_encoder(entries),
+    }
+
 
     return {
         "total_entries": total_entries,
