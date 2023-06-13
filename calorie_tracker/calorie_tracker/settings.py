@@ -146,6 +146,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # DRF Settings
 
 REST_FRAMEWORK = {
+    "COERCE_DECIMAL_TO_STRING": False,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
@@ -162,3 +163,11 @@ if DEBUG:
     SIMPLE_JWT = {
         "ACCESS_TOKEN_LIFETIME": timedelta(days=30),
     }
+
+NUTRITIONIX = {
+    "API_URL": env("NUTRITIONIX_API_URL"),
+    "HEADERS": {
+        "x-app-id": env("NUTRITIONIX_APP_ID"),
+        "x-app-key": env("NUTRITIONIX_APP_KEY"),
+    },
+}

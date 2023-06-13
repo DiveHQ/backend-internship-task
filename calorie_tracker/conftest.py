@@ -1,10 +1,11 @@
 """General Project Fixtures."""
 import pytest
-from django.contrib.auth import get_user_model
+from accounts.constants import USER_MANAGER_GROUP
+from core.constants import User
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import User as UserModel
 from model_bakery import baker
 from rest_framework.test import APIClient
-
-User = get_user_model()
 
 
 @pytest.fixture
@@ -17,6 +18,22 @@ def sample_user():
     user.save()
 
     return user
+
+
+@pytest.fixture
+def user_manager():
+    """Return a user in the User Managers group."""
+    group = Group.objects.get(name=USER_MANAGER_GROUP)
+    user: UserModel = baker.make(User)
+    user.groups.add(group)
+
+    return user
+
+
+@pytest.fixture
+def admin_user():
+    """Return an admin user."""
+    return baker.make(User, is_staff=True)
 
 
 @pytest.fixture
