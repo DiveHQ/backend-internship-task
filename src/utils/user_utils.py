@@ -78,7 +78,6 @@ def get_a_user(db, user_id):
     user = check_for_user(db, user_id).first()
 
     returned_user = UserResponse(
-        id=user.id,
         email=user.email,
         first_name=user.first_name,
         last_name=user.last_name,
@@ -118,7 +117,6 @@ def create_new_user(user, db):
     new_user = save_user_in_db(user, db)
 
     return UserResponse(
-        id=new_user.id,
         email=new_user.email,
         first_name=new_user.first_name,
         last_name=new_user.last_name,

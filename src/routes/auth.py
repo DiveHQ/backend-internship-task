@@ -51,9 +51,11 @@ def login(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     if not verify_password(user.password, user_data.password):
         raise InvalidCredentialError(detail="Invalid credentials")
 
-    token = get_access_token(str(user_data.id))
+    token, exp = get_access_token(str(user_data.id))
 
-    return Token(token=token, token_type="Bearer")
+    timestamp = exp.timestamp()
+
+    return Token(token=token, exp=timestamp, token_type="Bearer")
 
 @auth_router.post("/",
     status_code=status.HTTP_201_CREATED,

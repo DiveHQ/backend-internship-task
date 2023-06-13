@@ -7,7 +7,7 @@ from src.schema.calories import (
     Calorie,
     CaloriePaginatedResponse,
     CalorieUpdateInput,
-    CalorieResponse,
+    Calorie,
 )
 from src.db.repository.calorie import create_new_calorie_entry
 from src.db.database import get_db
@@ -80,9 +80,7 @@ def get_calories(
             time=calorie.time,
             text=calorie.text,
             number_of_calories=calorie.number_of_calories,
-            user_id=calorie.user_id,
             is_below_expected=calorie.is_below_expected,
-            id=calorie.id
         )
         for calorie in calorie_entries
     ]
@@ -133,18 +131,16 @@ def get_calorie_entry(
     calorie_entry = check_for_calorie_and_owner(db, calorie_id, current_user, f"You do not have a calorie entry with id {calorie_id}")
     return_data = calorie_entry.first()
     return Calorie(
-        id=return_data.id,
         date=return_data.date,
         time=return_data.time,
         text=return_data.text,
         number_of_calories=return_data.number_of_calories,
-        user_id=current_user.id,
         is_below_expected=return_data.is_below_expected,
     )
 
 
 @calorie_router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=CalorieResponse
+    "/", status_code=status.HTTP_201_CREATED, response_model=Calorie
 )
 def create_calorie(
     calorie_entry: CalorieEntry,
@@ -197,13 +193,11 @@ def create_calorie(
 
     new_calorie_entry = create_new_calorie_entry(calorie, db)
 
-    return CalorieResponse(
-        id=new_calorie_entry.id,
+    return Calorie(
         date=new_calorie_entry.date,
         time=new_calorie_entry.time,
         text=new_calorie_entry.text,
         number_of_calories=new_calorie_entry.number_of_calories,
-        user_id=new_calorie_entry.user_id,
         is_below_expected=new_calorie_entry.is_below_expected,
     )
 

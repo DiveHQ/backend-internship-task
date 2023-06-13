@@ -11,16 +11,12 @@ class User(BaseModel):
     password: str = Field(..., min_length=5)
     password_confirmation: str = Field(..., min_length=5)
     role: Optional[Role]
-    # class Config:
-    #     orm_mode = True
-
 
 class UserWithRole(User):
     role: Role = Field(...)
 
 
 class UserResponse(BaseModel):
-    id: int = Field(...)
     email: Optional[EmailStr] = Field(...)
     first_name: Optional[str] = Field(...)
     last_name: Optional[str] = Field(...)
@@ -35,6 +31,7 @@ class UserUpdateResponse(UserResponse):
 class Token(BaseModel):
     token: str = Field(...)
     token_type: str = Field(...)
+    exp: float = Field(...)
 
 
 class TokenData(BaseModel):

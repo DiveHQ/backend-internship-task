@@ -4,17 +4,11 @@ from typing import Optional, List, Dict
 
 
 class Calorie(BaseModel):
-    id: Optional[int]
     date: datetime.date = Field(...)
     time: datetime.time = Field(...)
     text: str = Field(...)
     number_of_calories: int = Field(...)
-    user_id: int = Field(...)
     is_below_expected: bool = Field(...)
-
-
-class CalorieResponse(Calorie):
-    id: int = Field(...)
 
 
 class CalorieUpdateInput(BaseModel):

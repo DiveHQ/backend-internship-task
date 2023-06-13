@@ -1,6 +1,6 @@
 from src.core.exceptions import NotFoundError, ForbiddenError
 from src.db import models
-from src.schema.calories import CalorieUpdate, CalorieResponse
+from src.schema.calories import CalorieUpdate, Calorie
 from datetime import datetime
 from sqlalchemy import func
 
@@ -67,13 +67,11 @@ def update_calorie_entry(calorie_id, calorie_entry, db, current_user):
     db.commit()
     updated_calorie_entry = calorie.first()
 
-    return CalorieResponse(
-        id=updated_calorie_entry.id,
+    return Calorie(
         date=updated_calorie_entry.date,
         time=updated_calorie_entry.time,
         text=updated_calorie_entry.text,
         number_of_calories=updated_calorie_entry.number_of_calories,
-        user_id=updated_calorie_entry.user_id,
         is_below_expected=updated_calorie_entry.is_below_expected,
     )
 

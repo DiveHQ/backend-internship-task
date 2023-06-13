@@ -29,8 +29,8 @@ class User(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     password = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     expected_calories = Column(Integer, nullable=False, server_default="1000")
     calorie_entries = relationship(
         "CalorieEntry", cascade="all,delete", back_populates="user"
@@ -43,10 +43,10 @@ class CalorieEntry(Base):
     date = Column(Date, nullable=False)
     time = Column(Time, nullable=False)
     text = Column(String, nullable=False)
-    number_of_calories = Column(Integer)
-    is_below_expected = Column(Boolean)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow)
+    number_of_calories = Column(Integer, nullable=False)
+    is_below_expected = Column(Boolean, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     user_id = Column(Integer, ForeignKey("users.id"))
     user = relationship("User", back_populates="calorie_entries")
     

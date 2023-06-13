@@ -6,7 +6,7 @@ from src.db import models
 
 from src.schema.user import TokenData
 from fastapi.security import OAuth2PasswordBearer
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from src.core.configvars import env_config
 from src.core.exceptions import CredentialsException
 
@@ -55,7 +55,7 @@ def create_access_token(data: dict, expires_delta: timedelta):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, env_config.SECRET, algorithm=ALGORITHM)
 
-    return encoded_jwt
+    return encoded_jwt, expire
 
 
 def get_access_token(sub: str):
@@ -68,8 +68,8 @@ def get_access_token(sub: str):
 
     """
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token({"sub": sub}, expires_delta=access_token_expires)
-    return access_token
+    access_token, exp = create_access_token({"sub": sub}, expires_delta=access_token_expires)
+    return access_token, exp
 
 
 def get_current_user(
@@ -89,29 +89,3 @@ def get_current_user(
     if not user:
         raise CredentialsException(detail="User not authenticated")
     return user
-
-
-def get_current_manager(current_user=Depends(get_current_user)):
-    """
-    Checks if user is a user manager and returns it
-    Args:
-        current_user: It depends on the get_current_user function
-
-    Return: User manager
-    """
-    if current_user.role.name != "user_manager":
-        raise HTTPException(status_code=403, detail="Insufficient privileges")
-    return current_user
-
-
-def get_current_admin_user(current_user=Depends(get_current_user)):
-    """
-    Checks if user is an admin user and returns it
-    Args:
-        current_user: It depends on the get_current_user function
-
-    Return: Admin user
-    """
-    if current_user.role.name != "admin":
-        raise HTTPException(status_code=403, detail="Insufficient privileges")
-    return current_user
