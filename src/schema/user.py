@@ -12,6 +12,7 @@ class User(BaseModel):
     password_confirmation: str = Field(..., min_length=5)
     role: Optional[Role]
 
+
 class UserWithRole(User):
     role: Role = Field(...)
 

@@ -15,9 +15,10 @@ def check_for_user(db, user_id):
     user_in_db = db.query(models.User).filter(models.User.id == user_id)
     first_user = user_in_db.first()
     if not first_user:
-        raise NotFoundError(detail=f"User with id {user_id} does not exist")
+        raise NotFoundError(detail=f"User with specified id not found")
 
     return user_in_db
+
 
 def check_user_and_role(db, user_id, current_user, msg):
     user = check_for_user(db, user_id)
@@ -25,18 +26,17 @@ def check_user_and_role(db, user_id, current_user, msg):
 
     if current_user.role.name == "admin":
         return user
-    
+
     if current_user.role.name == "manager":
         if first_user.role.name != "user":
             raise ForbiddenError(detail=msg)
         else:
             return user
-    
-    if (current_user.id != first_user.id):
-        raise ForbiddenError(detail=msg)
-    
-    return user
 
+    if current_user.id != first_user.id:
+        raise ForbiddenError(detail=msg)
+
+    return user
 
 
 def get_all_users(db):
@@ -146,7 +146,7 @@ def update_existing_user(user_id, user, db, current_user):
         last_name=user.last_name,
         updated_at=current_time,
         role=user.role,
-        expected_calories=user.expected_calories
+        expected_calories=user.expected_calories,
     )
     user_dict = updated_user.dict()
     new_update = {k: v for k, v in user_dict.items() if v is not None}
@@ -167,7 +167,7 @@ def update_existing_user(user_id, user, db, current_user):
     )
 
 
-def delete_existing_user(user_id, db, current_user):
+def delete_existing_user(user_id, db):
     """
     Deletes a regular user
     Args:
@@ -178,12 +178,9 @@ def delete_existing_user(user_id, db, current_user):
 
     """
 
-    user_in_db = check_user_and_role(
-        db, user_id, current_user, "You do not have the permission to delete this user"
-    )
+    user_in_db = check_for_user(db, user_id)
     user_in_db.delete()
     db.commit()
-
 
 
 """

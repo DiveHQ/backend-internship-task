@@ -49,4 +49,3 @@ class CalorieEntry(Base):
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
     user_id = Column(Integer, ForeignKey("users.id"))
     user = relationship("User", back_populates="calorie_entries")
-    

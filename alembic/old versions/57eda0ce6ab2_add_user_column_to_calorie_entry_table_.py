@@ -11,8 +11,8 @@ from datetime import datetime
 from sqlalchemy.orm import relationship
 
 # revision identifiers, used by Alembic.
-revision = '57eda0ce6ab2'
-down_revision = '553db079bd70'
+revision = "57eda0ce6ab2"
+down_revision = "553db079bd70"
 branch_labels = None
 depends_on = None
 

@@ -4,13 +4,6 @@ from src.schema.calories import CalorieUpdate, Calorie
 from datetime import datetime
 from sqlalchemy import func
 
-# def check_for_calorie_entry(db, calorie_id):
-#     calorie = db.query(models.CalorieEntry).filter(models.CalorieEntry.id == calorie_id)
-#     calorie_first = calorie.first()
-#     if not calorie_first:
-#         raise NotFoundError(detail=f"Calorie entry with id {calorie_id} does not exist")
-
-#     return calorie
 
 def get_total_number_of_calories(db, current_user, date):
     total_calories_today = (
@@ -21,6 +14,7 @@ def get_total_number_of_calories(db, current_user, date):
         )
         .scalar()
     )
+
 
 def check_for_calorie_and_owner(db, calorie_id, current_user, msg):
     """
@@ -39,7 +33,7 @@ def check_for_calorie_and_owner(db, calorie_id, current_user, msg):
     )
     first_entry = calorie_entry.first()
     if not first_entry:
-        raise NotFoundError(detail=f"Calorie entry with id {calorie_id} not found")
+        raise NotFoundError(detail=f"Calorie entry with specified id not found")
     if current_user.role.name == "admin":
         return calorie_entry
     elif first_entry.user_id != current_user.id:

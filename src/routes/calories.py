@@ -20,7 +20,7 @@ from src.utils.calorie_utils import (
     check_for_calorie_and_owner,
     update_calorie_entry,
     delete_calorie_entry,
-    get_total_number_of_calories
+    get_total_number_of_calories,
 )
 from src.utils.utils import RoleChecker
 
@@ -57,22 +57,26 @@ def get_calories(
     if current_user.role.name == "admin":
         total_calorie_entries = db.query(models.CalorieEntry).count()
         calorie_entries = (
-        db.query(models.CalorieEntry)
-        .order_by(desc(models.CalorieEntry.created_at))
-        .offset(offset)
-        .limit(limit)
-        .all()
-    )
+            db.query(models.CalorieEntry)
+            .order_by(desc(models.CalorieEntry.created_at))
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
     else:
-        total_calorie_entries = db.query(models.CalorieEntry).filter(models.CalorieEntry.user_id == current_user.id).count()
+        total_calorie_entries = (
+            db.query(models.CalorieEntry)
+            .filter(models.CalorieEntry.user_id == current_user.id)
+            .count()
+        )
         calorie_entries = (
-        db.query(models.CalorieEntry)
-        .filter(models.CalorieEntry.user_id == current_user.id)
-        .order_by(desc(models.CalorieEntry.created_at))
-        .offset(offset)
-        .limit(limit)
-        .all()
-    )
+            db.query(models.CalorieEntry)
+            .filter(models.CalorieEntry.user_id == current_user.id)
+            .order_by(desc(models.CalorieEntry.created_at))
+            .offset(offset)
+            .limit(limit)
+            .all()
+        )
 
     calories_response = [
         Calorie(
@@ -128,7 +132,12 @@ def get_calorie_entry(
 
     """
 
-    calorie_entry = check_for_calorie_and_owner(db, calorie_id, current_user, f"You do not have a calorie entry with id {calorie_id}")
+    calorie_entry = check_for_calorie_and_owner(
+        db,
+        calorie_id,
+        current_user,
+        f"You do not have a calorie entry with id {calorie_id}",
+    )
     return_data = calorie_entry.first()
     return Calorie(
         date=return_data.date,
@@ -139,9 +148,7 @@ def get_calorie_entry(
     )
 
 
-@calorie_router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=Calorie
-)
+@calorie_router.post("/", status_code=status.HTTP_201_CREATED, response_model=Calorie)
 def create_calorie(
     calorie_entry: CalorieEntry,
     current_user=Depends(get_current_user),
@@ -247,10 +254,11 @@ def delete_calorie(
 
     delete_calorie_entry(db, calorie_id, current_user)
 
-@calorie_router.delete(
-    "/", status_code=status.HTTP_204_NO_CONTENT
-)
-def delete_all_calories(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+
+@calorie_router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+def delete_all_calories(
+    db: Session = Depends(get_db), current_user=Depends(get_current_user)
+):
     """
     Deletes all calorie entries
     Args:

@@ -68,7 +68,9 @@ def get_access_token(sub: str):
 
     """
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token, exp = create_access_token({"sub": sub}, expires_delta=access_token_expires)
+    access_token, exp = create_access_token(
+        {"sub": sub}, expires_delta=access_token_expires
+    )
     return access_token, exp
 
 
