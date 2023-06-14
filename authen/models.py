@@ -18,4 +18,5 @@ class Calo(models.Model):
     name = models.CharField(max_length=150)
     quantity = models.IntegerField(max_length=5)
     Calories = models.IntegerField(max_length=5)
-    date_time = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

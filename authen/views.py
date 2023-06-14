@@ -32,7 +32,9 @@ class LoginAPI(KnoxLoginView):
         login(request, user)
         return super(LoginAPI, self).post(request, format=None)
 
-#
+
+
+#CRUD Section for Calories
 
 class  CaloView(APIView):
   permission_classes = [permissions.AllowAny]
@@ -53,5 +55,34 @@ class  CaloView(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+  
+
+  def delete(self, request, id, *args, **kwargs):
+      if Calo.objects.filter(id=id).exists():
+        project = Calo.objects.get(id=id)
+        project.delete()
+        return Response({"response":"Calo Deleted"}, status=status.HTTP_200_OK)
+      else:
+          return Response(
+              {"res": "Calo Doesn't Exists"},
+              status=status.HTTP_400_BAD_REQUEST
+          )
+
+  def patch(self, request, id, *args, **kwargs):
+    if Calo.objects.filter(id=id).exists():
+      project = Calo.objects.get(id=id)
+      data = {
+      'title': request.data.get('title'), 
+      'description': request.data.get('description'), 
+      }
+      serializer = CaloSerializer(instance = project, data=data, partial = True)
+      if serializer.is_valid():
+          serializer.save()
+          return Response(serializer.data, status=status.HTTP_200_OK)
+      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(
+                {"res": "Calo Doesn't Exists"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
