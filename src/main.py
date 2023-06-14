@@ -14,7 +14,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from alembic import command
 from alembic.config import Config
-from src.db.database import engine, SQLALCHEMY_DATABASE_URL
+from src.db.database import engine
 from sqlalchemy import inspect
 
 def check_if_table_exist():
