@@ -5,12 +5,14 @@ from src.schema.user import (
     UserUpdateResponse,
     UserPaginatedResponse,
 )
-from src.core.exceptions import UserAlreadyExistsError, ValidationError
+from src.core.exceptions import UserAlreadyExistsError, ValidationError, ErrorResponse
 from src.db.repository.user import save_user_in_db
 from datetime import datetime
 from src.core.exceptions import NotFoundError, ForbiddenError
 from src.utils.utils import get_password_hash
 from sqlalchemy import desc
+from src.core.configvars import env_config
+from fastapi import status
 
 
 user_link = "/api/v1/users"
@@ -24,7 +26,7 @@ def check_for_user(db, user_id):
     user_in_db = db.query(models.User).filter(models.User.id == user_id)
     first_user = user_in_db.first()
     if not first_user:
-        raise NotFoundError(detail="User not found")
+        raise ErrorResponse(data=[], errors={"message": env_config.ERRORS.get("USER_NOT_FOUND")}, status_code=status.HTTP_404_NOT_FOUND)
 
     return user_in_db
 
@@ -38,12 +40,13 @@ def check_user_and_role(db, user_id, current_user, msg):
 
     if current_user.role.name == "manager":
         if first_user.role.name != "user":
-            raise ForbiddenError(detail=msg)
+            raise ErrorResponse(data=[], errors={"message":msg}, status_code=status.HTTP_403_FORBIDDEN)
         else:
             return user
 
     if current_user.id != first_user.id:
-        raise ForbiddenError(detail=msg)
+        raise ErrorResponse(data=[], errors={"message":msg}, status_code=status.HTTP_403_FORBIDDEN)
+        
 
     return user
 
@@ -140,11 +143,11 @@ def create_new_user(user, db):
 
     user_data = db.query(models.User).filter(models.User.email == user.email).first()
     if user_data:
-        raise UserAlreadyExistsError(detail="User with email already exists")
+        raise ErrorResponse(data=[], errors={"message": env_config.ERRORS.get("USER_EXISTS")}, status_code=status.HTTP_409_CONFLICT)
 
     hash_passwd = get_password_hash(user.password)
     if user.password != user.password_confirmation:
-        raise ValidationError(detail="Passwords do not match")
+        raise ErrorResponse(data=[], errors={"message": env_config.ERRORS.get("PASSWORD_MATCH_DETAIL")}, status_code=status.HTTP_400_BAD_REQUEST)
 
     user.password = hash_passwd
 
@@ -171,7 +174,7 @@ def update_existing_user(user_id, user, db, current_user):
 
     """
     user_in_db = check_user_and_role(
-        db, user_id, current_user, "You do not have the permission to update this user"
+        db, user_id, current_user, env_config.ERRORS.get("NOT_PERMITTED_UPDATE_USER")
     )
     current_time = datetime.utcnow()
     updated_user = UserUpdate(

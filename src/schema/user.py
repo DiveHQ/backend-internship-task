@@ -13,15 +13,20 @@ class User(BaseModel):
     role: Optional[Role]
 
 
-class UserResponse(BaseModel):
+class UserRes(BaseModel):
     email: Optional[EmailStr] = Field(...)
     first_name: Optional[str] = Field(...)
     last_name: Optional[str] = Field(...)
     role: Role = Field(...)
     expected_calories: int = Field(...)
 
+class UserResponse(BaseModel):
+    data: UserRes = Field(...)
+    errors: dict = Field(...)
+    status_code: int = Field(...)
 
-class UserPaginatedResponse(BaseModel):
+
+class UserPaginate(BaseModel):
     total: int = Field(...)
     page: int = Field(...)
     size: int = Field(...)
@@ -29,28 +34,33 @@ class UserPaginatedResponse(BaseModel):
     users_response: List[UserResponse] = Field(...)
     links: Optional[Dict[str, Optional[str]]]
 
+class UserPaginatedResponse(BaseModel):
+    data: UserPaginate = Field(...)
+    errors: dict = Field(...)
+    status_code: int = Field(...)
 
-class UserWithRole(User):
-    role: Role = Field(...)
 
-
-class UserUpdateResponse(UserResponse):
+class UserUpdate(UserRes):
     updated_at: datetime.datetime = Field(...)
 
+class UserUpdateResponse(BaseModel):
+    data: UserUpdate = Field(...)
+    errors: dict = Field(...)
+    status_code: int = Field(...)
 
 class Token(BaseModel):
     token: str = Field(...)
     token_type: str = Field(...)
     exp: float = Field(...)
 
+class TokenResponse(BaseModel):
+    data: Token = Field(...)
+    errors: dict = Field(...)
+    status_code: int = Field(...)
+
 
 class TokenData(BaseModel):
     id: Optional[str] = Field(default=None)
-
-
-class TotalUsers(BaseModel):
-    total: int = Field(...)
-    data: List[UserResponse] = Field(...)
 
 
 class UserUpdate(BaseModel):
@@ -61,6 +71,3 @@ class UserUpdate(BaseModel):
     role: Optional[Role]
     expected_calories: Optional[int]
 
-
-class AdminUserUpdate(UserUpdate):
-    role: Optional[Role]

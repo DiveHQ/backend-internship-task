@@ -1,6 +1,19 @@
 from fastapi import HTTPException, status
 
 
+class ErrorResponse(Exception):
+    def __init__(self, status_code=None, data=None, errors=None):
+        self.status_code = status_code
+        self.data = data
+        self.errors = errors or {}
+
+    def to_dict(self):
+        return {
+            "data": self.data,
+            "errors": self.errors,
+            "status_code": self.status_code,
+        }
+
 class ValidationError(HTTPException):
     def __init__(self, detail: str):
         self.status_code = status.HTTP_400_BAD_REQUEST

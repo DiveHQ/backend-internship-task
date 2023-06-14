@@ -40,3 +40,5 @@ class CaloriePaginatedResponse(BaseModel):
     total_pages: int = Field(...)
     calorie_entries: List[CalorieResponse] = Field(...)
     links: Optional[Dict[str, Optional[str]]]
+
+# class C

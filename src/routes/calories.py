@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status, Depends, Query
-from src.core.exceptions import ForbiddenError
+from src.core.exceptions import ErrorResponse, ForbiddenError
 from src.utils.oauth2 import get_current_user
 from datetime import datetime
 from src.schema.calories import (
@@ -21,6 +21,7 @@ from src.utils.calorie_utils import (
     delete_calorie_entry,
     get_total_number_of_calories,
 )
+from src.core.configvars import env_config
 from src.utils.utils import RoleChecker
 
 calorie_router = APIRouter(tags=["Calorie"], prefix="/calories")
@@ -141,7 +142,7 @@ def get_calorie_entry(
         db,
         calorie_id,
         current_user,
-        "Calorie entry not found",
+        env_config.ERRORS.get("CALORIE_NOT_FOUND"),
     )
     return_data = calorie_entry.first()
     return CalorieResponse(
@@ -268,7 +269,9 @@ def delete_all_calories(
     """
 
     if current_user.role.name != "admin":
-        raise ForbiddenError(detail="You are not allowed to perform this operation")
+        ErrorResponse(data=[], 
+                                errors={"message": env_config.ERRORS.get("NOT_PERMITTED")}, 
+                                status_code=status.HTTP_403_FORBIDDEN)
 
     db.query(models.CalorieEntry).delete()
     db.commit()

@@ -20,8 +20,12 @@ from src.schema.user import (
 from fastapi.security import OAuth2PasswordRequestForm
 from src.utils.utils import verify_password
 from src.utils.oauth2 import get_access_token, get_current_user
-from src.core.exceptions import ForbiddenError, InvalidCredentialError
+from src.core.exceptions import ForbiddenError, InvalidCredentialError, ErrorResponse
 from src.utils.utils import RoleChecker
+from src.core.configvars import env_config
+from src.core.response import APIResponse
+from src.schema.response import APIResponse
+
 
 auth_router = APIRouter(tags=["Auth"], prefix="/users")
 allow_operation = RoleChecker(["manager", "admin"])
@@ -47,7 +51,7 @@ def signup(user: User, db: Session = Depends(get_db)):
     return user
 
 
-@auth_router.post("/login", response_model=Token)
+@auth_router.post("/login", status_code=status.HTTP_200_OK, response_model=APIResponse)
 def login(
     user: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
@@ -67,16 +71,21 @@ def login(
                 ).filter(models.User.email == user.username
                 ).first()
     if not user_data:
-        raise InvalidCredentialError(detail="Invalid Credentials")
+        raise ErrorResponse(data=[], status_code=status.HTTP_401_UNAUTHORIZED, errors={"message": env_config.ERRORS.get("INVALID_CREDENTIALS")})
 
     if not verify_password(user.password, user_data.password):
-        raise InvalidCredentialError(detail="Invalid credentials")
+        raise ErrorResponse(data=[], status_code=status.HTTP_401_UNAUTHORIZED, errors={"message": env_config.ERRORS.get("INVALID_CREDENTIALS")})
 
     token, exp = get_access_token(str(user_data.id))
 
     timestamp = exp.timestamp()
 
-    return Token(token=token, exp=timestamp, token_type="Bearer")
+    token_response = Token(token=token, exp=timestamp, token_type="Bearer")
+
+    print(token_response.dict())
+
+    return APIResponse(data=token_response.dict(), errors={}, status_code=status.HTTP_200_OK)
+    # return Token(token=token, exp=timestamp, token_type="Bearer")
 
 
 @auth_router.post(
@@ -103,12 +112,15 @@ def create_user(
     get_user_role = current_user.role.name
     if get_user_role == "admin":
         if user.role and user.role.name == "admin":
-            raise ForbiddenError(detail="You are not allowed to create an admin user")
+            raise ErrorResponse(data=[], 
+                                errors={"message": "You are not allowed to create an admin user"}, 
+                                status_code=status.HTTP_403_FORBIDDEN)
+            
     if get_user_role == "manager":
         if user.role and (user.role.name == "admin" or user.role.name == "manager"):
-            raise ForbiddenError(
-                detail="You are not allowed to create a user with this role"
-            )
+            raise ErrorResponse(data=[], 
+                                errors={"message": "You are not allowed to create a user with this role"}, 
+                                status_code=status.HTTP_403_FORBIDDEN)
 
     user = create_new_user(user, db)
     return user
