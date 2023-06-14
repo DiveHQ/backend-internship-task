@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Calo
+
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,7 +20,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return user
     
-class CaloSerializer(serializers.Modelserializer):
+class CaloSerializer(serializers.ModelSerializer):
     class Meta:
+        
         model = Calo
-        fields = ['id','name','quatity','calories','date_time']
+        fields = ['id','name','quantity','calories','created_at','updated_at']

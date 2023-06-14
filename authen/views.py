@@ -1,12 +1,14 @@
-from rest_framework import generics, permissions,status,Response
+from rest_framework import generics, permissions,status
 from rest_framework.views import APIView
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 from django.shortcuts import render
+from rest_framework.response import Response
 from django.contrib.auth import login
 from .serializer import UserSerializer, RegisterSerializer , CaloSerializer
 from .models import Calo
+from django.core.paginator import Paginator
 
 # Register API
 class RegisterAPI(generics.GenericAPIView):
@@ -40,9 +42,13 @@ class  CaloView(APIView):
   permission_classes = [permissions.AllowAny]
 
   def get(self,request,*args,**kwargs):
-    projects = Calo.objects.all()
-    serializer = CaloSerializer(projects, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    Calor = Calo.objects.all()
+    page = Paginator(Calo,15)
+    if self.request.GET.get('page'):
+      page_number = request.GET.get("page")
+      page= page.get_page(page_number)
+    serializer = CaloSerializer(Calor,many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK)
   
   def post(self, request, *args, **kwargs):
     data = {
