@@ -2,11 +2,6 @@
 
 <div align="center">
 
-  ![Status](https://img.shields.io/badge/status-active-success.svg)
-  ![GitHub issues](https://img.shields.io/github/issues/eeTiboah/dive-backend-internship-task?color=yellow)
-  ![GitHub pull requests](https://img.shields.io/github/issues-pr/eeTiboah/dive-backend-internship-task?color=success)
-
-
 </div>
 
 ---
