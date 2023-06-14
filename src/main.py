@@ -17,14 +17,14 @@ from alembic.config import Config
 from src.db.database import engine, SQLALCHEMY_DATABASE_URL
 from sqlalchemy import inspect
 
-def check_tables_exist():
+def check_if_table_exist():
     inspector = inspect(engine)
     tables = inspector.get_table_names()
     return bool(tables)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    if not check_tables_exist():
+    if not check_if_table_exist():
         alembic_cfg = Config("alembic.ini")
         command.upgrade(alembic_cfg, "head")
     db = SessionLocal()
