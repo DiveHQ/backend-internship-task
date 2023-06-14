@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from django.contrib.auth import login
 from .serializer import UserSerializer, RegisterSerializer , CaloSerializer
 from .models import Calo
-from django.core.paginator import Paginator
+from .pagnation import CustomPagination
 
 # Register API
 class RegisterAPI(generics.GenericAPIView):
@@ -40,13 +40,11 @@ class LoginAPI(KnoxLoginView):
 
 class  CaloView(APIView):
   permission_classes = [permissions.AllowAny]
+  pagination_class = CustomPagination
 
+  
   def get(self,request,*args,**kwargs):
     Calor = Calo.objects.all()
-    page = Paginator(Calo,15)
-    if self.request.GET.get('page'):
-      page_number = request.GET.get("page")
-      page= page.get_page(page_number)
     serializer = CaloSerializer(Calor,many=True)
     return Response(serializer.data,status=status.HTTP_200_OK)
   
