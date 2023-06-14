@@ -1,11 +1,13 @@
-from django.shortcuts import render
-from rest_framework import generics, permissions
-from rest_framework.response import Response
-from knox.models import AuthToken
-from .serializer import UserSerializer, RegisterSerializer
+from rest_framework import generics, permissions,status,Response
+from rest_framework.views import APIView
 from rest_framework.authtoken.serializers import AuthTokenSerializer
+from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
+from django.shortcuts import render
 from django.contrib.auth import login
+from .serializer import UserSerializer, RegisterSerializer , CaloSerializer
+from .models import Calo
+
 # Register API
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
@@ -29,4 +31,27 @@ class LoginAPI(KnoxLoginView):
         user = serializer.validated_data['user']
         login(request, user)
         return super(LoginAPI, self).post(request, format=None)
+
+#
+
+class  CaloView(APIView):
+  permission_classes = [permissions.AllowAny]
+
+  def get(self,request,*args,**kwargs):
+    projects = Calo.objects.all()
+    serializer = CaloSerializer(projects, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+  
+  def post(self, request, *args, **kwargs):
+    data = {
+        'name': request.data.get('name'), 
+        'quantity': request.data.get('quantity'),
+        'calories': request.data.get('calories')
+    }
+    serializer = CaloSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
