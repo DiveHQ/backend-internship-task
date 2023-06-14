@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 from app.permissions import ManagerEditDeletePermission, IsOwnerOrReadOnly
 from calory_limit.serializers import CaloryLimitSerializer
 from .serializers import CalorySerializer
@@ -15,6 +16,7 @@ import datetime
 
 class CaloryView(APIView):
     permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination()
     '''
     This function gets an instance of the calory limit model
     '''
@@ -63,9 +65,10 @@ class CaloryView(APIView):
     def get(self, request, pk):
         limit = self.get_limit(pk)
         calories = Calories.objects.filter(calory_limit=pk).all()
-        serializer = CalorySerializer(calories, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
+        paginated_limits = self.pagination_class.paginate_queryset(calories, request)
+        serializer = CalorySerializer(paginated_limits, many=True)
+        return self.pagination_class.get_paginated_response(serializer.data)
+        
 
 '''
 A get request for retrieving a given calory data
@@ -81,14 +84,16 @@ A get request for getting the amount of calories taken today
 '''   
 class GetCurrentCaloryDetails(APIView):
     permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination()
     def get(self, request):
         current_date = datetime.date.today()
         calories_data = Calories.objects.filter(user=request.user, created_at__date=current_date)
-        serializer = CalorySerializer(calories_data, many=True)
+        paginated_limits = self.pagination_class.paginate_queryset(calories_data, request)
+        serializer = CalorySerializer(paginated_limits, many=True)
         total_calories = sum(calories['calories'] for calories in serializer.data)
         response = {
             'total': total_calories,
-            'data': serializer.data,
+            'data': self.pagination_class.get_paginated_response(serializer.data)
         }
         return Response(response, status=status.HTTP_200_OK) 
 

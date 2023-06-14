@@ -1,10 +1,11 @@
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+from drf_yasg.utils import swagger_auto_schema
 from app.permissions import IsOwnerOrReadOnly, ManagerEditDeletePermission
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from .serializers import CaloryLimitSerializer
 from .models import CaloryLimit
 
@@ -25,11 +26,13 @@ def check_limit_set(view_func):
 
 class CaloryLimitView(APIView):
     permission_classes = [IsAuthenticated]
+    pagination_class = PageNumberPagination()
     
     '''
     Setting a limit resource
     '''
     @check_limit_set
+    @swagger_auto_schema(request_body=CaloryLimitSerializer)
     def post(self, request):
         serializer = CaloryLimitSerializer(data=request.data)
         if serializer.is_valid():
@@ -42,8 +45,9 @@ class CaloryLimitView(APIView):
     '''
     def get(self, request):
         calory_limits = CaloryLimit.objects.filter(user=request.user).all()
-        serializer = CaloryLimitSerializer(calory_limits, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginated_limits = self.pagination_class.paginate_queryset(calory_limits, request)
+        serializer = CaloryLimitSerializer(paginated_limits, many=True)
+        return self.pagination_class.get_paginated_response(serializer.data)
     
 
 '''
