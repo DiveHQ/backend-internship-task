@@ -80,7 +80,7 @@ class CaloryDetailsView(RetrieveAPIView):
 A get request for getting the amount of calories taken today
 '''   
 class GetCurrentCaloryDetails(APIView):
-    permission_classes = [ManagerEditDeletePermission | IsAdminUser | IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         current_date = datetime.date.today()
         calories_data = Calories.objects.filter(user=request.user, created_at__date=current_date)

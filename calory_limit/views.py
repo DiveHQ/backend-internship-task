@@ -50,6 +50,7 @@ class CaloryLimitView(APIView):
 For performing GET, PUT, DELETE operation on a particular resource
 '''
 class CaloryLimitDetailsView(RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsOwnerOrReadOnly | ManagerEditDeletePermission]
+    permission_classes = [ IsOwnerOrReadOnly | ManagerEditDeletePermission]
     queryset = CaloryLimit.objects.all()
     serializer_class = CaloryLimitSerializer
+

@@ -12,27 +12,27 @@ To access the API documentation, please click [here](https://documenter.getpostm
 Follow the steps below to set up the project on your local machine:
 
 1. Clone the project repository by running the following command:
-``` https://github.com/DiveHQ/backend-internship-task.git ```
+``` https://github.com/Gibril1/backend-internship-task.git ```
 
 2. Create a  virutal environment
 ``` python -m venv .venv ``` 
-On Windows: Activate by:  ```.venv/scripts/activate```
-On MacOS and Linux: Activate by:  ```source .venv/bin/activate```
+* On Windows: Activate by:  ```.venv/scripts/activate```
+* On MacOS and Linux: Activate by:  ```source .venv/bin/activate```
 
 3. Install dependencies
 ```pip install -r requirements.txt```
 
-4. Run ``` python manage.py runserver ``` to server on port 8000 on local machine
+4. Run ``` python manage.py runserver ``` to server on port ```8000``` on local machine
 
 ## Running test suites
 
 There are three apps in this project. They are **users**, **calories** and **calory_limit**
 
-For testing urls:
+* For testing urls:
 ``` python manage.py test <app_name>.tests.test_urls ```
-For testing database models:
+* For testing models:
 ``` python manage.py test <app_name>.tests.test_models ```
-For testing views:
+* For testing views:
 ``` python manage.py test <app_name>.tests.test_views ```
 
 
@@ -50,7 +50,9 @@ There are three database models I used.
 2. **Category Limit**: This table stores the daily calory limits of the user
 3. **Calories**: This table stores the amount of calories and food taken. 
 
+**The tables have a one-to-many-relationship between them**
+
+
 ### Logic
 Therefore on the CategoryLimit model, there is a field called present_calory_amount that keeps track of the number of calories the user takes in. When this value exceeds the set calory_limit, another field called exceeded_maximum which is a Boolean Field is set to True
 
-**The tables have a one-to-many-relationship between them**
