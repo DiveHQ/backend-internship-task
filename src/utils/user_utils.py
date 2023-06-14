@@ -40,9 +40,6 @@ def check_user_and_role(db, user_id, current_user, msg):
     user = check_for_user(db, user_id)
     first_user = user.first()
 
-    print(current_user.id)
-    print(first_user.id)
-
     if current_user.role.name == "admin":
         return user
 
