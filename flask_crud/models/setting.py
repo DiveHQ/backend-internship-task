@@ -9,7 +9,7 @@ def generate_uuid():
 
 class Setting(db.Model):
     id = Column(String(36), primary_key=True, default=generate_uuid)
-    user_id = Column(String(36), ForeignKey('user.id'), nullable=False)
+    user_id = Column(String(36), ForeignKey('user.id'), nullable=False, unique=True)
     expected_calories_per_day = Column(Integer, nullable=True)  # Can be null if not provided
 
     user = db.relationship('User', backref='settings')

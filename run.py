@@ -1,9 +1,9 @@
-from flask_crud import app, db
+from flask_crud import create_app, db
 from flask_crud.routes.user_routes import user_blueprint
 from flask_crud.routes.entry_routes import entry_blueprint
 from flask_crud.routes.setting_routes import setting_blueprint
 
-from flask_crud import app, db
+app = create_app('development')
 from flask_crud.models.role import Role
 
 # import logging

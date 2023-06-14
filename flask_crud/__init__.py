@@ -1,9 +1,18 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_crud.config import DevelopmentConfig, TestingConfig
 
-from flask_crud.config import DevelopmentConfig
 
+def create_app(config):
+    app = Flask(__name__)
+    if config == 'development':
+        app.config.from_object(DevelopmentConfig)
+    elif config == 'testing':
+        app.config.from_object(TestingConfig)
+    init_db(app)
+    return app
 
-app = Flask(__name__)
-app.config.from_object(DevelopmentConfig)
-db = SQLAlchemy(app)
+db = SQLAlchemy()
+
+def init_db(app):
+    db.init_app(app)

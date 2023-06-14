@@ -1,11 +1,12 @@
 from marshmallow import Schema, fields
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify, request
-from flask_crud import app
+from flask_crud import create_app
 from flask_crud.models.user import User
 import jwt
 from functools import wraps
 
+app= create_app('development')
 
 def token_required(f):
     @wraps(f)
@@ -36,13 +37,20 @@ class EntrySchema(Schema):
     calories = fields.Int(required=False)
     is_below_expected = fields.Bool(required=False)
 
+class SettingSchema(Schema):
+    expected_calories_per_day = fields.Int(required=True)
+
 class UserUpdateSchema(Schema):
     username = fields.Str(required=True)
     # Add more fields as needed
+
 class EntryUpdateSchema(Schema):
     text = fields.Str(required=False)
     calories = fields.Int(required=False)
     is_below_expected = fields.Bool(required=False)
+
+class SettingUpdateSchema(Schema):
+    expected_calories_per_day = fields.Int(required=True)
 
 def hash_password(password):
     return generate_password_hash(password, method='scrypt')

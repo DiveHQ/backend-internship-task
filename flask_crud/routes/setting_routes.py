@@ -1,32 +1,16 @@
 from flask import Blueprint, request, jsonify
-from flask_crud import db, app
+from flask_crud import db, create_app
 from flask_crud.models.user import User
 from flask_crud.models.entry import Entry
 from flask_crud.routes.entry_routes import update_entries_below_expected
+from flask_crud.utils.helpers import token_required
 from flask_crud.models.setting import Setting
 from functools import wraps
 import jwt
-import datetime
+from datetime import datetime
 
 setting_blueprint = Blueprint('setting', __name__)
-
-
-def token_required(f):
-    @wraps(f)
-    def decorator(*args, **kwargs):
-        auth = request.headers.get('Authorization')
-        token = auth.split()[1] if auth else None
-        if not token:
-            return jsonify({'message': 'Token is missing!'}), 401
-
-        user_data = get_user_from_token(token)
-        if not user_data:
-            return jsonify({'message': 'Invalid token.'}), 401
-
-        return f(user_data, *args, **kwargs)
-
-    return decorator
-
+app = create_app("development")
 
 @setting_blueprint.route('/settings', methods=['POST'])
 @token_required
@@ -82,7 +66,7 @@ def update_user_settings(user_data):
 
     # If the user has a daily calorie expectation set, update all entries for today
     if setting.expected_calories_per_day is not None:
-        today = datetime.today().date()
+        today = datetime.now().date()
         update_entries_below_expected(current_user_id, today, setting.expected_calories_per_day)
 
     return jsonify({'message': 'User settings updated successfully', 'settings': setting.to_dict()}), 200

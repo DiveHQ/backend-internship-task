@@ -6,10 +6,10 @@ from werkzeug.security import check_password_hash
 from flask_crud.models.user import User
 from flask_crud.models.role import Role
 from flask_crud.utils.helpers import UserSchema, UserUpdateSchema, hash_password, token_required
-from flask_crud import db, app
+from flask_crud import db, create_app
 import datetime
 import jwt
-
+app = create_app('development')
 user_blueprint = Blueprint('user', __name__)
 
 @user_blueprint.route('/register/regular', methods=['POST'])
@@ -26,8 +26,9 @@ def register_regular():
         return jsonify({'message': 'New user created! Welcome.'}), 201
     except IntegrityError:
         return jsonify({'message': 'Username already exists.'}), 400
-    except Exception:
-        return jsonify({'message': 'Registration Failed'}), 500
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({'message': 'User Registration Failed'}), 500
 
 @user_blueprint.route('/register/admin', methods=['POST'])
 def register_admin():
@@ -44,7 +45,7 @@ def register_admin():
     except IntegrityError:
         return jsonify({'message': 'Username already exists.'}), 400
     except Exception:
-        return jsonify({'message': 'Registration Failed'}), 500
+        return jsonify({'message': 'Admin Registration Failed'}), 500
 
 
 @user_blueprint.route('/register/user_manager', methods=['POST'])
@@ -62,7 +63,7 @@ def register_user_manager():
     except IntegrityError:
         return jsonify({'message': 'Username already exists.'}), 400
     except Exception:
-        return jsonify({'message': 'Registration Failed'}), 500
+        return jsonify({'message': 'User Manager Registration Failed'}), 500
 
 
 @user_blueprint.route('/login', methods=['POST'])
@@ -221,5 +222,5 @@ def create_user(username, password, role_name):
         print(f"IntegrityError occurred: {e}")
         raise
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An error occurred while creating user: {e}")
         raise

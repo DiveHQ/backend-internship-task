@@ -63,3 +63,43 @@
 Note: urlparse has been changed to urllib.parse
 In Nutritionx do
 import urllib.parse
+
+
+
+
+
+.
+├── README.md
+├── create_tables.py
+├── flask_crud
+│   ├── __init__.py
+│   ├── config.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── entry.py
+│   │   ├── role.py
+│   │   ├── setting.py
+│   │   └── user.py
+│   ├── routes
+│   │   ├── __init__.py
+│   │   ├── entry_routes.py
+│   │   ├── setting_routes.py
+│   │   └── user_routes.py
+│   ├── services
+│   │   ├── __init__.py
+│   │   ├── entry_service.py
+│   │   └── user_service.py
+│   ├── tests
+│   │   ├── e2e
+│   │   ├── functional
+│   │   └── unit
+│   │       ├── __init__.py
+│   │       ├── __pycache__
+│   │       ├── test_entry.py
+│   │       └── test_user.py
+│   └── utils
+│       ├── __init__.py
+│       └── helpers.py
+├── progress.md
+├── requirements.txt
+└── run.py
