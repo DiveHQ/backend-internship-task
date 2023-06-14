@@ -9,10 +9,11 @@ venv:
 	python3 -m venv venv \
 	&& source ./venv/bin/activate \
 	&& pip install poetry \
-	&& poetry install
+	&& poetry install \
+	&& source venv/bin/activate
 
-activate_venv:
-	source ./venv/bin/activate
+activate:
+	$(call activate_venv)
 
 test:
 	$(call activate_venv) && pytest
@@ -23,8 +24,8 @@ format:
 lint:
 	$(call activate_venv) && poetry run flake8 .
 
-remove_unused_imports:
-	$(call activate_venv) && poetry run autoflake --remove-all-unused-imports --recursive --in-place --exclude=venv/*,alembic/* .
+remove:
+	$(call activate_venv) && poetry run autoflake --remove-all-unused-imports --recursive --in-place --exclude=venv,alembic .
 
 start:
 	docker-compose up -d

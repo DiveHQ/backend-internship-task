@@ -22,8 +22,7 @@ class EnvConfig(BaseSettings):
         "NOT_PERMITTED_DELETE_USER": "You are not permitted to delete this user",
         "NOT_PERMITTED_UPDATE_USER": "You are not permitted to update this user",
         "NOT_PERMITTED": "You are not permitted to perform this operation",
-        "ENTRY_NOT_RETRIEVED": "Could not retrieve number of calories. Enter it or write a new text"
-
+        "ENTRY_NOT_RETRIEVED": "Could not retrieve number of calories. Enter it or write a new text",
     }
 
     class Config:

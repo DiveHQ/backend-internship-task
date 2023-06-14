@@ -1,10 +1,11 @@
-from src.core.exceptions import NotFoundError, ForbiddenError, ErrorResponse
+from src.core.exceptions import ErrorResponse
 from src.db import models
-from src.schema.calories import CalorieUpdate, CalorieResponse
+from src.schema.calories import Calorie, CalorieUpdate, CalorieResponse
 from datetime import datetime
 from sqlalchemy import func
 from src.core.configvars import env_config
 from fastapi import status
+
 
 def get_total_number_of_calories(db, current_user, date):
     total_calories_today = (
@@ -36,11 +37,17 @@ def check_for_calorie_and_owner(db, calorie_id, current_user, msg):
     )
     first_entry = calorie_entry.first()
     if not first_entry:
-        raise ErrorResponse(data=[], errors={"message": env_config.ERRORS.get("CALORIE_NOT_FOUND")}, status_code=status.HTTP_404_NOT_FOUND)
+        raise ErrorResponse(
+            data=[],
+            errors=[{"message": env_config.ERRORS.get("CALORIE_NOT_FOUND")}],
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
     if current_user.role.name == "admin":
         return calorie_entry
     elif first_entry.user_id != current_user.id:
-        raise ErrorResponse(data=[], errors={"message": msg}, status_code=status.HTTP_403_FORBIDDEN)
+        raise ErrorResponse(
+            data=[], errors=[{"message": msg}], status_code=status.HTTP_403_FORBIDDEN
+        )
 
     return calorie_entry
 
@@ -59,7 +66,10 @@ def update_calorie_entry(calorie_id, calorie_entry, db, current_user):
     """
 
     calorie = check_for_calorie_and_owner(
-        db, calorie_id, current_user, env_config.ERRORS.get("NOT_PERMITTED_UPDATE_CALORIE")
+        db,
+        calorie_id,
+        current_user,
+        env_config.ERRORS.get("NOT_PERMITTED_UPDATE_CALORIE"),
     )
     current_time = datetime.utcnow()
     date = datetime.now().date()
@@ -98,12 +108,18 @@ def update_calorie_entry(calorie_id, calorie_entry, db, current_user):
     db.commit()
     updated_calorie_entry = calorie.first()
 
-    return CalorieResponse(
+    response = Calorie(
         date=updated_calorie_entry.date,
         time=updated_calorie_entry.time,
         text=updated_calorie_entry.text,
         number_of_calories=updated_calorie_entry.number_of_calories,
         is_below_expected=updated_calorie_entry.is_below_expected,
+    )
+
+    return CalorieResponse(
+        data=response,
+        errors=[],
+        status_code=200
     )
 
 
@@ -120,7 +136,10 @@ def delete_calorie_entry(db, calorie_id, current_user):
     """
 
     calorie = check_for_calorie_and_owner(
-        db, calorie_id, current_user, env_config.ERRORS.get("NOT_PERMITTED_DELETE_CALORIE")
+        db,
+        calorie_id,
+        current_user,
+        env_config.ERRORS.get("NOT_PERMITTED_DELETE_CALORIE"),
     )
     calorie.delete()
     db.commit()

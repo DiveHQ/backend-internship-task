@@ -1,11 +1,10 @@
 from fastapi import HTTPException, status
 
-
 class ErrorResponse(Exception):
     def __init__(self, status_code=None, data=None, errors=None):
         self.status_code = status_code
         self.data = data
-        self.errors = errors or {}
+        self.errors = errors or []
 
     def to_dict(self):
         return {
@@ -13,43 +12,6 @@ class ErrorResponse(Exception):
             "errors": self.errors,
             "status_code": self.status_code,
         }
-
-class ValidationError(HTTPException):
-    def __init__(self, detail: str):
-        self.status_code = status.HTTP_400_BAD_REQUEST
-        self.detail = detail
-
-
-class UserAlreadyExistsError(HTTPException):
-    def __init__(self, detail: str):
-        self.status_code = status.HTTP_409_CONFLICT
-        self.detail = detail
-
-
-class InvalidCredentialError(HTTPException):
-    def __init__(self, detail: str):
-        self.status_code = status.HTTP_401_UNAUTHORIZED
-        self.detail = detail
-
-
-class UserNotFoundError(ValidationError):
-    pass
-
-
-class EmptyResponseError(ValidationError):
-    pass
-
-
-class NotFoundError(HTTPException):
-    def __init__(self, detail: str):
-        self.status_code = status.HTTP_404_NOT_FOUND
-        self.detail = detail
-
-
-class ForbiddenError(HTTPException):
-    def __init__(self, detail: str):
-        self.status_code = status.HTTP_403_FORBIDDEN
-        self.detail = detail
 
 
 class CredentialsException(HTTPException):

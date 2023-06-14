@@ -22,7 +22,7 @@ class UserRes(BaseModel):
 
 class UserResponse(BaseModel):
     data: UserRes = Field(...)
-    errors: dict = Field(...)
+    errors: list = Field(...)
     status_code: int = Field(...)
 
 
@@ -31,12 +31,12 @@ class UserPaginate(BaseModel):
     page: int = Field(...)
     size: int = Field(...)
     total_pages: int = Field(...)
-    users_response: List[UserResponse] = Field(...)
+    users_response: List[UserRes] = Field(...)
     links: Optional[Dict[str, Optional[str]]]
 
 class UserPaginatedResponse(BaseModel):
     data: UserPaginate = Field(...)
-    errors: dict = Field(...)
+    errors: list = Field(...)
     status_code: int = Field(...)
 
 
@@ -45,7 +45,7 @@ class UserUpdate(UserRes):
 
 class UserUpdateResponse(BaseModel):
     data: UserUpdate = Field(...)
-    errors: dict = Field(...)
+    errors: list = Field(...)
     status_code: int = Field(...)
 
 class Token(BaseModel):
@@ -55,13 +55,12 @@ class Token(BaseModel):
 
 class TokenResponse(BaseModel):
     data: Token = Field(...)
-    errors: dict = Field(...)
+    errors: list = Field(...)
     status_code: int = Field(...)
 
 
 class TokenData(BaseModel):
     id: Optional[str] = Field(default=None)
-
 
 class UserUpdate(BaseModel):
     email: Optional[EmailStr]

@@ -55,8 +55,8 @@ def test_user(client):
 
     assert res.status_code == 201
     new_user = res.json()
-    new_user["password"] = user.get("password")
-    new_user["id"] = 1
+    new_user["data"]["password"] = user.get("password")
+    new_user["data"]["id"] = 1
     return new_user
 
 
@@ -73,8 +73,8 @@ def test_user_1(client):
 
     assert res.status_code == 201
     new_user = res.json()
-    new_user["password"] = user.get("password")
-    new_user["id"] = 2
+    new_user["data"]["password"] = user.get("password")
+    new_user["data"]["id"] = 2
     return new_user
 
 
@@ -83,12 +83,12 @@ def authorized_user(client, test_user):
     res = client.post(
         "/api/v1/users/login",
         data={
-            "username": test_user.get("email"),
-            "password": test_user.get("password"),
+            "username": test_user.get('data').get("email"),
+            "password": test_user.get('data').get("password"),
         },
     )
     res_body = res.json()
-    token = res_body.get("token")
+    token = res_body.get("data").get("token")
     client.headers = {**client.headers, "Authorization": f"Bearer {token}"}
 
     return client, test_user
@@ -114,7 +114,7 @@ def calorie_entries(test_user, session, test_user_1):
             "text": "beef",
             "id": 1,
             "is_below_expected": True,
-            "user_id": test_user["id"],
+            "user_id": test_user.get("data").get("id"),
             "date": date,
             "time": time_obj,
             "number_of_calories": 90,
@@ -125,7 +125,7 @@ def calorie_entries(test_user, session, test_user_1):
             "text": "chicken",
             "id": 2,
             "is_below_expected": True,
-            "user_id": test_user_1["id"],
+            "user_id": test_user_1.get("data").get("id"),
             "date": date,
             "time": time_obj,
             "number_of_calories": 70,
@@ -136,7 +136,7 @@ def calorie_entries(test_user, session, test_user_1):
             "text": "rice",
             "id": 3,
             "is_below_expected": True,
-            "user_id": test_user["id"],
+            "user_id": test_user.get("data").get("id"),
             "date": date,
             "time": time_obj,
             "number_of_calories": 70,
@@ -147,7 +147,7 @@ def calorie_entries(test_user, session, test_user_1):
             "text": "grape",
             "id": 4,
             "is_below_expected": True,
-            "user_id": test_user_1["id"],
+            "user_id": test_user_1.get("data").get("id"),
             "date": date,
             "time": time_obj,
             "number_of_calories": 150,
@@ -158,7 +158,7 @@ def calorie_entries(test_user, session, test_user_1):
             "text": "milo",
             "id": 5,
             "is_below_expected": False,
-            "user_id": test_user["id"],
+            "user_id": test_user.get("data").get("id"),
             "date": date,
             "time": time_obj,
             "number_of_calories": 660,
@@ -169,7 +169,7 @@ def calorie_entries(test_user, session, test_user_1):
             "text": "water",
             "id": 6,
             "is_below_expected": False,
-            "user_id": test_user_1["id"],
+            "user_id": test_user_1.get("data").get("id"),
             "date": date,
             "time": time_obj,
             "number_of_calories": 70,

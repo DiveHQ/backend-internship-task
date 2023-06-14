@@ -16,15 +16,14 @@ from src.schema.user import (
     UserResponse,
     UserUpdate,
     UserUpdateResponse,
+    TokenResponse,
 )
 from fastapi.security import OAuth2PasswordRequestForm
 from src.utils.utils import verify_password
 from src.utils.oauth2 import get_access_token, get_current_user
-from src.core.exceptions import ForbiddenError, InvalidCredentialError, ErrorResponse
+from src.core.exceptions import ErrorResponse
 from src.utils.utils import RoleChecker
 from src.core.configvars import env_config
-from src.core.response import APIResponse
-from src.schema.response import APIResponse
 
 
 auth_router = APIRouter(tags=["Auth"], prefix="/users")
@@ -32,9 +31,7 @@ allow_operation = RoleChecker(["manager", "admin"])
 
 
 @auth_router.post(
-    "/register",
-    status_code=status.HTTP_201_CREATED,
-    response_model=UserResponse
+    "/register", status_code=status.HTTP_201_CREATED, response_model=UserResponse
 )
 def signup(user: User, db: Session = Depends(get_db)):
     """
@@ -51,12 +48,10 @@ def signup(user: User, db: Session = Depends(get_db)):
     return user
 
 
-@auth_router.post("/login", status_code=status.HTTP_200_OK, response_model=APIResponse)
-def login(
-    user: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db)
-):
-
+@auth_router.post(
+    "/login", status_code=status.HTTP_200_OK, response_model=TokenResponse
+)
+def login(user: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     """
     Creates a token for authorization
     Args:
@@ -67,14 +62,20 @@ def login(
 
     """
 
-    user_data = db.query(models.User
-                ).filter(models.User.email == user.username
-                ).first()
+    user_data = db.query(models.User).filter(models.User.email == user.username).first()
     if not user_data:
-        raise ErrorResponse(data=[], status_code=status.HTTP_401_UNAUTHORIZED, errors={"message": env_config.ERRORS.get("INVALID_CREDENTIALS")})
+        raise ErrorResponse(
+            data=[],
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            errors=[{"message": env_config.ERRORS.get("INVALID_CREDENTIALS")}],
+        )
 
     if not verify_password(user.password, user_data.password):
-        raise ErrorResponse(data=[], status_code=status.HTTP_401_UNAUTHORIZED, errors={"message": env_config.ERRORS.get("INVALID_CREDENTIALS")})
+        raise ErrorResponse(
+            data=[],
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            errors=[{"message": env_config.ERRORS.get("INVALID_CREDENTIALS")}],
+        )
 
     token, exp = get_access_token(str(user_data.id))
 
@@ -82,10 +83,9 @@ def login(
 
     token_response = Token(token=token, exp=timestamp, token_type="Bearer")
 
-    print(token_response.dict())
-
-    return APIResponse(data=token_response.dict(), errors={}, status_code=status.HTTP_200_OK)
-    # return Token(token=token, exp=timestamp, token_type="Bearer")
+    return TokenResponse(
+        data=token_response.dict(), errors=[], status_code=status.HTTP_200_OK
+    )
 
 
 @auth_router.post(
@@ -95,9 +95,7 @@ def login(
     response_model=UserResponse,
 )
 def create_user(
-    user: User,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    user: User, db: Session = Depends(get_db), current_user=Depends(get_current_user)
 ):
     """
     Return a newly created user
@@ -112,15 +110,21 @@ def create_user(
     get_user_role = current_user.role.name
     if get_user_role == "admin":
         if user.role and user.role.name == "admin":
-            raise ErrorResponse(data=[], 
-                                errors={"message": "You are not allowed to create an admin user"}, 
-                                status_code=status.HTTP_403_FORBIDDEN)
-            
+            raise ErrorResponse(
+                data=[],
+                errors=[{"message": "You are not allowed to create an admin user"}],
+                status_code=status.HTTP_403_FORBIDDEN,
+            )
+
     if get_user_role == "manager":
         if user.role and (user.role.name == "admin" or user.role.name == "manager"):
-            raise ErrorResponse(data=[], 
-                                errors={"message": "You are not allowed to create a user with this role"}, 
-                                status_code=status.HTTP_403_FORBIDDEN)
+            raise ErrorResponse(
+                data=[],
+                errors=[{
+                    "message": "You are not allowed to create a user with this role"
+                }],
+                status_code=status.HTTP_403_FORBIDDEN,
+            )
 
     user = create_new_user(user, db)
     return user
@@ -176,7 +180,6 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 @auth_router.patch(
     "/{user_id}",
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(allow_operation)],
     response_model=UserUpdateResponse,
 )
 def update_user(

@@ -24,6 +24,8 @@ class RoleChecker:
 
     def __call__(self, user: User = Depends(get_current_user)):
         if user.role.name not in self.allowed_roles:
-            raise ErrorResponse(data=[], 
-                                errors={"message": env_config.ERRORS.get("NOT_PERMITTED")}, 
-                                status_code=status.HTTP_403_FORBIDDEN)
+            raise ErrorResponse(
+                data=[],
+                errors=[{"message": env_config.ERRORS.get("NOT_PERMITTED")}],
+                status_code=status.HTTP_403_FORBIDDEN,
+            )

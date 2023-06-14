@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, status, HTTPException
+from fastapi import FastAPI, Request, status
 from src.core.response import APIResponse
 from src.core.exceptions import ErrorResponse
 from src.routes.auth import auth_router
@@ -10,9 +10,8 @@ from src.db.models import Role
 from src.utils.user_utils import create_new_user
 from contextlib import asynccontextmanager
 from src.db.database import SessionLocal
-from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import JSONResponse
 
 
 @asynccontextmanager
@@ -38,20 +37,23 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    print(exc.errors()[0])
-    res = APIResponse(data=[], errors=[error for error in exc.errors()], status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    res = APIResponse(
+        data=[],
+        errors=[error for error in exc.errors()],
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+    )
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content=res.to_dict(),
     )
 
+
 async def http_exception_handler(request: Request, exc: ErrorResponse):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content=exc.to_dict()
-    )
+    return JSONResponse(status_code=exc.status_code, content=exc.to_dict())
+
 
 @app.get("/")
 async def root():

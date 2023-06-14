@@ -1,10 +1,12 @@
 from fastapi import APIRouter, status, Depends, Query
-from src.core.exceptions import ErrorResponse, ForbiddenError
+from src.core.exceptions import ErrorResponse
 from src.utils.oauth2 import get_current_user
 from datetime import datetime
 from src.schema.calories import (
     CalorieEntry,
     Calorie,
+    CalorieInput,
+    CaloriePaginate,
     CaloriePaginatedResponse,
     CalorieUpdateInput,
     CalorieResponse,
@@ -32,8 +34,8 @@ allow_operation = RoleChecker(["user", "admin"])
 
 
 @calorie_router.get(
-    "/",
-    status_code=status.HTTP_200_OK,
+    "/", 
+    status_code=status.HTTP_200_OK, 
     response_model=CaloriePaginatedResponse
 )
 def get_calories(
@@ -109,7 +111,7 @@ def get_calories(
     if page > 1:
         links["prev"] = f"{calorie_link}?limit={limit}&page={page - 1}"
 
-    return CaloriePaginatedResponse(
+    response = CaloriePaginate(
         calorie_entries=calories_response,
         total=total_calorie_entries,
         page=page,
@@ -118,9 +120,15 @@ def get_calories(
         links=links,
     )
 
+    return CaloriePaginatedResponse(
+        data=response, errors=[], status_code=200
+    )
+
 
 @calorie_router.get(
-    "/{calorie_id}", status_code=status.HTTP_200_OK, response_model=CalorieResponse
+    "/{calorie_id}", 
+    status_code=status.HTTP_200_OK, 
+    response_model=CalorieResponse
 )
 def get_calorie_entry(
     calorie_id: int,
@@ -145,17 +153,24 @@ def get_calorie_entry(
         env_config.ERRORS.get("CALORIE_NOT_FOUND"),
     )
     return_data = calorie_entry.first()
-    return CalorieResponse(
+    response = Calorie(
         date=return_data.date,
         time=return_data.time,
         text=return_data.text,
         number_of_calories=return_data.number_of_calories,
         is_below_expected=return_data.is_below_expected,
     )
+    return CalorieResponse(
+       data=response,
+       errors=[],
+       status_code=200
+    )
 
 
 @calorie_router.post(
-    "/", status_code=status.HTTP_201_CREATED, response_model=CalorieResponse
+    "/", 
+    status_code=status.HTTP_201_CREATED, 
+    response_model=CalorieResponse
 )
 def create_calorie(
     calorie_entry: CalorieEntry,
@@ -188,7 +203,7 @@ def create_calorie(
         total_calories_today + number_of_calories
     ) < current_user.expected_calories
 
-    calorie = Calorie(
+    calorie = CalorieInput(
         date=date,
         time=time,
         text=calorie_entry.text,
@@ -199,7 +214,7 @@ def create_calorie(
 
     new_calorie_entry = create_new_calorie_entry(calorie, db)
 
-    return CalorieResponse(
+    response = Calorie(
         date=new_calorie_entry.date,
         time=new_calorie_entry.time,
         text=new_calorie_entry.text,
@@ -207,9 +222,17 @@ def create_calorie(
         is_below_expected=new_calorie_entry.is_below_expected,
     )
 
+    return CalorieResponse(
+        data=response,
+        errors=[],
+        status_code=201
+    )
+
 
 @calorie_router.patch(
-    "/{calorie_id}", status_code=status.HTTP_200_OK, response_model=CalorieResponse
+    "/{calorie_id}", 
+    status_code=status.HTTP_200_OK, 
+    response_model=CalorieResponse
 )
 def update_calorie(
     calorie_id: int,
@@ -256,8 +279,7 @@ def delete_calorie(
 
 @calorie_router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
 def delete_all_calories(
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    db: Session = Depends(get_db), current_user=Depends(get_current_user)
 ):
     """
     Deletes all calorie entries
@@ -267,11 +289,14 @@ def delete_all_calories(
     Return: Nothing
 
     """
+    print(current_user.role.name)
 
     if current_user.role.name != "admin":
-        ErrorResponse(data=[], 
-                                errors={"message": env_config.ERRORS.get("NOT_PERMITTED")}, 
-                                status_code=status.HTTP_403_FORBIDDEN)
+        raise ErrorResponse(
+            data=[],
+            errors=[{"message": env_config.ERRORS.get("NOT_PERMITTED")}],
+            status_code=status.HTTP_403_FORBIDDEN,
+        )
 
     db.query(models.CalorieEntry).delete()
     db.commit()

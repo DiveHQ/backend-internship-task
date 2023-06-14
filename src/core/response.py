@@ -1,7 +1,7 @@
 
-from starlette.responses import JSONResponse
 
-class APIResponse(JSONResponse):
+
+class APIResponse():
     def __init__(self, data=None, errors=None, status_code=None):
         self.data = data
         self.errors = errors or {}
@@ -13,5 +13,3 @@ class APIResponse(JSONResponse):
             "errors": self.errors,
             "status_code": self.status_code,
         }
-
-

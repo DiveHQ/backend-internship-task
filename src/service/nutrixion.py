@@ -1,9 +1,9 @@
-from src.core.exceptions import ValidationError, EmptyResponseError
 from src.core.configvars import env_config
 import httpx
 import json
 from src.core.exceptions import ErrorResponse
 from fastapi import status
+
 
 def get_nutrition_data(text):
     headers = {
@@ -15,12 +15,20 @@ def get_nutrition_data(text):
     resp: httpx.Response = httpx.get(url, headers=headers, timeout=timeout)
     if resp.status_code != 200:
         msg = json.loads(resp.text).get("message")
-        raise ValidationError(detail=msg)
+        raise ErrorResponse(
+            data=[],
+            errors=[{"message": msg}],
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
     data = resp.json()
 
     branded = data.get("branded")
     if not branded:
-        raise ErrorResponse(data=[], errors={"message": env_config.ERRORS.get("ENTRY_NOT_RETRIEVED")}, status_code=status.HTTP_400_BAD_REQUEST)
+        raise ErrorResponse(
+            data=[],
+            errors=[{"message": env_config.ERRORS.get("ENTRY_NOT_RETRIEVED")}],
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
 
     food = branded[0]
 

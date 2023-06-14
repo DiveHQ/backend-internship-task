@@ -1,6 +1,6 @@
 
 
-FROM python:3.10
+FROM python:3.10-alpine
 
 WORKDIR /code
 
@@ -21,4 +21,6 @@ RUN poetry install
 
 COPY . /code/
 
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]
+EXPOSE 8080
+
+ENTRYPOINT ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]

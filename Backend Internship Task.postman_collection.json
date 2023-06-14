@@ -12,11 +12,21 @@
 				{
 					"name": "Register User",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNjg5MjA3Njc5fQ.Wvy5zuyvQjg9x5hlQN6AWEJoobCgYMzeJd39SQVmJUs",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"in@gmail.com\",\n    \"first_name\": \"Otis\",\n    \"last_name\": \"Redding\",\n    \"password\": \"asdfghjkl\",\n    \"password_confirmation\": \"asdfghjkl\"\n}",
+							"raw": "{\n    \"email\": \"adcsdsdj@gmail.com\",\n    \"first_name\": \"Otis\",\n    \"last_name\": \"Redding\",\n    \"password\": \"asdfghjkl\",\n    \"password_confirmation\": \"asdfghjkl\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -50,7 +60,7 @@
 							"formdata": [
 								{
 									"key": "username",
-									"value": "in@gmail.com",
+									"value": "otis@gmail.com",
 									"type": "text"
 								},
 								{
@@ -85,7 +95,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjg5MjA2MDAxfQ.v_lTxV8dhZBwHPBfSEXjgq8t5mBerm7AGnWzgcxo9fE",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjg5MzI0OTAzfQ.YEk5EbHqFcMqBzdiSp41FluiZIpT3ckVTE6iJeIYP0A",
 									"type": "string"
 								}
 							]
@@ -102,7 +112,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/v1/users/4",
+							"raw": "http://localhost:8000/api/v1/users/20",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -112,7 +122,7 @@
 								"api",
 								"v1",
 								"users",
-								"4"
+								"20"
 							]
 						}
 					},
@@ -126,7 +136,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjg5MjQ5MTQ0fQ.hvn4qzMcW-z1zx3vipsCEvknUxJ7VBjsigiWP-oglBQ",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjg5MzQwMjc2fQ.4EdXP_dc3lwrZYm5wLYutr2fAKf4hUFjrNqlGV6b_bg",
 									"type": "string"
 								}
 							]
@@ -135,7 +145,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"user@gmail.com\",\n    \"first_name\": \"Otis\",\n    \"last_name\": \"Redding\",\n    \"password\": \"asdfghjkl\",\n    \"password_confirmation\": \"asdfghjkl\"\n}",
+							"raw": "{\n    \"email\": \"manager1@gmail.com\",\n    \"first_name\": \"Otis\",\n    \"last_name\": \"Redding\",\n    \"password\": \"asdfghjkl\",\n    \"password_confirmation\": \"asdfghjkl\",\n    \"role\": \"manager\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -167,7 +177,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNjg5MjU4NDEwfQ.IAlqDR06HN7Qkz4t6wF4wd7pvCr67GpsuIFOaMquLko",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjg5MzI0OTAzfQ.YEk5EbHqFcMqBzdiSp41FluiZIpT3ckVTE6iJeIYP0A",
 									"type": "string"
 								}
 							]
@@ -199,7 +209,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNjg5MjU4NDEwfQ.IAlqDR06HN7Qkz4t6wF4wd7pvCr67GpsuIFOaMquLko",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjg5MzI0OTAzfQ.YEk5EbHqFcMqBzdiSp41FluiZIpT3ckVTE6iJeIYP0A",
 									"type": "string"
 								}
 							]
@@ -231,7 +241,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjg5MjQ5MTQ0fQ.hvn4qzMcW-z1zx3vipsCEvknUxJ7VBjsigiWP-oglBQ",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNjg5MzQ1NDQ3fQ.9lIbFXaxo4mNcwiufvDbRa5O97dX1HABJ4k6Jx0gVj0",
 									"type": "string"
 								}
 							]
@@ -239,7 +249,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/api/v1/users/5",
+							"raw": "http://localhost:8000/api/v1/users/20",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -249,7 +259,7 @@
 								"api",
 								"v1",
 								"users",
-								"5"
+								"20"
 							]
 						}
 					},
@@ -263,7 +273,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNjg5MjU4NDEwfQ.IAlqDR06HN7Qkz4t6wF4wd7pvCr67GpsuIFOaMquLko",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNjg5MzQ1NDQ3fQ.9lIbFXaxo4mNcwiufvDbRa5O97dX1HABJ4k6Jx0gVj0",
 									"type": "string"
 								}
 							]
@@ -300,7 +310,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjg5MjQ5MTQ0fQ.hvn4qzMcW-z1zx3vipsCEvknUxJ7VBjsigiWP-oglBQ",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNjg5MzQwMzYyfQ.dUm4FnhCxqhsAtjkFZ5DzA-eINItEO20fkaoalgAvaE",
 									"type": "string"
 								}
 							]
@@ -309,7 +319,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"text\": \"food\",\n    \"number_of_calories\": 500\n}",
+							"raw": "{\n    \"text\": \"regular\",\n    \"number_of_calories\": 500\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -350,7 +360,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"number_of_calories\": 12\n}",
+							"raw": "{\n    \"number_of_calories\": 1200\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -358,7 +368,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/v1/calories/1",
+							"raw": "http://localhost:8000/api/v1/calories/5",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -368,7 +378,7 @@
 								"api",
 								"v1",
 								"calories",
-								"1"
+								"5"
 							]
 						}
 					},
@@ -385,7 +395,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNjg5MjU4NDEwfQ.IAlqDR06HN7Qkz4t6wF4wd7pvCr67GpsuIFOaMquLko",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjg5MzI0OTAzfQ.YEk5EbHqFcMqBzdiSp41FluiZIpT3ckVTE6iJeIYP0A",
 									"type": "string"
 								}
 							]
@@ -423,7 +433,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNjg5MjU4NDEwfQ.IAlqDR06HN7Qkz4t6wF4wd7pvCr67GpsuIFOaMquLko",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjg5MzI0OTAzfQ.YEk5EbHqFcMqBzdiSp41FluiZIpT3ckVTE6iJeIYP0A",
 									"type": "string"
 								}
 							]
@@ -440,7 +450,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/v1/calories/2",
+							"raw": "http://localhost:8000/api/v1/calories/1",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -450,7 +460,7 @@
 								"api",
 								"v1",
 								"calories",
-								"2"
+								"1"
 							]
 						}
 					},
@@ -464,7 +474,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiZXhwIjoxNjg5MjU4NDEwfQ.IAlqDR06HN7Qkz4t6wF4wd7pvCr67GpsuIFOaMquLko",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNjg5MzQwMzYyfQ.dUm4FnhCxqhsAtjkFZ5DzA-eINItEO20fkaoalgAvaE",
 									"type": "string"
 								}
 							]
@@ -472,7 +482,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8000/api/v1/calories/3",
+							"raw": "http://localhost:8000/api/v1/calories/54",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -482,7 +492,7 @@
 								"api",
 								"v1",
 								"calories",
-								"3"
+								"54"
 							]
 						}
 					},
@@ -496,7 +506,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNjg5MjQ5MTQ0fQ.hvn4qzMcW-z1zx3vipsCEvknUxJ7VBjsigiWP-oglBQ",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwiZXhwIjoxNjg5MzQ1NDQ3fQ.9lIbFXaxo4mNcwiufvDbRa5O97dX1HABJ4k6Jx0gVj0",
 									"type": "string"
 								}
 							]

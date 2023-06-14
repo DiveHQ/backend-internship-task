@@ -1,16 +1,12 @@
 # CalorieTrack
 
 ## Table of Contents
-+ [About](#about)
 + [Getting Started](#getting_started)
-+ [Usage](#usage)
 + [Prerequisites](#prerequisites)
 + [Activating Virtual Environments](#virtual_environment)
 + [Configuring Environment Variables](#environment_variables)
 + [Running app](#running_app)
 
-## About <a name = "about"></a>
-This is a REST API for tracking daily calorie intake 
 
 ## Getting Started <a name = "getting_started"></a>
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
@@ -56,6 +52,8 @@ Make a copy of `.env.example`. This newly created file should be `.env`
 cp .env.example .env
 ```
 #### 2.1 Fill out environment variables
+Ensure to fill out the environment variables. The admin user is created automatically when the application starts so the details should be filled before starting the app.
+
 ```
 SECRET=Used for encoding and decoding JWT
 NUTRIXION_APP_ID=The application ID obtained from nutrixionix
