@@ -16,7 +16,7 @@
 </p>
 
 ## 📝 Table of Contents
-+ [About](#about)
+- [About](#about)
 - [Assumptions](#assumptions)
 - [Helpful Resources](#resources)
 - [Built Using](#built_using)
