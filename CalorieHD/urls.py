@@ -21,6 +21,6 @@ from rest_framework.authtoken import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('authen.urls')),
-    path('',include('colari.urls')),
+    path('',include('calori.urls')),
   path('api-token-auth', views.obtain_auth_token)
 ]

@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'authen.apps.AuthenConfig',
     'knox',
     'requests',
+    'calori.apps.CaloriConfig',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
