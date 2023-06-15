@@ -33,9 +33,10 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'authen.apps.AuthenConfig',
     'knox',
+    'rest_framework',
     'requests',
     'calori.apps.CaloriConfig',
-    'rest_framework',
+    'django_filters',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

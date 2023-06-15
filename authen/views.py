@@ -4,6 +4,7 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 from rest_framework.response import Response
+from django.shortcuts import redirect
 from django.contrib.auth import login
 from django.contrib.auth.models import User
 from .serializer import UserSerializer, RegisterSerializer , CaloSerializer
@@ -12,37 +13,44 @@ from .pagenation import CustomPagination
 """from .env import SECRET_KEY"""
 
 
-# Register API
+"""Register API"""
 class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        return Response({
-        "user": UserSerializer(user, context=self.get_serializer_context()).data,
-        "token": AuthToken.objects.create(user)[1]
-        })
+      try:
+          serializer = self.get_serializer(data=request.data)
+          serializer.is_valid(raise_exception=True)
+          user = serializer.save()
+          return Response({
+          "user": UserSerializer(user, context=self.get_serializer_context()).data,
+          "token": AuthToken.objects.create(user)[1]
+          })
+      except:
+        return Response("Invalid Details! ")
+        
+          
 
-#login API
+"""login API"""
 class LoginAPI(KnoxLoginView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
+      try:
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         login(request, user)
-        return super(LoginAPI, self).post(request, format=None)
+        while True:
+            response = redirect('/project')
+            return response
+      except:
+        err_msg="UNAUTHORIZED ACCESS!,try again with valid credentials"
+        return Response({"msg":err_msg})
+      
 
 
-
-
-
-
-#crud users
-
+"""crud users"""
 class UserManger(APIView):
   permissions_classes = (permissions.AllowAny)
   pagination_class = CustomPagination
@@ -67,6 +75,7 @@ class UserManger(APIView):
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
   
+  
   def get(self,requst,*args,**kwargs):
     user = User.objects.all()
     page = self.paginate_queryset(user)
@@ -76,11 +85,11 @@ class UserManger(APIView):
       serializer = UserSerializer(user, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
   
-  def post(self,request,*args,**kwargs):
-      
+ 
+  def post(self,request,*args,**kwargs):  
       data = {
         'username': request.data.get('username'), 
-        'email': request.data.get('emial'),
+        'email': request.data.get('email'),
         'password': request.data.get('password'),
     }
 
@@ -89,9 +98,9 @@ class UserManger(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
       return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-  
-  
-  
+
+
+
   def delete(self, request, id, *args, **kwargs):
       if User.objects.filter(id=id).exists():
         project = User.objects.get(id=id)
@@ -107,10 +116,10 @@ class UserManger(APIView):
     if User.objects.filter(id=id).exists():
       project = User.objects.get(id=id)
       data = {
-      'title': request.data.get('title'), 
-      'description': request.data.get('description'), 
+      "username":request.data.get("username"),
+      "email" :request.data.get("email")
       }
-      serializer = CaloSerializer(instance = project, data=data, partial = True)
+      serializer = UserSerializer(instance = project, data=data, partial = True)
       if serializer.is_valid():
           serializer.save()
           return Response(serializer.data, status=status.HTTP_200_OK)

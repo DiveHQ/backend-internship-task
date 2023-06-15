@@ -5,12 +5,15 @@ from authen.serializer import  CaloSerializer
 from .models import Calo
 from authen.pagenation import CustomPagination
 import requests
+from  django_filters.rest_framework import DjangoFilterBackend
 # Create your views here.
 #CRUD Section for Calories
 
 class  CaloView(APIView):
+  
   permission_classes = [permissions.AllowAny]
   pagination_class = CustomPagination
+  
 
   @property
   def paginator(self):
@@ -23,7 +26,6 @@ class  CaloView(APIView):
             pass
         return self._paginator
   def paginate_queryset(self, queryset):
-        
         if self.paginator is None:
             return None
         return self.paginator.paginate_queryset(queryset,
@@ -34,6 +36,10 @@ class  CaloView(APIView):
   
   def get(self,request,*args,**kwargs):
     Calor = Calo.objects.all()
+    
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['name', 'id']
+    
     page = self.paginate_queryset(Calor)
     if page is not None:
             serializer = self.get_paginated_response(CaloSerializer(page,
@@ -55,7 +61,8 @@ class  CaloView(APIView):
     data = {
         'name': request.data.get('name'), 
         'quantity': request.data.get('quantity'),
-        'calories': calories
+        'calories': calories,
+        'limit_reach':request.data.get('limit_reach')
     }
 
     serializer = CaloSerializer(data=data)
