@@ -8,5 +8,5 @@ class User(models.Model):
     daily_Calo = models.IntegerField()
     
     def __str__(self) -> str:
-        return super().__str__()
+        return self.username
     

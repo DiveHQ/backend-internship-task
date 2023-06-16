@@ -21,9 +21,8 @@ class ModelTestCase(TestCase):
         self.assertEquals(calo.limt_reach,True)
         
 class ViewTestCase(TestCase):
-    def test_Get(self):
-        
-        reponse= self.client.get('')
+    def test_get(self):
+        response= self.client.get("")
         self.assertEqual(response.status_code,200)
 
     def test_post(self):
