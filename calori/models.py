@@ -1,5 +1,5 @@
 from django.db import models
-
+from authen.models import User
 # Create your models here.
 class Calo(models.Model):
     name = models.CharField(max_length=150)
@@ -7,4 +7,4 @@ class Calo(models.Model):
     calories = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    """limt_reach = models.BooleanField(default=False)"""
+    limt_reach = models.BooleanField(default=False)
