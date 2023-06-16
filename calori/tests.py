@@ -11,13 +11,13 @@ class ModelTestCase(TestCase):
             password="iloves",
             daily_Calo= 300
         )
-        data.save()
+        
         calo = Calo.objects.create(user_id=1,name='bread',quantity=20,calories=350)
         
         calo.user = data
         calo.save()
-        
-              
+        data.save()
+        limit = calo
         self.assertEquals(calo.limt_reach,True)
         
 class ViewTestCase(TestCase):
@@ -36,7 +36,7 @@ class ViewTestCase(TestCase):
         self.assertEqual(response.status_code,200)
     def test_delete(self):
         
-        response = self.client.delete()
+        response = self.client.delete("")
         self.assertEqual(response.status_code,200)
         
     def test_patch(self):
@@ -45,4 +45,4 @@ class ViewTestCase(TestCase):
         }
         
         response = self.client.patch('')
-        self.assertEqual(response.status_code, response)
+        self.assertEqual(response.status_code, 200)
