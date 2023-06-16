@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from .models import User
 
 
-user_manager = Group(name="user_manager")
+user_manager = Group(name="Manager")
 manager_CT = ContentType.article_content_type = ContentType.objects.get_for_model(User)
 
 #permissions

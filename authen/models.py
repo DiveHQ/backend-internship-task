@@ -5,5 +5,8 @@ class User(models.Model):
     username=models.CharField(max_length=100)
     email=models.EmailField( max_length=254)
     password = models.CharField(max_length=50)
-    daily_Cola = models.IntegerField()
+    daily_Calo = models.IntegerField()
+    
+    def __str__(self) -> str:
+        return super().__str__()
     

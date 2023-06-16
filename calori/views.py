@@ -6,6 +6,7 @@ from .models import Calo
 from authen.pagenation import CustomPagination
 import requests
 from  django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.auth.decorators import login_required, permission_required
 # Create your views here.
 #CRUD Section for Calories
 
@@ -47,8 +48,8 @@ class  CaloView(APIView):
     else:
             serializer = CaloSerializer(Calor, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
-  
 
+  @login_required
   def post(self, request, *args, **kwargs):
     calories =  request.data.get('calories')
     if not calories:
@@ -71,7 +72,7 @@ class  CaloView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
   
-
+  @login_required
   def delete(self, request, id, *args, **kwargs):
       if Calo.objects.filter(id=id).exists():
         project = Calo.objects.get(id=id)
@@ -82,7 +83,7 @@ class  CaloView(APIView):
               {"res": "Calo Doesn't Exists"},
               status=status.HTTP_400_BAD_REQUEST
           )
-
+  @login_required
   def patch(self, request, id, *args, **kwargs):
     if Calo.objects.filter(id=id).exists():
       project = Calo.objects.get(id=id)

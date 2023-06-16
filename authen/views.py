@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.contrib.auth import login
 from .models import User
 from .serializer import UserSerializer, RegisterSerializer , CaloSerializer
+from django.contrib.auth.decorators import login_required, permission_required,user_passes_test
 from .pagenation import CustomPagination
 from django.contrib.auth.models import Group
 
@@ -76,7 +77,8 @@ class UserManger(APIView):
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
   
-  
+  @login_required
+          
   def get(self,requst,*args,**kwargs):
     user = User.objects.all()
     page = self.paginate_queryset(user)
@@ -86,12 +88,14 @@ class UserManger(APIView):
       serializer = UserSerializer(user, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
   
- 
+  @login_required
+  
   def post(self,request,*args,**kwargs):  
       data = {
         'username': request.data.get('username'), 
         'email': request.data.get('email'),
         'password': request.data.get('password'),
+        'daily_Calo': request.data.get('daily_Calo')
     }
 
       serializer = RegisterSerializer(data=data)
@@ -101,7 +105,7 @@ class UserManger(APIView):
       return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+  @login_required
   def delete(self, request, id, *args, **kwargs):
       if User.objects.filter(id=id).exists():
         project = User.objects.get(id=id)
@@ -112,13 +116,14 @@ class UserManger(APIView):
               {"res": "User Doesn't Exists"},
               status=status.HTTP_400_BAD_REQUEST
           )
-      
+  @login_required
   def patch(self, request, id, *args, **kwargs):
     if User.objects.filter(id=id).exists():
       project = User.objects.get(id=id)
       data = {
       "username":request.data.get("username"),
-      "email" :request.data.get("email")
+      "email" :request.data.get("email"),
+      "daily_Calo": request.data.get("daily_Calo")
       }
       serializer = UserSerializer(instance = project, data=data, partial = True)
       if serializer.is_valid():
