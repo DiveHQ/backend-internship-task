@@ -66,7 +66,7 @@ class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=20)
+    phone_number = models.CharField(max_length=20, null=True)
     expected_calories = models.IntegerField(null=True)
     is_admin = models.BooleanField(default=False)
     is_user_manager = models.BooleanField(default=False)
