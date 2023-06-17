@@ -1,12 +1,19 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from .manager import CustomUserManager
 
 class User(AbstractUser):
     
     email = models.EmailField(max_length=200,unique=True)
     daily_calo = models.IntegerField(null=False)
-    
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('username','password','daily_calo')
+
+    objects = CustomUserManager()
+
+    def __str__(self):
+        return self.email
+
     def __str__(self):
         return (self.username)
     

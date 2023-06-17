@@ -112,25 +112,14 @@ class  CaloView(APIView):
   def patch(self, request, id, *args, **kwargs):
       user=request.user.id
       if Calo.objects.filter(user=user).filter(id=id).exists():
-              data = {
-              'name': request.data.get('name'), 
-              'quantity': request.data.get('quantity'),
-              'calories': request.data.get('calories'),
-                'user': user 
-              }
+              
               """
               the assumption here is that when a user request to for update
               they need to update every detail of their collection:ID with old or new set
               of data
               """
-              
               calor = Calo.objects.filter(id=id).get()
-              """calor.name = data.get('name',calor.name)
-              calor.calories = data.get('calories',calor.calories)
-              calor.quantity = data.get('quantity',calor.quantity)
-              
-              calor.save()"""
-              serializer = CaloSerializer(instance=calor,data=data,partial=True)
+              serializer = CaloSerializer(instance=calor,data=request.data,partial=True)
               if serializer.is_valid():
                   serializer.save()
                   return Response(serializer.data, status=status.HTTP_200_OK)

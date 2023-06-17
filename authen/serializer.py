@@ -10,6 +10,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 # Register Serializer
 class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        min_length=6, write_only=True, required=True)
     class Meta:
         model = User
         fields = ('id', 'username', 'email', 'password','daily_calo')
@@ -27,10 +29,10 @@ class CaloSerializer(serializers.ModelSerializer):
         model = Calo
         fields = ['id','name','quantity','calories','created_at','updated_at','user']
         
-        """def create(self, validated_data):
+        def create(self, validated_data):
             user=User.objects.get(user=self.user)
             calories = Calo.objects.create(name=validated_data['name'], quantity=validated_data['quantity'], 
                                         calories=validated_data['calories'],created_at=validated_data['created_at'],
                                         updated_at=validated_data['updated_at'],user=validated_data[user])
             
-            return calories"""
+            return calories
