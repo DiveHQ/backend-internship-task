@@ -10,12 +10,13 @@ from  django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.decorators import login_required, permission_required
 from authen.filters import calo_Filter
 from authen.models import User
+from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 #CRUD Section for Calories
 
 class  CaloView(APIView):
-  
-  permission_classes = [permissions.AllowAny]
+   
+  permission_classes = [IsAuthenticated]
   pagination_class = CustomPagination
   
 
@@ -41,7 +42,8 @@ class  CaloView(APIView):
   
  
   def get(self,request,*args,**kwargs):
-    Calor = Calo.objects.all()
+    user=request.user.id
+    Calor = Calo.objects.filter(user=user).all()
     
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_fields = ('name', 'id')
@@ -94,31 +96,47 @@ class  CaloView(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
   
-  @login_required
   def delete(self, request, id, *args, **kwargs):
-      if Calo.objects.filter(id=id).exists():
-        project = Calo.objects.get(id=id)
+      user=request.user.id
+      if Calo.objects.filter(user=user).filter(id=id).exists():
+        project = Calo.objects.filter(user=user).get(id=id)
         project.delete()
-        return Response({"response":"Calo Deleted"}, status=status.HTTP_200_OK)
+        return Response({"msg":"Calo Deleted"}, status=status.HTTP_200_OK)
       else:
           return Response(
-              {"res": "Calo Doesn't Exists"},
+              {"msg": "Calo Doesn't Exists"},
               status=status.HTTP_400_BAD_REQUEST
           )
-  @login_required
+          
+  
   def patch(self, request, id, *args, **kwargs):
-    if Calo.objects.filter(id=id).exists():
-      project = Calo.objects.get(id=id)
-      data = {
-      'title': request.data.get('title'), 
-      'description': request.data.get('description'), 
-      }
-      serializer = CaloSerializer(instance = project, data=data, partial = True)
-      if serializer.is_valid():
-          serializer.save()
-          return Response(serializer.data, status=status.HTTP_200_OK)
-      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    return Response(
+      user=request.user.id
+      if Calo.objects.filter(user=user).filter(id=id).exists():
+              data = {
+              'name': request.data.get('name'), 
+              'quantity': request.data.get('quantity'),
+              'calories': request.data.get('calories'),
+                'user': user 
+              }
+              """
+              the assumption here is that when a user request to for update
+              they need to update every detail of their collection:ID with old or new set
+              of data
+              """
+              
+              calor = Calo.objects.filter(id=id).get()
+              """calor.name = data.get('name',calor.name)
+              calor.calories = data.get('calories',calor.calories)
+              calor.quantity = data.get('quantity',calor.quantity)
+              
+              calor.save()"""
+              serializer = CaloSerializer(instance=calor,data=data,partial=True)
+              if serializer.is_valid():
+                  serializer.save()
+                  return Response(serializer.data, status=status.HTTP_200_OK)
+              return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+      else:    
+        return Response(
                 {"res": "Calo Doesn't Exists"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
