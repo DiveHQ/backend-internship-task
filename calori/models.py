@@ -14,6 +14,8 @@ class Calo(models.Model):
         
         if not self.limt_reach:
             
+            
+            
             suppose_calo = self.user.objects.get(daily_Calo="daily_Calo")
 
             if self.calories >= suppose_calo  :
