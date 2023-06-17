@@ -6,11 +6,12 @@ from knox.views import LoginView as KnoxLoginView
 from rest_framework.response import Response
 from django.shortcuts import redirect
 from django.contrib.auth import login
+
 from .models import User
 from .serializer import UserSerializer, RegisterSerializer , CaloSerializer
 from django.contrib.auth.decorators import login_required, permission_required,user_passes_test
 from .pagenation import CustomPagination
-from django.contrib.auth.models import Group
+
 
 """from .env import SECRET_KEY"""
 
@@ -25,7 +26,7 @@ class RegisterAPI(generics.GenericAPIView):
           serializer.is_valid(raise_exception=True)
           user = serializer.save()
           user = UserSerializer(user, context=self.get_serializer_context()).data
-          group = Group.objects.get(name='user')
+         
          
           return Response({"user":user})
           """except:
@@ -43,9 +44,10 @@ class LoginAPI(KnoxLoginView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         login(request, user)
-        while True:
-            response = redirect('/project')
-            return response
+        
+        return super(LoginAPI, self).post(request,format=None)
+        
+          
       except:
         err_msg="UNAUTHORIZED ACCESS!,try again with valid credentials"
         return Response({"msg":err_msg})

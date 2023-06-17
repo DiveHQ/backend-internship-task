@@ -4,9 +4,12 @@ from rest_framework.response import Response
 from authen.serializer import  CaloSerializer
 from .models import Calo
 from authen.pagenation import CustomPagination
+from django_filters import rest_framework as filters
 import requests
 from  django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.decorators import login_required, permission_required
+from authen.filters import calo_Filter
+from authen.models import User
 # Create your views here.
 #CRUD Section for Calories
 
@@ -34,13 +37,30 @@ class  CaloView(APIView):
   def get_paginated_response(self, data):
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
+      
   
+ 
   def get(self,request,*args,**kwargs):
     Calor = Calo.objects.all()
     
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_fields = ('name', 'id')
+    
+    
+    #trying to implement filters
+    
+    """"Calor = calo_Filter(request.GET, queryset= Calo.objects.all())"""
+    """      
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['name', 'id']
+    """
     
+    """
+      if name:
+        Calor = Calor(name__icontains=name)
+    """
+    
+     
     page = self.paginate_queryset(Calor)
     if page is not None:
             serializer = self.get_paginated_response(CaloSerializer(page,
@@ -49,7 +69,8 @@ class  CaloView(APIView):
             serializer = CaloSerializer(Calor, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-  @login_required
+  
+  
   def post(self, request, *args, **kwargs):
     calories =  request.data.get('calories')
     if not calories:
@@ -64,8 +85,9 @@ class  CaloView(APIView):
         'quantity': request.data.get('quantity'),
         'calories': calories,
         'limit_reach':request.data.get('limit_reach')
+          ,'user': request.user.id
     }
-
+    
     serializer = CaloSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
