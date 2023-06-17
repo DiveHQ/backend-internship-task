@@ -6,7 +6,7 @@ class User(AbstractUser):
     
     email = models.EmailField(max_length=200,unique=True)
     daily_calo = models.IntegerField(null=False)
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ('username','password','daily_calo')
 
     objects = CustomUserManager()

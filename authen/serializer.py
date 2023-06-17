@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import User
 from calori.models import Calo
-
+from django.contrib.auth.hashers import make_password
 # User Serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 # Register Serializer
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(
+    password =serializers.CharField(
         min_length=6, write_only=True, required=True)
     class Meta:
         model = User
@@ -18,7 +18,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        user = User.objects.create(username=validated_data['username'], email=validated_data['email'], 
+    
+        user = User.objects.create_user(username=validated_data['username'], email=validated_data['email'], 
                                         password=validated_data['password'],daily_calo=validated_data['daily_calo'])
 
         return user

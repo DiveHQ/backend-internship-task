@@ -7,8 +7,10 @@ from rest_framework.response import Response
 from django.shortcuts import redirect
 from django.contrib.auth import login
 from .models import User
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.models import Group
 from .serializer import UserSerializer, RegisterSerializer , CaloSerializer
-from django.contrib.auth.decorators import login_required, permission_required,user_passes_test
+from django.contrib.auth.decorators import permission_required
 from .pagenation import CustomPagination
 
 
@@ -27,7 +29,9 @@ class RegisterAPI(generics.GenericAPIView):
           serializer.is_valid(raise_exception=True)
           user = serializer.save()
           user = UserSerializer(user, context=self.get_serializer_context()).data
-         
+          gp =User.objects.filter(username=request.data.get("username")).get()
+          group = Group.objects.get(name='Client')
+          gp.groups.add(group)
          
           return Response({"user":user})
           """except:
@@ -57,10 +61,10 @@ class LoginAPI(KnoxLoginView):
 
 
 """crud users"""
-class UserManger(APIView):
-  
+class UserManger(APIView,PermissionRequiredMixin):  
+  """  permission_required =('user.add_user','user.change_user','user.view_user','user.delete_user')"""
   pagination_class = CustomPagination
-
+  user=User.objects.all() 
   @property
   def paginator(self):
         if not hasattr(self, '_paginator'):
@@ -81,7 +85,7 @@ class UserManger(APIView):
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
   
-      
+  @permission_required(user.has_perm("view_user"))  
   def get(self,requst,*args,**kwargs):
     user = User.objects.all()
     page = self.paginate_queryset(user)
@@ -91,7 +95,7 @@ class UserManger(APIView):
       serializer = UserSerializer(user, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
   
-  
+  @permission_required("user.add_user")
   def post(self,request,*args,**kwargs):  
       data = {
         'username': request.data.get('username'), 
@@ -107,7 +111,7 @@ class UserManger(APIView):
       return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
- 
+  @permission_required("user.delete_user")
   def delete(self, request, id, *args, **kwargs):
       if User.objects.filter(id=id).exists():
         project = User.objects.get(id=id)
@@ -118,10 +122,11 @@ class UserManger(APIView):
               {"res": "User Doesn't Exists"},
               status=status.HTTP_400_BAD_REQUEST
           )
-  
+  @permission_required("user.change_user")
   def patch(self, request, id, *args, **kwargs):
     if User.objects.filter(id=id).exists():
       project = User.objects.filter(id=id).get()
+      
       """data = {
       "username":request.data.get("username"),
       "email" :request.data.get("email"),
