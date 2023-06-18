@@ -25,3 +25,10 @@ But in other be sure that it work i used postman to re test the endpoints
 2.python -Wa manage.py test calori.test_viewp.ViewTestCase.test_post
 3.python -Wa manage.py test calori.test_viewp.ViewTestCase.test_delete 
 4.python -Wa manage.py test calori.test_viewp.ViewTestCase.test_update  
+
+#commands to run the API server
+
+python manage.py runserver
+
+
+
