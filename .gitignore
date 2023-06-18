@@ -1,0 +1,23 @@
+# cache files
+__pycache__/
+
+# development database
+db.sqlite3
+
+# log files
+*.log
+
+# virtual environment
+.venv/
+
+# environment secrets
+.env
+
+# ignore migrations while development
+# add to vcs when stable and deployed and under maintenance
+migrations/
+
+# static files
+staticfiles/
+site_static/
+media/

@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "calories-api"
+version = "0.1.0"
+description = ""
+authors = ["Ananyobrata Pal <ananyo141@gmail.com>"]
+license = "GPLv3"
+readme = "README.md"
+packages = [{include = "calories_api"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+djangorestframework = "^3.14.0"
+django-cors-headers = "^4.1.0"
+djangorestframework-simplejwt = "^5.2.2"
+python-dotenv = "^1.0.0"
+dj-database-url = "^2.0.0"
+psycopg2-binary = "^2.9.6"
+drf-spectacular = "^0.26.2"
+gunicorn = "^20.1.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.3.3"
+black = "^23.3.0"
+isort = "^5.12.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,14 @@
+services:
+  api:
+    container_name: calories-api
+    build: .
+    command: poetry run gunicorn backend.wsgi:application
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - 80:8000
+    env_file:
+      - ./.env
+    environment:
+      # for production
+      - RENDER=1
