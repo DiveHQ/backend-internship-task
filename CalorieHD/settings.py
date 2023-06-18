@@ -125,6 +125,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ]
 }
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 

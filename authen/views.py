@@ -7,9 +7,8 @@ from rest_framework.response import Response
 from django.shortcuts import redirect
 from django.contrib.auth import login
 from .models import User
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import Group
-from .serializer import UserSerializer, RegisterSerializer , CaloSerializer
+from .serializer import UserSerializer, RegisterSerializer
 from django.contrib.auth.decorators import permission_required
 from .pagenation import CustomPagination
 
@@ -25,13 +24,17 @@ class RegisterAPI(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
           """try:"""
+         
           serializer = self.get_serializer(data=request.data)
           serializer.is_valid(raise_exception=True)
           user = serializer.save()
           user = UserSerializer(user, context=self.get_serializer_context()).data
+          
           gp =User.objects.filter(username=request.data.get("username")).get()
-          group = Group.objects.get(name='Client')
+          group = Group.objects.get_or_create(name='Client')
+          group =Group.objects.get(name='Client')
           gp.groups.add(group)
+          
          
           return Response({"user":user})
           """except:
@@ -45,99 +48,109 @@ class LoginAPI(KnoxLoginView):
     permission_classes = [AllowAny] 
 
     def post(self, request, format=None):
-      try:
         serializer = AuthTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         login(request,user)
         
         return super(LoginAPI, self).post(request,format=None)
-        
-          
-      except:
-        err_msg="UNAUTHORIZED ACCESS!,try again with valid credentials"
-        return Response({"msg":err_msg})
-      
-
 
 """crud users"""
-class UserManger(APIView,PermissionRequiredMixin):  
-  """  permission_required =('user.add_user','user.change_user','user.view_user','user.delete_user')"""
+class UserManger(APIView):  
+  
   pagination_class = CustomPagination
-  group=Group.objects.get(name='Manager') 
-  permission_required =('group.add_user','group.change_user','group.view_user','group.delete_user')
+  
   @property
   def paginator(self):
-        if not hasattr(self, '_paginator'):
-            if self.pagination_class is None:
-                self._paginator = None
-            else:
-                self._paginator = self.pagination_class()
-        else:
-            pass
-        return self._paginator
+              if not hasattr(self, '_paginator'):
+                  if self.pagination_class is None:
+                      self._paginator = None
+                  else:
+                      self._paginator = self.pagination_class()
+              else:
+                  pass
+              return self._paginator
   def paginate_queryset(self, queryset):
-        
-        if self.paginator is None:
-            return None
-        return self.paginator.paginate_queryset(queryset,
-                   self.request, view=self)
+              
+              if self.paginator is None:
+                  return None
+              return self.paginator.paginate_queryset(queryset,
+                        self.request, view=self)
   def get_paginated_response(self, data):
-        assert self.paginator is not None
-        return self.paginator.get_paginated_response(data)
-  
-  
-  def get(self,requst,*args,**kwargs):
-    user = User.objects.all()
-    page = self.paginate_queryset(user)
-    if page is not None:
-            serializer = self.get_paginated_response(UserSerializer(page,many=True).data)
-    else:
-      serializer = UserSerializer(user, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-  
-  def post(self,request,*args,**kwargs):  
-      data = {
-        'username': request.data.get('username'), 
-        'email': request.data.get('email'),
-        'password': request.data.get('password'),
-        'daily_calo': request.data.get('daily_calo')
-    }
+              assert self.paginator is not None
+              return self.paginator.get_paginated_response(data)
+        
+  def get(self,request,*args,**kwargs):
+          user2 = request.user 
+          user2 =User.objects.filter(id=user2.id).get()    
+          if user2.has_perm('authen.add_user'):
+          
+              user = User.objects.all().order_by('id')
+              page = self.paginate_queryset(user)
+              if page is not None:
+                      serializer = self.get_paginated_response(UserSerializer(page,many=True).data)
+              else:
+                serializer = UserSerializer(user, many=True)
+              return Response(serializer.data, status=status.HTTP_200_OK)
+                
+          else:
+            return Response({
+                  "res":"Unauthorized"
+                })   
+  def post(self,request,*args,**kwargs): 
+            user = request.user     
+            if user.has_perm("authen.view_user") :
+             
+                data = {
+                  'username': request.data.get('username'), 
+                  'email': request.data.get('email'),
+                  'password': request.data.get('password'),
+                  'daily_calo': request.data.get('daily_calo')
+                  }
 
-      serializer = RegisterSerializer(data=data)
-      if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-  
+                serializer = RegisterSerializer(data=data)
+                if serializer.is_valid():
+                  serializer.save()
+                  return Response(serializer.data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+              
+            else:
+              return Response({
+                  "res":"Unauthorized"
+                })  
+          
   def delete(self, request, id, *args, **kwargs):
-      if User.objects.filter(id=id).exists():
-        project = User.objects.get(id=id)
-        project.delete()
-        return Response({"response":"User Deleted"}, status=status.HTTP_200_OK)
-      else:
-          return Response(
-              {"res": "User Doesn't Exists"},
-              status=status.HTTP_400_BAD_REQUEST
-          )
-  
+        user = request.user     
+        if  user.has_perm('authen.delete_user'):
+                if User.objects.filter(id=id).exists():
+                  project = User.objects.get(id=id)
+                  project.delete()
+                  return Response({"response":"User Deleted"}, status=status.HTTP_200_OK)
+                else:
+                    return Response(
+                        {"res": "User Doesn't Exists"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            
+        else:
+            return Response({
+                  "res":"Unauthorized"
+                })              
   def patch(self, request, id, *args, **kwargs):
-    if User.objects.filter(id=id).exists():
-      project = User.objects.filter(id=id).get()
-      
-      """data = {
-      "username":request.data.get("username"),
-      "email" :request.data.get("email"),
-      "daily_Calo": request.data.get("daily_Calo")
-      }"""
-      serializer = UserSerializer(instance = project, data=request.data, partial = True)
-      if serializer.is_valid():
-          serializer.save()
-          return Response(serializer.data, status=status.HTTP_200_OK)
-      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    return Response(
-                {"res": "User Doesn't Exists"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        user = request.user     
+        if user.has_perm('authen.change_user'):
+                if User.objects.filter(id=id).exists():
+                  project = User.objects.filter(id=id).get()
+                  serializer = UserSerializer(instance = project, data=request.data, partial = True)
+                  if serializer.is_valid():
+                      serializer.save()
+                      return Response(serializer.data, status=status.HTTP_200_OK)
+                  return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                            {"res": "User Doesn't Exists"}, 
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+        else:
+              return Response({
+                  "res":"Unauthorized"
+                })  

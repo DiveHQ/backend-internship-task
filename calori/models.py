@@ -10,15 +10,9 @@ class Calo(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     limt_reach = models.BooleanField(default=False)
     
-    def limit_reached(self):
-        
-        if not self.limt_reach:
-            
-            
-            
-            suppose_calo = self.user.objects.get(daily_Calo="daily_Calo")
-
-            if self.calories >= suppose_calo  :
+    def limit_reached(self,request):
+            suppose_calo = User.objects.filter(id=request.user.id).get()
+            if self.calories >= suppose_calo.daily_calo  :
                 self.limt_reach == True
                 return self.limt_reach 
             else:
