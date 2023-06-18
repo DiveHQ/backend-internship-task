@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "tracker",
     "accounts",
+    "controls",
 ]
 
 AUTH_USER_MODEL = "accounts.User"
