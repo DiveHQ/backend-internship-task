@@ -7,6 +7,7 @@ from .serializers import UserSerializer
 from .authentication import TokenAuthentication
 from .permissions import IsAdminOrUserManager
 from .models import User
+from rest_framework.pagination import PageNumberPagination
 
 
 class LoginView(APIView):
@@ -151,15 +152,18 @@ class ListUsersView(APIView):
     """
     permission_classes = [permissions.IsAuthenticated, IsAdminOrUserManager]
     authentication_classes = [TokenAuthentication]
+    pagination_class = PageNumberPagination
 
     def get(self, request):
         """
         Retrieve a list of all users.
         """
         users = User.objects.all()
-        serializer = UserSerializer(users, many=True, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
+        paginator = self.pagination_class()
+        paginator.page_size = request.data.get('page_size', 10)
+        paginated_entries = paginator.paginate_queryset(users, request)
+        serializer = UserSerializer(paginated_entries, many=True, context={'request': request})
+        return paginator.get_paginated_response(serializer.data)
 
 class UserDetailView(APIView):
     """
