@@ -1,24 +1,10 @@
+from django.db import models
 from rest_framework import serializers
 from .models import Entry
-from django.db import models
 
 class EntrySerializer(serializers.ModelSerializer):
     """
     Serializer class for the Entry model.
-
-    This serializer is used to convert Entry model instances to JSON and vice versa.
-    It also includes custom validation and logic for calculating the calorie goal met.
-
-    Attributes:
-        model (class): The model associated with the serializer.
-        fields (tuple/list): The fields to include in the serialized representation.
-        read_only_fields (tuple/list): The fields that should be read-only when deserializing.
-
-    Methods:
-        create(validated_data): Creates a new Entry instance with the given validated data.
-        update(instance, validated_data): Updates an existing Entry instance with the given validated data.
-        calculate_calorie_goal_met(entry, expected_calories_per_day=None): Calculates and updates the calorie goal met field for the given Entry instance.
-
     """
 
     class Meta:
@@ -96,3 +82,4 @@ class EntrySerializer(serializers.ModelSerializer):
         if total_calories_for_day is not None and expected_calories_per_day is not None:
             entry.meets_calorie_expectation = total_calories_for_day < expected_calories_per_day
             entry.save()
+

@@ -10,7 +10,7 @@ from .permissions import (
     IsAdmin
 )
 from .serializers import EntrySerializer
-
+from .tasks import get_calories_from_api
 
 class CreateEntryView(APIView):
     """
@@ -41,6 +41,11 @@ class CreateEntryView(APIView):
         data = request.data.copy()
         data['user'] = user_id
         data.pop('user_id')
+        if 'calories' not in data:
+            try:
+                data['calories'] = get_calories_from_api(data['text'])
+            except:
+                return Response({'detail': 'Unable to get calories from API'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = EntrySerializer(data=data)
         if serializer.is_valid():
