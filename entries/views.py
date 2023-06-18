@@ -11,7 +11,7 @@ from .permissions import (
 )
 from .serializers import EntrySerializer
 from .tasks import get_calories_from_api
-
+from rest_framework.pagination import PageNumberPagination
 
 class CreateEntryView(APIView):
     """
@@ -147,8 +147,11 @@ class ListEntriesView(APIView):
             entries = Entry.objects.filter(user=request.user)
         if request.data.get('date'):
             entries = entries.filter(date=request.data.get('date'))
-        serializer = EntrySerializer(entries, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        paginator = PageNumberPagination()
+        paginator.page_size = request.data.get('page_size', 10)
+        paginated_entries = paginator.paginate_queryset(entries, request)
+        serializer = EntrySerializer(paginated_entries, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 
 class EntryDetailView(APIView):
