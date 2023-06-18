@@ -5,4 +5,5 @@ urlpatterns = [
     path("profile", profile, name="profile"),
     path("tracker/entries/all/", all_entries, name="all_entries"),
     path("users/all/", all_users, name="all_users"),
+    path("users/<int:pk>/", user_detail, name="user_detail"),
 ]

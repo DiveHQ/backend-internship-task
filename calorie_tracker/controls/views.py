@@ -109,7 +109,34 @@ def profile(request):
         password = data.get("password")
         if password:
             user.set_password(password)
-
         user.save()
 
         return Response("Account details updated successfully")
+
+
+@api_view(["GET", "PUT", "DELETE"])
+@permission_classes([IsUserManager])
+def user_detail(request, pk):
+    try:
+        user = User.objects.get(pk=pk)
+    except User.DoesNotExist:
+        return Response("User not found", status=404)
+
+    if request.method == "GET":
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+    elif request.method == "PUT":
+        # Update the user's account details
+        user.username = request.data.get("username", user.username)
+        user.email = request.data.get("email", user.email)
+        user.role = request.data.get("role", user.role)
+        user.expected_calories = request.data.get(
+            "expected_calories", user.expected_calories
+        )
+        user.save()
+        return Response("Account details updated successfully")
+
+    elif request.method == "DELETE":
+        user.delete()
+        return Response(status=204)
