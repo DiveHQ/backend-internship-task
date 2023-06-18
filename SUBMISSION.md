@@ -3,7 +3,17 @@
 - [ ] commands to set up the repo (dependencies etc.)
 
 -clone https://github.com/DiveHQ/backend-internship-task.git
--run pip install requirement.txt
+-run pip install requirement.txt {
+    if errors:
+        manually:
+            *pip install django
+            *pip install djangorestframework
+            *pip install django-rest-knox
+}
+
+-python manager migrate 
+-python manager createsuperuser(create admin)
+#now kick start the server(welcome)
 -python manage.py runserver
 
 #commands to run the test suite
@@ -20,10 +30,10 @@ But in other be sure that it work i used postman to re test the endpoints
 """
 #for the user manager
 
-1.python -Wa manage.py test authen.tests.View_Manager_Test.test_GetUser 
-2.python -Wa manage.py test authen.tests.View_Manager_Test.test_DeleteUser
-3.python -Wa manage.py test authen.tests.View_Manager_Test.test_UpdateUser
-4.python -Wa manage.py test authen.tests.View_Manager_Test.test_CreateUser
+1.python -Wa manage.py test authen.tests_umanager.View_Manager_Test.test_GetUser 
+2.python -Wa manage.py test authen.tests_umanager.View_Manager_Test.test_DeleteUser
+3.python -Wa manage.py test authen.tests_umanager.View_Manager_Test.test_UpdateUser
+4.python -Wa manage.py test authen.tests_umanager.View_Manager_Test.test_CreateUser
 
 #for the calories
 

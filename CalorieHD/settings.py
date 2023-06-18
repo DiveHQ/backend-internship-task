@@ -27,6 +27,17 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+"""import json
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+try:
+          with open(os.path.join(BASE_DIR, 'secrets.json')) as handle:
+            SECRETS = json.load(handle)
+except IOError:
+          SECRETS = {}
+
+key=SECRETS['API_KEY']"""
 
 # Application definition
 
@@ -35,6 +46,7 @@ INSTALLED_APPS = [
     'knox',
     'rest_framework',
     'requests',
+    'dotenv',
     'calori.apps.CaloriConfig',
     'django_filters',
     'django.contrib.admin',

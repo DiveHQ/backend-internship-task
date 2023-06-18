@@ -7,8 +7,10 @@ from authen.pagenation import CustomPagination
 import requests
 from authen.models import User
 from rest_framework.permissions import IsAuthenticated
+import json
 # Create your views here.
 #CRUD Section for Calories
+import os
 
 class  CaloView(APIView):
    
@@ -60,15 +62,24 @@ class  CaloView(APIView):
                 },status=status.HTTP_401_UNAUTHORIZED)   
       
   def post(self, request, *args, **kwargs):
-      user2 = request.user 
-      user2 =User.objects.filter(id=user2.id).get()    
-      if user2.has_perm('calori.add_calo'):
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+        try:
+          with open(os.path.join(BASE_DIR, 'secret.json')) as handle:
+            SECRETS = json.load(handle)
+        except IOError:
+          SECRETS = {}
+      
+        key=SECRETS['API_KEY']
+        user2 = request.user 
+        user2 =User.objects.filter(id=user2.id).get()    
+        if user2.has_perm('calori.add_calo'):
           calories =  request.data.get('calories')
           if not calories:
             try:
               query = request.data.get('name')
               api_url = 'https://api.api-ninjas.com/v1/nutrition?query={}'.format(query)
-              response = requests.get(api_url, headers={'X-Api-Key': "QQ8RM7o93r8tFonRPHaRpw==YyWb0znekP61Q8Ua"}).json()
+              response = requests.get(api_url, headers={'X-Api-Key':key }).json()
               cal=  response[0]['calories']
               calories = int(cal)
             except:
@@ -89,7 +100,7 @@ class  CaloView(APIView):
               serializer.save()
               return Response(serializer.data, status=status.HTTP_201_CREATED)
           return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-      else:
+        else:
           return Response({
                   "res":"Unauthorized"
                 },status=status.HTTP_401_UNAUTHORIZED)   
