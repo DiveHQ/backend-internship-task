@@ -86,14 +86,22 @@ class  CaloView(APIView):
               return{
                 "msg":"could not automate Calories for{query}"
               }
-          
+
+               
+          def limit_reach(self,request):
+                suppose_calo = User.objects.filter(id=request.user.id).get()
+                if calories >= suppose_calo.daily_calo  :
+                    return   True
+                else:
+                    return  True
+          limt_reach= limit_reach
           data = {
-              'name': request.data.get('name'), 
-              'quantity': request.data.get('quantity'),
-              'calories': calories,
-              'limit_reach':request.data.get('limit_reach')
-                ,'user': request.user.id
-          }
+                'name': request.data.get('name'), 
+                'quantity': request.data.get('quantity'),
+                'calories': calories,
+                'limit_reach':limt_reach,
+                'user': request.user.id
+                }
           
           serializer = CaloSerializer(data=data)
           if serializer.is_valid():
@@ -106,47 +114,47 @@ class  CaloView(APIView):
                 },status=status.HTTP_401_UNAUTHORIZED)   
           
   def delete(self, request, id, *args, **kwargs):
-      user2 = request.user 
-      user2 =User.objects.filter(id=user2.id).get()    
-      if user2.has_perm('calori.delete_calo'):
-            user=request.user.id
-            if Calo.objects.filter(user=user).filter(id=id).exists():
-              project = Calo.objects.filter(user=user).get(id=id)
-              project.delete()
-              return Response({"msg":"Calo Deleted"}, status=status.HTTP_200_OK)
+            user2 = request.user 
+            user2 =User.objects.filter(id=user2.id).get()    
+            if user2.has_perm('calori.delete_calo'):
+                      user=request.user.id
+                      if Calo.objects.filter(user=user).filter(id=id).exists():
+                            project = Calo.objects.filter(user=user).get(id=id)
+                            project.delete()
+                            return Response({"msg":"Calo Deleted"}, status=status.HTTP_200_OK)
+                      else:
+                              return Response(
+                                  {"msg": "Calo Doesn't Exists"},
+                                  status=status.HTTP_400_BAD_REQUEST
+                              )
+                      
             else:
-                return Response(
-                    {"msg": "Calo Doesn't Exists"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-                
-      else:
-        return Response({
-                  "res":"Unauthorized"
-                },status=status.HTTP_401_UNAUTHORIZED)   
+              return Response({
+                        "res":"Unauthorized"
+                      },status=status.HTTP_401_UNAUTHORIZED)   
   
   def patch(self, request, id, *args, **kwargs):
       user2 = request.user 
       user2 =User.objects.filter(id=user2.id).get()    
       if user2.has_perm('calori.change_calo'):
-          user=request.user.id
-          if Calo.objects.filter(user=user).filter(id=id).exists():
-                  
-                  """
-                  the assumption here is that when a user request to for update
-                  they can decide to update one or all
-                  """
-                  calor = Calo.objects.filter(id=id).get()
-                  serializer = CaloSerializer(instance=calor,data=request.data,partial=True)
-                  if serializer.is_valid():
-                      serializer.save()
-                      return Response(serializer.data, status=status.HTTP_200_OK)
-                  return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-          else:    
-            return Response(
-                    {"res": "Calo Doesn't Exists"}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+              user=request.user.id
+              if Calo.objects.filter(user=user).filter(id=id).exists():
+                      
+                      """
+                      the assumption here is that when a user request to for update
+                      they can decide to update one or all
+                      """
+                      calor = Calo.objects.filter(id=id).get()
+                      serializer = CaloSerializer(instance=calor,data=request.data,partial=True)
+                      if serializer.is_valid():
+                          serializer.save()
+                          return Response(serializer.data, status=status.HTTP_200_OK)
+                      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+              else:    
+                return Response(
+                        {"res": "Calo Doesn't Exists"}, 
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
             
       else:
         return Response({

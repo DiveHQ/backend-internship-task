@@ -28,12 +28,13 @@ class CaloSerializer(serializers.ModelSerializer):
     class Meta:
         
         model = Calo
-        fields = ['id','name','quantity','calories','created_at','updated_at','user']
+        fields = ['id','name','quantity','calories','created_at','updated_at','user',"limt_reach"]
+       
         
         def create(self, validated_data):
             user=User.objects.get(user=self.user)
             calories = Calo.objects.create(name=validated_data['name'], quantity=validated_data['quantity'], 
                                         calories=validated_data['calories'],created_at=validated_data['created_at'],
-                                        updated_at=validated_data['updated_at'],user=validated_data[user])
+                                        updated_at=validated_data['updated_at'],user=validated_data[user],limt_reach=validated_data['limt_reach'])
             
             return calories

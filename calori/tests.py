@@ -5,7 +5,7 @@ from authen.models import User
 
 class ModelTestCase(TestCase):
     def test_limit_reached(self):
-        data = User.objects.create(
+        data = User.objects.create_user(
             username="Kofi",
             email= "eek@gmaii.com",
             password="iloves",
@@ -17,6 +17,6 @@ class ModelTestCase(TestCase):
         calo.user = data
         calo.save()
         data.save()
-        limit = calo
+        
         self.assertEquals(calo.limt_reach,True)
         
