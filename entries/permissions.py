@@ -1,5 +1,7 @@
 from rest_framework import permissions
 from .models import Entry
+from django.http import Http404
+from rest_framework.exceptions import ValidationError
 
 
 class EntriesCreateObjectLevelPermission(permissions.BasePermission):
@@ -20,7 +22,7 @@ class EntriesCreateObjectLevelPermission(permissions.BasePermission):
         if not user_id:
             return False
 
-        if request.user.is_admin or user_id == int(request.user.id):
+        if request.user.is_admin or int(user_id) == int(request.user.id):
             return True
 
         return False
@@ -68,7 +70,7 @@ class EntriesObjectLevelPermission(permissions.BasePermission):
         """
         entry_id = request.data.get('entry_id')
         if not entry_id:
-            return False
+            raise ValidationError('Entry ID not provided')
         if request.user.is_admin:
             return True
         try:
@@ -76,7 +78,7 @@ class EntriesObjectLevelPermission(permissions.BasePermission):
             if str(entry.user.id) == str(request.user.id):
                 return True
         except Entry.DoesNotExist:
-            pass
+            raise Http404("Entry does not exist")
         return False
 
     def has_object_permission(self, request, view, obj):

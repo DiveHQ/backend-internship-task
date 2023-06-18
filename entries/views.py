@@ -79,7 +79,7 @@ class UpdateEntryView(APIView):
 
         serializer = EntrySerializer(entry, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=entry.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -140,7 +140,6 @@ class EntryDetailView(APIView):
     API view for retrieving details of a specific entry.
     Requires authentication and permission to access entries.
     """
-
     authentication_classes = [TokenAuthentication]
     permission_classes = [permissions.IsAuthenticated, EntriesObjectLevelPermission]
 
