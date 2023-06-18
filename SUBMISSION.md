@@ -42,9 +42,28 @@ But in other be sure that it work i used postman to re test the endpoints
 3.python -Wa manage.py test calori.test_viewp.ViewTestCase.test_delete 
 4.python -Wa manage.py test calori.test_viewp.ViewTestCase.test_update  
 
+#to run all test,
+1..python  manage.py test
+
+
+
 #commands to run the API server
 
 python manage.py runserver
 
 
+<INTRUCTION>
+#there is the need to get an nutrition api key from
+https://api.api-ninjas.com
+
+and save it as secret.json in the basePath where manage.py is
+Storing in the form {
+    "API_KEY":"Your_API_KEY"
+}
+will make it simple for you
+
+
+<NOTICE>
+
+THERE IS A TEST THAT FAILS, AND AM STILL WORKING ON THE LOGIC
 
