@@ -1,4 +1,10 @@
 
+#best to hava a virtual environment
+- [ ] commands to set up the repo (dependencies etc.)
+
+-clone https://github.com/DiveHQ/backend-internship-task.git
+-run pip install requirement.txt
+-python manage.py runserver
 
 #commands to run the test suite
 

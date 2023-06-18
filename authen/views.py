@@ -23,8 +23,6 @@ class RegisterAPI(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
     def post(self, request, *args, **kwargs):
-          """try:"""
-         
           serializer = self.get_serializer(data=request.data)
           serializer.is_valid(raise_exception=True)
           user = serializer.save()
@@ -35,10 +33,7 @@ class RegisterAPI(generics.GenericAPIView):
           group =Group.objects.get(name='Client')
           gp.groups.add(group)
           
-         
           return Response({"user":user})
-          """except:
-        return Response("Invalid Details! ")"""
         
           
 
@@ -85,18 +80,18 @@ class UserManger(APIView):
           user2 =User.objects.filter(id=user2.id).get()    
           if user2.has_perm('authen.add_user'):
           
-              user = User.objects.all().order_by('id')
-              page = self.paginate_queryset(user)
-              if page is not None:
-                      serializer = self.get_paginated_response(UserSerializer(page,many=True).data)
-              else:
-                serializer = UserSerializer(user, many=True)
-              return Response(serializer.data, status=status.HTTP_200_OK)
+                  user = User.objects.all().order_by('id')
+                  page = self.paginate_queryset(user)
+                  if page is not None:
+                          serializer = self.get_paginated_response(UserSerializer(page,many=True).data)
+                  else:
+                            serializer = UserSerializer(user, many=True)
+                  return Response(serializer.data, status=status.HTTP_200_OK)
                 
           else:
             return Response({
                   "res":"Unauthorized"
-                })   
+                },  status=status.HTTP_401_UNAUTHORIZED)   
   def post(self,request,*args,**kwargs): 
             user = request.user     
             if user.has_perm("authen.view_user") :
@@ -122,6 +117,7 @@ class UserManger(APIView):
   def delete(self, request, id, *args, **kwargs):
         user = request.user     
         if  user.has_perm('authen.delete_user'):
+            
                 if User.objects.filter(id=id).exists():
                   project = User.objects.get(id=id)
                   project.delete()

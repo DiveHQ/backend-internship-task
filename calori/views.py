@@ -4,11 +4,7 @@ from rest_framework.response import Response
 from authen.serializer import  CaloSerializer
 from .models import Calo
 from authen.pagenation import CustomPagination
-from django_filters import rest_framework as filters
 import requests
-from  django_filters.rest_framework import DjangoFilterBackend
-from django.contrib.auth.decorators import login_required, permission_required
-from authen.filters import calo_Filter
 from authen.models import User
 from rest_framework.permissions import IsAuthenticated
 # Create your views here.
@@ -46,11 +42,11 @@ class  CaloView(APIView):
     user2 =User.objects.filter(id=user2.id).get()    
     if user2.has_perm('calori.view_calo'):
           user=request.user.id
+          """
+          apply filters with for only userID's contain and 
+          think there is no need to apply additional filter features
+          """
           Calor = Calo.objects.filter(user=user).all().order_by("id")
-          
-          filter_backends = (filters.DjangoFilterBackend,)
-          filterset_fields = ('name', 'id')
-          
           page = self.paginate_queryset(Calor)
           if page is not None:
                   serializer = self.get_paginated_response(CaloSerializer(page,
@@ -61,9 +57,8 @@ class  CaloView(APIView):
     else:
       return Response({
                   "res":"Unauthorized"
-                })   
-  
-  
+                },status=status.HTTP_401_UNAUTHORIZED)   
+      
   def post(self, request, *args, **kwargs):
       user2 = request.user 
       user2 =User.objects.filter(id=user2.id).get()    
@@ -97,7 +92,7 @@ class  CaloView(APIView):
       else:
           return Response({
                   "res":"Unauthorized"
-                })   
+                },status=status.HTTP_401_UNAUTHORIZED)   
           
   def delete(self, request, id, *args, **kwargs):
       user2 = request.user 
@@ -117,7 +112,7 @@ class  CaloView(APIView):
       else:
         return Response({
                   "res":"Unauthorized"
-                })   
+                },status=status.HTTP_401_UNAUTHORIZED)   
   
   def patch(self, request, id, *args, **kwargs):
       user2 = request.user 
@@ -128,8 +123,7 @@ class  CaloView(APIView):
                   
                   """
                   the assumption here is that when a user request to for update
-                  they need to update every detail of their collection:ID with old or new set
-                  of data
+                  they can decide to update one or all
                   """
                   calor = Calo.objects.filter(id=id).get()
                   serializer = CaloSerializer(instance=calor,data=request.data,partial=True)
@@ -146,4 +140,4 @@ class  CaloView(APIView):
       else:
         return Response({
                   "res":"Unauthorized Access!"
-                }) 
+                },status=status.HTTP_401_UNAUTHORIZED) 
