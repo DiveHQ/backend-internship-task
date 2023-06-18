@@ -17,6 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from .users.views import RootView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", RootView.as_view(), name="root"),
 ]
+
+handler404 = "backend.exceptions.handleNotFound"
+handler500 = "backend.exceptions.handleServerError"
+handler400 = "backend.exceptions.handleBadRequest"
