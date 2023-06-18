@@ -1,0 +1,4 @@
+Django              
+django-filter       
+jango-rest-knox    
+djangorestframework 

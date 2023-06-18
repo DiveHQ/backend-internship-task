@@ -29,11 +29,5 @@ and many more articles (the internet has no limit)
 
 
 
-#About my user
-    I decide to use the buit in User model in django to make my work fast
-    feel free to add ur own custom user models and Validation
 
-#INSTALLATIONS
 
-1.GET requirements
-2.
