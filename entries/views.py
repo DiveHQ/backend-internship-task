@@ -12,6 +12,7 @@ from .permissions import (
 from .serializers import EntrySerializer
 from .tasks import get_calories_from_api
 
+
 class CreateEntryView(APIView):
     """
     API view for creating a new entry.
@@ -126,16 +127,26 @@ class ListEntriesView(APIView):
     """
 
     authentication_classes = [TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated, IsAdmin]
-
+    permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
         """
         Get a list of all entries.
 
         Returns the serialized list of entry objects.
         """
-
-        entries = Entry.objects.all()
+        user_id = request.data.get('user_id')
+        if request.user.is_admin:
+            if user_id:
+                try:
+                    entries = Entry.objects.filter(user=user_id)
+                except Entry.DoesNotExist:
+                    return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+            else:
+                entries = Entry.objects.all()
+        else:
+            entries = Entry.objects.filter(user=request.user)
+        if request.data.get('date'):
+            entries = entries.filter(date=request.data.get('date'))
         serializer = EntrySerializer(entries, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
