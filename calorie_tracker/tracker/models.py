@@ -9,7 +9,7 @@ class Entry(models.Model):
     date = models.DateField(auto_now_add=True)
     time = models.TimeField(auto_now_add=True)
     text = models.TextField()
-    calories = models.PositiveIntegerField()
+    calories = models.PositiveIntegerField(blank=True)
 
     def __str__(self):
         return f"Entry for {self.user.username} on {self.date}"

@@ -7,44 +7,99 @@ from rest_framework.permissions import BasePermission
 
 from django.contrib.auth import get_user_model
 from accounts.serializers import UserSerializer
+from . import calories_calculator
 
 User = get_user_model()
 
 
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
-        return request.user.role == "admin"
+        if request.user:
+            return request.user.role == "admin"
+        else:
+            return False
+
+
+# @api_view(["GET"])
+# @permission_classes([IsAdmin])
+# def all_entries(request):
+#     entries = Entry.objects.all()
+#     entry_serializer = EntrySerializer(entries, many=True)
+
+#     users = User.objects.all()
+#     user_serializer = UserSerializer(users, many=True)
+
+#     data = {"All Entries": entry_serializer.data, "All Users": user_serializer.data}
+
+
+#     return Response(data)
 
 
 @api_view(["GET"])
 @permission_classes([IsAdmin])
 def all_entries(request):
     entries = Entry.objects.all()
-    entry_serializer = EntrySerializer(entries, many=True)
+    serializer = EntrySerializer(entries, many=True)
+    return Response(serializer.data)
 
+
+@api_view(["GET"])
+@permission_classes([IsAdmin])
+def all_users(request):
     users = User.objects.all()
-    user_serializer = UserSerializer(users, many=True)
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
 
-    data = {"All Entries": entry_serializer.data, "All Users": user_serializer.data}
 
-    return Response(data)
+@api_view(["GET", "PUT"])
+@permission_classes([IsAuthenticated])
+def profile(request):
+    user = request.user
+
+    if request.method == "GET":
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+    elif request.method == "PUT":
+        data = request.data
+
+        # Update the user's account details
+        user.username = data.get("username", user.username)
+        user.email = data.get("email", user.email)
+        user.expected_calories = data.get("expected_calories", user.expected_calories)
+        password = data.get("password")
+        if password:
+            user.set_password(password)
+
+        user.save()
+
+        return Response("Account details updated successfully")
+
+
+import requests
 
 
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def entry_list(request):
     if request.method == "GET":
-        entries = Entry.objects.filter(
-            user=request.user
-        )  # Filter entries by the currently logged-in user
+        entries = Entry.objects.filter(user=request.user)
         serializer = EntrySerializer(entries, many=True)
         return Response(serializer.data)
     elif request.method == "POST":
         serializer = EntrySerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(
-                user=request.user
-            )  # Assign the currently logged-in user to the entry
+            # Fetch calorie information using the calories_calculator.get_calories function
+            food_name = serializer.validated_data.get("text")
+            calories = serializer.validated_data.get("calories")
+            if not calories:
+                calories = calories_calculator.get_calories(food_name)
+
+            if calories is not None:
+                # Assign the fetched calorie information to the serializer data
+                serializer.validated_data["calories"] = calories
+
+            serializer.save(user=request.user)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
