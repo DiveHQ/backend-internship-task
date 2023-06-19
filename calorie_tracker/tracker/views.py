@@ -20,9 +20,13 @@ User = get_user_model()
 def entry_list(request):
     if request.method == "GET":
         date = request.GET.get("date")
+        query = request.GET.get("query")
 
         entries = Entry.objects.filter(user=request.user)
 
+        # Filter entries based on query parameters
+        if query:
+            entries = entries.filter(text__icontains=query)
         # Filter entries by date if provided
         if date:
             entries = entries.filter(date=date)
