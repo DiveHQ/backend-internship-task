@@ -42,11 +42,15 @@ It was developed as a part of the Backend Internship Task for DiveHQ.
    $ python manage.py runserver
    ```
 
-7. Open your web browser and visit [http://localhost:8000//api/v1/accounts/register/](http://localhost:8000/api/v1/accounts/register/) . Here you need to register yourself first in order to access the routes.
+7. Open your web browser and visit [http://localhost:8000/api/v1/accounts/register/](http://localhost:8000/api/v1/accounts/register/) . Here you need to register yourself first in order to access the routes.
+
+#### Admin Panel:
+
+- Admin Panel has the functionality to have access over all the Entries and Users. Do check it out to have more control over the api. [Admin Panel](http://localhost:8000/admin)
 
 ### Configuration
 
-- Modify the project settings in `settings.py` as needed, such as database settings, static files, etc. If hosted, remember to add the host address in the setting.py file.
+- Modify the project settings in `settings.py` as needed, such as database settings, static files, etc. If hosted, remember to add the host address in the `setting.py` file.
 
 ## Running the Test Suite
 
@@ -73,5 +77,5 @@ It was developed as a part of the Backend Internship Task for DiveHQ.
 
 ## API Documentation
 
-[Postman Collection](https://documenter.getpostman.com/view/21453554/2s93sjU935)
+[Postman Collection](https://documenter.getpostman.com/view/21453554/2s93sjU935)<br>
 [API Documentation (.md)](./APIDocumention.md)
