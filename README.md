@@ -42,6 +42,6 @@ Using the [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github
 3. Using GitHub Discussions to ask any relevant questions regarding the project
 4. Final submission Checklist:
 - [ &#9745;] SUBMISSION.md in the repository / PR, with:
-  - [ ] commands to set up the repo (dependencies etc.)
-  - [ ] commands to run the test suite
-  - [ ] commands to run the API server
+  - [&#9745; ] commands to set up the repo (dependencies etc.)
+  - [ &#9745;] commands to run the test suite
+  - [ &#9745;] commands to run the API server
