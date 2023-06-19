@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Entry List</title>
+</head>
+<body>
+    <h1>Entry List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Meal</th>
+                <th>Calories</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+            <tr>
+                <td>{{ entry.date }}</td>
+                <td>{{ entry.meal }}</td>
+                <td>{{ entry.calories }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
