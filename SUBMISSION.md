@@ -78,7 +78,7 @@ It was developed as a part of the Backend Internship Task for DiveHQ.
 
 ## API Documentation
 
-[Postman Collection](https://api.postman.com/collections/17375194-b95733eb-afb2-49a0-a1c1-417f71896177?access_key=PMAT-01H393D1Q6GRQJYGZ76EVW8EGF) <br>
+[Postman Collection](https://interstellar-crescent-487348.postman.co/workspace/TICC~f2c8121f-3c6e-4f37-8235-c8fdd6b5a5b4/collection/17375194-b95733eb-afb2-49a0-a1c1-417f71896177?action=share&creator=17375194) <br>
 [Restframework Docs](http://127.0.0.1:8000/doc/) <br>
 [Redoc](http://127.0.0.1:8000/redoc/) <br>
 [To download API documentation in Yaml](http://127.0.0.1:8000/doc.yaml) <br>
