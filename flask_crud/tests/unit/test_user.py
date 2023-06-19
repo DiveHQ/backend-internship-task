@@ -59,3 +59,50 @@ class TestUser(TestBase):
             self.assertEqual(response.status_code, 201)
             self.assertEqual(data['message'], 'New Admin created! Welcome.')
             print("test_register passed")
+
+
+class TestEntries(TestBase):
+    def setUp(self):
+        super().setUp()
+        admin = User.query.filter_by(username='admin').first()
+
+        # Set daily calorie goal for each test
+        response = self.client.post(
+            '/api/settings',
+            json=dict(expected_calories_per_day=2000),
+            headers={'Authorization': f'Bearer {admin.generate_auth_token()}'}
+        )
+        data = response.get_json()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(data['message'], 'User settings created successfully')
+        self.assertEqual(data['settings']['expected_calories_per_day'], 2000)
+
+    def test_create_entry_within_daily_calorie_goal(self):
+        admin = User.query.filter_by(username='admin').first()
+
+        # Create an entry within daily calorie goal
+        response = self.client.post(
+            '/api/entries',
+            json=dict(text='apple', calories=95),
+            headers={'Authorization': f'Bearer {admin.generate_auth_token()}'}
+        )
+        data = response.get_json()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(data['message'], 'Entry created successfully')
+        self.assertEqual(data['entry']['is_below_expected'], True)
+        print("test_create_entry_within_daily_calorie_goal passed")
+
+    def test_create_entry_exceeding_daily_calorie_goal(self):
+        admin = User.query.filter_by(username='admin').first()
+
+        # Create an entry exceeding daily calorie goal
+        response = self.client.post(
+            '/api/entries',
+            json=dict(text='burger', calories=2500),
+            headers={'Authorization': f'Bearer {admin.generate_auth_token()}'}
+        )
+        data = response.get_json()
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(data['message'], 'Entry created successfully')
+        self.assertEqual(data['entry']['is_below_expected'], False)
+        print("test_create_entry_exceeding_daily_calorie_goal passed")

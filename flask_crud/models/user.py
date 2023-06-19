@@ -1,6 +1,9 @@
 from sqlalchemy import Column, String, ForeignKey
 import uuid
+from datetime import datetime, timedelta
+import jwt
 from flask_crud import db
+from flask_crud.config import DevelopmentConfig
 
 def generate_uuid():
     return str(uuid.uuid4())
@@ -22,3 +25,10 @@ class User(db.Model):
                 'name': self.role.name
             } if self.role else None
         }
+    def generate_auth_token(self, expires_in=3600):
+        payload = {
+            'user_id': self.id,
+            'iat': datetime.utcnow(),
+            'exp': datetime.utcnow() + timedelta(seconds=expires_in)
+        }
+        return jwt.encode(payload, DevelopmentConfig.JWT_SECRET_KEY, algorithm='HS256')

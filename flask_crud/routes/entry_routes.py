@@ -44,40 +44,35 @@ def create_entry(user_data):
     except ValidationError as e:
         return jsonify({'message': e.messages}), 400
     try:
-        # check if calories is provided
         if data.get('calories') is None:
-            print(data.get('text'), "data")
-            # get the calories data from Nutritionix API
-            response = nutritionix.search(query=data.get(
-                'text'))
+            response = nutritionix.search(query=data.get('text'))
             data['calories'] = response['branded'][0]['nf_calories']
-            print(data['calories'], "data calories")
-
-        today = datetime.now().date()
-        total_calories_today = calculate_total_calories(current_user_id, today)
 
         user_settings = Setting.query.filter_by(user_id=current_user_id).first()
-        print(total_calories_today, "total_calories_today")
-        print(user_settings.expected_calories_per_day, "user_settings")
-
-        is_below_expected = True
-        if user_settings and user_settings.expected_calories_per_day is not None:
-            is_below_expected = total_calories_today <= user_settings.expected_calories_per_day
-            print(is_below_expected, "is_below_expected")
 
         entry = Entry(
             user_id=current_user_id,
             text=data.get('text'),
             calories=data.get('calories'),
-            is_below_expected=is_below_expected
+            is_below_expected=False  # Set to False initially
         )
         db.session.add(entry)
         db.session.commit()
+
+        # Now calculate the total calories and update is_below_expected
+        today = datetime.now().date()
+        total_calories_today = calculate_total_calories(current_user_id, today)
+
+        if user_settings and user_settings.expected_calories_per_day is not None:
+            is_below_expected = total_calories_today <= user_settings.expected_calories_per_day
+            entry.is_below_expected = is_below_expected
+            db.session.commit()
 
         return jsonify({'message': 'Entry created successfully', 'entry': entry.to_dict()}), 201
     except Exception as e:
         print(f'An error occurred: {e}')
         return jsonify({'message': 'Create Entry Failed'}), 500
+
 
 @entry_blueprint.route('/entries', methods=['GET'])
 @token_required
@@ -157,7 +152,8 @@ def update_entry(user_data, entry_id):
     current_user_id = user_data.id
     data = request.get_json()
 
-    entry = Entry.query.get(entry_id)
+    # entry = Entry.query.get(entry_id)
+    entry = db.session.get(Entry, entry_id)
     if not entry or (entry.user_id != current_user_id and (user_data.role.name != 'admin')):
         return jsonify({'message': 'Entry not found'}), 404
 
@@ -186,7 +182,8 @@ def update_entry(user_data, entry_id):
 @token_required
 def delete_entry(user_data, entry_id):
     current_user_id = user_data.id
-    entry = Entry.query.get(entry_id)
+    # entry = Entry.query.get(entry_id)
+    entry = db.session.get(Entry, entry_id)
     if not entry or (entry.user_id != current_user_id and user_data.role.name != 'admin'):
         return jsonify({'message': 'Entry not found'}), 404
 
@@ -204,7 +201,8 @@ def get_user_from_token(token):
     except:
         return jsonify({'message': 'Token is invalid!'}), 401
 
-    user = User.query.get(user_id)
+    # user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         return jsonify({'message': 'User not found!'}), 401
 

@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import jsonify, request
-from flask_crud import create_app
+from flask_crud import create_app, db
 from flask_crud.models.user import User
 import jwt
 from functools import wraps
@@ -62,7 +62,8 @@ def get_user_from_token(token):
     except:
         return jsonify({'message': 'Token is invalid!'}), 401
 
-    user = User.query.get(user_id)
+    # user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         return jsonify({'message': 'User not found!'}), 401
     

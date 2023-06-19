@@ -58,7 +58,7 @@ def register_user_manager():
         return jsonify({'message': e.messages}), 400
 
     try:
-        create_user(data['username'], data['password'], 'regular_user')
+        create_user(data['username'], data['password'], 'user_manager')
         return jsonify({'message': 'New User Manager created! Welcome.'}), 201
     except IntegrityError:
         return jsonify({'message': 'Username already exists.'}), 400
@@ -158,7 +158,8 @@ def get_user(user_data, user_id):
     if user_data.role.name == 'regular_user' and user_data.id == user_id:
         return jsonify(user=user_data.to_dict()), 200
     try:
-        user = User.query.get(user_id)
+        # user = User.query.get(user_id)  deprecated
+        user = db.session.get(User, user_id)
         if user is None:
             return jsonify(message="User not found"), 404
         return jsonify(user=user.to_dict()), 200
@@ -179,7 +180,8 @@ def update_user(user_data, user_id):
             data = schema.load(data)
         except ValidationError as e:
             return jsonify({'message': e.messages}), 400
-        user = User.query.get(user_id)
+        # user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if user is None:
             return jsonify(message="User not found"), 404
         for key, value in data.items():
@@ -197,7 +199,8 @@ def delete_user(user_data, user_id):
     if (user_data.role.name != 'admin' and user_data.role.name != 'user_manager') and user_data.id != user_id:
         return jsonify({'message': 'You are not authorized to access this resource.'}), 403
     try:
-        user = User.query.get(user_id)
+        # user = User.query.get(user_id)
+        user = db.session.get(User, user_id)
         if user is None:
             return jsonify({'message': 'User not found'}), 404
         

@@ -45,12 +45,16 @@
 
 - [ ] **Write Tests**
 
-  - [ ] Write unit tests to cover core calorie logic
+  - [x] Write unit tests to cover core calorie logic
   - [ ] Write end-to-end tests to validate overall functionality
 
 - [ ] **Documentation and Code Quality**
 
   - [ ] Document assumptions, choices, and code references
+  [SQLAlchemy V2](https://stackoverflow.com/questions/75365194/sqlalchemy-2-0-version-of-user-query-get1-in-flask-sqlalchemy)
+  [Nutritionix API Wrapper](https://github.com/leetrout/python-nutritionix)
+  [Flask Blueprint Testing](https://stackoverflow.com/questions/19962485/flask-blueprint-unit-testing)
+  [Using Sqlite in Flask](https://www.digitalocean.com/community/tutorials/how-to-use-an-sqlite-database-in-a-flask-application)
 
 - [ ] **GitHub Flow**
 
@@ -67,7 +71,7 @@ import urllib.parse
 
 
 
-
+-[x] **Folder Structure**
 .
 ├── README.md
 ├── create_tables.py
