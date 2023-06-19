@@ -51,10 +51,14 @@ class IsUserManager(BasePermission):
 def all_entries(request):
     entries = Entry.objects.all()
 
-    # Filter entries based on query parameters
     query = request.GET.get("query")
+    date = request.GET.get("date")
+    # Filter entries based on query parameters
     if query:
         entries = entries.filter(text__icontains=query)
+    # Filter entries by date if provided
+    if date:
+        entries = entries.filter(date=date)
 
     # Apply pagination
     paginator = PageNumberPagination()
@@ -73,10 +77,14 @@ def all_entries(request):
 def all_users(request):
     users = User.objects.all()
 
-    # Filter entries based on query parameters
     query = request.GET.get("query")
+    role = request.GET.get("role")
+    # Filter users based on query parameters
     if query:
         users = users.filter(username__icontains=query)
+    # Filter users by role if provided
+    if role:
+        users = users.filter(role=role)
 
     # Apply pagination
     paginator = PageNumberPagination()

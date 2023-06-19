@@ -3,10 +3,12 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Entry
 from .serializers import EntrySerializer
-from rest_framework.permissions import BasePermission
+
+# from rest_framework.permissions import BasePermission
 
 from django.contrib.auth import get_user_model
-from accounts.serializers import UserSerializer
+
+# from accounts.serializers import UserSerializer
 from . import calories_calculator
 from rest_framework.pagination import PageNumberPagination
 
@@ -17,9 +19,21 @@ User = get_user_model()
 @permission_classes([IsAuthenticated])
 def entry_list(request):
     if request.method == "GET":
+        date = request.GET.get("date")
+
         entries = Entry.objects.filter(user=request.user)
-        serializer = EntrySerializer(entries, many=True)
-        return Response(serializer.data)
+
+        # Filter entries by date if provided
+        if date:
+            entries = entries.filter(date=date)
+
+        # Apply pagination
+        paginator = PageNumberPagination()
+        paginator.page_size = 5  # Set the number of entries per page
+        paginated_entries = paginator.paginate_queryset(entries, request)
+
+        serializer = EntrySerializer(paginated_entries, many=True)
+        return paginator.get_paginated_response(serializer.data)
     elif request.method == "POST":
         serializer = EntrySerializer(data=request.data)
         if serializer.is_valid():
