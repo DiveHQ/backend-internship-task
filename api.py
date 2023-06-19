@@ -60,20 +60,27 @@ def authenticate(role):
 
 # Placeholder functions
 def get_calories_from_api(text):
-    # Placeholder implementation to get calories from an API
-    return 0
+    # Replace with your implementation to get calories from an API
+    response = requests.get(f'https://your-api-url.com/calories?text={text}')
+    if response.status_code == 200:
+        data = response.json()
+        calories = data.get('calories', 0)
+        return calories
+    else:
+        return 0
 
 def get_total_calories_for_day(user_id, date):
-    entries = CalorieEntry.query.filter_by(user_id=user_id, date=date).all()
-    total_calories = sum(entry.calories for entry in entries)
-    return total_calories
+    # Replace with your implementation to get the total calories for a user on a specific day
+    total_calories = CalorieEntry.query.with_entities(db.func.sum(CalorieEntry.calories)).filter_by(user_id=user_id, date=date).scalar()
+    return total_calories or 0
 
 def get_expected_calories(user_id):
-    # Placeholder implementation to get the expected calories for a user
+    # Replace with your implementation to get the expected calories for a user
     user = User.query.get(user_id)
     if user:
-        return user.expected_calories
-    return 0
+        return user.expected_calories or 0
+    else:
+        return 0
 
 def get_user_id_from_token():
     auth_header = request.headers.get('Authorization')
@@ -177,8 +184,8 @@ def create_entry():
 def get_entry(entry_id):
     user_id = get_user_id_from_token()
 
-    entry = CalorieEntry.query.get(entry_id)
-    if not entry or entry.user_id != user_id:
+    entry = CalorieEntry.query.filter_by(id=entry_id, user_id=user_id).first()
+    if not entry:
         return jsonify({'message': 'Entry not found'}), 404
 
     entry_data = {
