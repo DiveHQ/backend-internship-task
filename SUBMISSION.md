@@ -83,3 +83,11 @@ It was developed as a part of the Backend Internship Task for DiveHQ.
 [Redoc](http://127.0.0.1:8000/redoc/) <br>
 [To download API documentation in Yaml](http://127.0.0.1:8000/doc.yaml) <br>
 [To view API documentation in json](http://127.0.0.1:8000/doc.json) 
+
+
+## Obtaining API Key from calorieNinjas
+
+1. Visit [calorieninjas](https://calorieninjas.com/) and sign up for an account.
+2. After verifying your email, visit [calorieninjas](https://calorieninjas.com/) again and login to your account.
+3. Click on the **API** tab on the left sidebar.
+4. Copy the API key and paste it in the .env file in the project directory.
