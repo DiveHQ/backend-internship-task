@@ -58,7 +58,14 @@ def authenticate(role):
         return wrapper
     return decorator
 
-# Placeholder functions
+# Helper Functions
+def get_user_id_from_token():
+    auth_header = request.headers.get('Authorization')
+    token = auth_header.split(' ')[1]
+    payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+    user_id = payload['user_id']
+    return user_id
+
 def get_calories_from_api(text):
     # Replace with your implementation to get calories from an API
     response = requests.get(f'https://your-api-url.com/calories?text={text}')
@@ -81,13 +88,6 @@ def get_expected_calories(user_id):
         return user.expected_calories or 0
     else:
         return 0
-
-def get_user_id_from_token():
-    auth_header = request.headers.get('Authorization')
-    token = auth_header.split(' ')[1]
-    payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-    user_id = payload['user_id']
-    return user_id
 
 # Routes
 @app.route('/register', methods=['POST'])
@@ -200,5 +200,25 @@ def get_entry(entry_id):
 
     return jsonify(entry_data)
 
+@app.route('/entries', methods=['GET'])
+@authenticate('admin')
+def get_all_entries():
+    entries = CalorieEntry.query.all()
+
+    all_entries = []
+    for entry in entries:
+        entry_data = {
+            'id': entry.id,
+            'user_id': entry.user_id,
+            'date': entry.date.strftime('%Y-%m-%d'),
+            'time': entry.time.strftime('%H:%M:%S'),
+            'text': entry.text,
+            'calories': entry.calories,
+            'is_below_expected': entry.is_below_expected
+        }
+        all_entries.append(entry_data)
+
+    return jsonify(all_entries)
+
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
