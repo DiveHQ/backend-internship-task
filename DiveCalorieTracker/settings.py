@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'users',
     'entries',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -115,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -154,3 +155,5 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS =  True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+API_KEY = os.getenv('API_KEY')

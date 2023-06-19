@@ -43,7 +43,7 @@ class CreateEntryView(APIView):
         data['user'] = user_id
         data.pop('user_id')
         if 'calories' not in data:
-            try:
+            try:     
                 data['calories'] = get_calories_from_api(data['text'])
             except:
                 return Response({'detail': 'Unable to get calories from API'}, status=status.HTTP_400_BAD_REQUEST)
