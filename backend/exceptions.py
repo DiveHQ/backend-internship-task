@@ -1,6 +1,7 @@
 from rest_framework.exceptions import JsonResponse
 from rest_framework.views import exception_handler, status
 
+from .settings import DEBUG
 from .utils.createResponse import buildResponse, createResponse
 
 
@@ -11,19 +12,34 @@ def custom_exception_handler(exc, context):
 
     response = exception_handler(exc, context)
 
-    return (
-        createResponse(
-            message=exc.detail,
+    if response:
+        # if error is given as a dictionary of erraneous properties as keys and
+        # values as list
+        if isinstance(exc.detail, dict):
+            # merge the nested errors in a flattened string message
+            message = []
+            for key in exc.detail.keys():
+                message += [
+                    f"{key}: {', '.join(exc.detail[key]) if isinstance(exc.detail[key], list) else exc.detail[key]}"
+                ]
+            message = "; ".join(message)
+        # else error is given just as an exception
+        else:
+            message = exc.detail
+        # return the formatted response
+        return createResponse(
+            message=message,
             success=False,
             status_code=exc.status_code,
         )
-        if response is not None
-        else createResponse(
+
+    # if not on DEBUG mode, ie in PRODUCTION , return a generic error message
+    elif not DEBUG:
+        createResponse(
             message="Something went wrong",
             success=False,
             status_code=500,
         )
-    )
 
 
 def handleNotFound(request, exception):
