@@ -1,24 +1,24 @@
 ## 1. Following instruction are given for Unix/MacOs , for windows refer here:https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/
-## Installing Pip
+### Installing Pip
 ```bash
 python3 -m pip install --user --upgrade pip
 ```
-## Setting up virtual environment
-# Install venv
+### Setting up virtual environment
+### Install venv
 ```bash
 python3 -m pip install --user virtualenv
 ```
-# Creating virtual environment
+### Creating virtual environment
 ```bash
 python3 -m venv <venv name>
 ```
-# Activate & Deactivate virtual environment
+### Activate & Deactivate virtual environment
 ```bash
 source <venv_name>/bin/activate
 source <venv_name>/bin/deactivate
 ```
 ## Installing Dependencies
-# Inside virtual environment
+### Inside virtual environment
 ```bash
 pip install flask python-dotenv requests flask-jwt-extended validators os
 ```
