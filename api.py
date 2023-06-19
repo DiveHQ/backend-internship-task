@@ -7,13 +7,14 @@ from datetime import datetime, timedelta
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from flask_cors import CORS
+import config # Import the config.py file
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 migrate = Migrate(app, db)
-CORS(app)
+CORS(app, headers=app.config['CORS_HEADERS'])
 
 # Database Models
 class User(db.Model):
