@@ -12,6 +12,7 @@ def register():
     email = request.json['email']
     password = request.json['password']
     role = request.json['role']
+    expected_calories = request.json['expected_calories']
 
     if len(password) < 6:
         return jsonify({'error': "Password is too short"}), 400
@@ -32,7 +33,7 @@ def register():
     
 
     pwd_hash=generate_password_hash(password)
-    user=User(username=username, password=pwd_hash, email=email, role=role)
+    user=User(username=username, password=pwd_hash, email=email, role=role, expected_calories=expected_calories)
 
     db.session.add(user)
     db.session.commit()
