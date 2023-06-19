@@ -1,6 +1,7 @@
 Flask==2.3.2
 Flask-SQLAlchemy==3.0.3
 requests==2.26.0
+Flask-JWT-Extended==4.3.0
 python-dotenv==0.19.1
 PyJWT
 marshmallow==3.13.0
