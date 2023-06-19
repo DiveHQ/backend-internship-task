@@ -64,11 +64,15 @@ def get_calories_from_api(text):
     return 0
 
 def get_total_calories_for_day(user_id, date):
-    # Placeholder implementation to get the total calories for a user on a specific day
-    return 0
+    entries = CalorieEntry.query.filter_by(user_id=user_id, date=date).all()
+    total_calories = sum(entry.calories for entry in entries)
+    return total_calories
 
 def get_expected_calories(user_id):
     # Placeholder implementation to get the expected calories for a user
+    user = User.query.get(user_id)
+    if user:
+        return user.expected_calories
     return 0
 
 def get_user_id_from_token():
