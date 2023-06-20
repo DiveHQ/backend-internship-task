@@ -10,4 +10,6 @@ urlpatterns = [
     path("profile/", views.UserProfile.as_view()),
     # refresh and verify token
     path("refresh/", views.RefreshToken.as_view(), name="token_refresh"),
+    # user settings
+    path("settings/", views.UserSettingView.as_view(), name="user-settings"),
 ]

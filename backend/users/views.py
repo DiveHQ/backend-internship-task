@@ -1,6 +1,16 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status
-from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import (
+    CreateAPIView,
+    GenericAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
+from rest_framework.mixins import (
+    CreateModelMixin,
+    RetrieveModelMixin,
+    UpdateModelMixin,
+)
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -8,9 +18,9 @@ from rest_framework_simplejwt.views import (
 
 from backend.utils.createResponse import createResponse
 
-from .models import User
-from .permissions import IsSameUser
-from .serializers import UserSerializer
+from .models import User, UserSettings
+from .permissions import IsSameUser, IsUserManager
+from .serializers import UserSerializer, UserSettingsSerializer
 
 
 class UserProfile(RetrieveUpdateDestroyAPIView):
@@ -18,7 +28,6 @@ class UserProfile(RetrieveUpdateDestroyAPIView):
     Retrieve, or modify a user's profile.
     """
 
-    queryset = User.objects.all()
     permission_classes = [IsAuthenticated, IsSameUser]
     serializer_class = UserSerializer
 
@@ -95,3 +104,35 @@ class RefreshToken(TokenRefreshView):
                 status_code=response.status_code,
             )
         return super().finalize_response(request, response, *args, **kwargs)
+
+
+class ElevatedUserView(RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, or modify a user's profile.
+    Only for managers and admins.
+    """
+
+    permission_classes = [IsUserManager | IsAdminUser]
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    filter_backends = [DjangoFilterBackend]
+
+
+class UserSettingView(
+    GenericAPIView,
+    CreateModelMixin,
+    RetrieveModelMixin,
+    UpdateModelMixin,
+):
+    """Viewset for creating, retrieving and updating user settings."""
+
+    queryset = UserSettings.objects.all()
+    serializer_class = UserSettingsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Allow access to only the settings of the request user."""
+        return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

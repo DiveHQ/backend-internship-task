@@ -39,7 +39,11 @@ def root(request):
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # user routes
     path("user/", include("backend.users.urls")),
+    # tracker routes
+    path("tracker/", include("backend.tracker.urls")),
+    # documentation
     path("docs/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "docs/swagger/",

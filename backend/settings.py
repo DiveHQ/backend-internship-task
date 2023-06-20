@@ -13,10 +13,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 
+import dj_database_url
+
 from .environment import env
-
-# import dj_database_url
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,8 +79,8 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",
     ],
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 5,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "PAGE_SIZE": 6,
     # "DEFAULT_PARSER_CLASSES": [
     #     "rest_framework.parsers.JSONParser",
     #     "rest_framework.parsers.MultiPartParser",
@@ -156,13 +155,21 @@ DATABASES = {
 }
 
 # set production postgres configuration if deployed
-# if not DEBUG:
-#     DATABASES = {
-#         "default": dj_database_url.config(
-#             default=env.get("POSTGRES_URL"),
-#             conn_max_age=600,
-#         )
-#     }
+if not DEBUG:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=env.get("POSTGRES_URL"),
+            conn_max_age=600,
+        )
+    }
+
+NUTRITIONIX = {
+    "API_URL": env.get("NUTRITIONIX_API_URL"),
+    "HEADERS": {
+        "x-app-id": env.get("NUTRITIONIX_APP_ID"),
+        "x-app-key": env.get("NUTRITIONIX_APP_KEY"),
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

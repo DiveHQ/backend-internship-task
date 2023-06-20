@@ -10,7 +10,9 @@ def buildResponse(*, message, data={}, success=True):
     }
 
 
-def createResponse(*, message, data={}, success=True, status_code=status.HTTP_200_OK):
+def createResponse(
+    *, message, data={}, success=True, status_code=status.HTTP_200_OK
+):
     return Response(
         buildResponse(message=message, data=data, success=success),
         status=status_code,
