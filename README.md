@@ -1,47 +1,70 @@
 ## ![Dive logo](https://user-images.githubusercontent.com/424487/219708981-f0416526-ba48-4b01-b5b3-c0eb73362718.png) Dive 
-<!-- ![Company Logo](https://example.org) -->
 
-| Octernship info  | Timelines and Stipend |
-| ------------- | ------------- |
-| Assignment Deadline  | 19th June 2023  |
-| Octernship Duration  | 3rd July 2023 - 3rd October 2023 |
-| Monthly Stipend  | $500 USD  |
+## Deployment
+The application is deployed on Vercel: `https://api-calories-drf.vercel.app`
 
-## Assignment
+## About
+
+This repository is a Calorie Tracker Web Application built using Django Rest Framework and SQLite3 database.The application allows users to enters their meals and thereby manage their calorie intake. The application also allows managers to keep track of their users <br>
+It was developed as a part of the Backend Internship Task for DiveHQ for the Github Octernship program.
+
+## Features
+1. Sign up/ Sign in to the Web Application
+2. Mantain Calorie intake
+3. Set Goals
+4. Managers can access their users meals
+5. Get Calorie intakes for meals without knowing it
+6. Create, Update , See and Delete meal entries
+
+## Repository Setup
+
+1. Clone the repository to your local machine:
+
+   ```
+   $ git clone <repository-url>
+   ```
+
+2. Navigate to the project directory and change into the backend directory:
+
+   ```
+   $ cd <directory>
+   ```
+
+3. Create and activate a virtual environment (optional but recommended):
+
+   ```
+   $ poetry install
+   ```
+
+4. Install the required dependencies and setup database:
+
+   ```
+   $ poetry run ./build.sh
+   ```
+
+5. Startup the server:
+
+   ```
+   $ poetry run ./manage.py runserver
+   ```
+
+6. (Optional) Create a superuser to access the admin interface:
+
+   ```
+   $ poetry run ./manage.py createsuperuser
+   ```
+
+8. Open web browser and visit [http://localhost:8000/](http://localhost:8000/) to access the project.
 
 
-# Write a REST API for the input of calories in Python
+9. Go to visit [http://localhost:8000/user/register](http://localhost:8000/user/register) to create an account. Only authenticated Users can access the web app
 
-### Task Instructions
-- API Users must be able to create an account and log in.
-- All API calls must be authenticated.
-- Implement at least three roles with different permission levels: a regular user would only be able to CRUD on their owned records, a user manager would be able to CRUD only users, and an admin would be able to CRUD all records and users.
-- Each entry has a date, time, text, and number of calories.
-- If the number of calories is not provided, the API should connect to a Calories API provider (for example, https://www.nutritionix.com) and try to get the number of calories for the entered meal.
-- User setting – Expected number of calories per day.
-- Each entry should have an extra boolean field set to true if the total for that day is less than the expected number of calories per day, otherwise should be false.
-- The API must be able to return data in the JSON format.
-- The API should provide filter capabilities for all endpoints that return a list of elements, as well should be able to support pagination.
-- Write unit and e2e tests.
-- Use any *Python* web framework
-- Use *SQLite* as the database
+10. Use [http://localhost:8000/tracker/](http://localhost:8000/tracker/) to create and view entries.
 
-### Task Expectations
-- API Design Best Practices
-- Documentation of any assumptions or choices made and why
-- Links as citation to any article / code referred to or used
-- Unit tests covering the core calories logic
-- Appropriate exception handling and error messages
-- Code Quality - remove any unnecessary code, avoid large functions
-- Good commit history - we won’t accept a repo with a single giant commit 🙅‍♀️
-
-### Task submission
-Using the [GitHub Flow](https://docs.github.com/en/get-started/quickstart/github-flow#following-github-flow) for assignment submission
-1. Creating a new branch 
-2. Raising a Pull Request for submission
-3. Using GitHub Discussions to ask any relevant questions regarding the project
-4. Final submission Checklist:
-- [ ] SUBMISSION.md in the repository / PR, with:
-  - [ ] commands to set up the repo (dependencies etc.)
-  - [ ] commands to run the test suite
-  - [ ] commands to run the API server
+## Running the API Server Locally
+- Run the following command to start the API server:
+    ```
+    $ python manage.py runserver 8000
+    ``` 
+    The API server will start, and you can access it at http://localhost:8000/ in your web browser.
+    Make sure to replace 8000 with the appropriate port number if you have configured a different port for your Django project.
